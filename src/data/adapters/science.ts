@@ -22,13 +22,16 @@ export const scienceAdapter: LayerAdapter = {
   credit: 'Positions NASA/JPL-Caltech; narrative by MARSWALK',
   sourceUrl: 'https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/',
   sourceNote:
-    'Five ranked sampling stations across the boxwork network, ordered up-slope. Task times are crew-rehearsed estimates including drill setup and sample handoff.',
+    'Six sampling stations, each pinned to a position Curiosity was actually surveyed at on the ' +
+    'sol given — the coordinates and quoted elevations are measured, not placed by eye. Ordered ' +
+    'by sol, which here is also ascending elevation: Glen Torridon (2300) up to the boxwork ' +
+    'region (4893). The station titles and the task-time estimates are ours, not NASA’s.',
   defaultVisible: true,
   defaultOpacity: 1,
   mapRenderable: true,
   legend: {
     type: 'points',
-    note: 'Ordered BX-01 through BX-05. The planner solves the traverse in this order; drag a waypoint off the list to drop it from the EVA.',
+    note: 'Ordered GT-01 through BX-06. The planner solves the traverse in this order; drop a station from the list to take it out of the EVA.',
   },
   async load(): Promise<LayerData> {
     return { type: 'points', points: getSciencePoints(), bounds: { ...BOUNDS_M } };
