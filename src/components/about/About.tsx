@@ -299,6 +299,23 @@ export function About() {
           </ul>
         </Panel>
 
+        <Panel title="Accessibility">
+          <ul className="space-y-1.5">
+            {[
+              'No state is signalled by colour alone. A walk-back violation is red, heavier AND dotted on the map, stated in words on the station card, and read out in the click-inspect panel.',
+              'GO / NO-GO carries a text verdict and a count of violations, not just a green or red dot.',
+              'Every interactive control shows a visible focus ring, and the whole app is reachable by keyboard: 1-5 switch modes, G runs the guided demo, M measure, W the return-to-safety field, L the layer rail, Esc cancels.',
+              'A reduced-motion preference is respected: pulses, blinks and transitions stop. The guided demo still advances, because its captions are information rather than decoration.',
+              'Panels are labelled landmarks, icon-only controls carry names, and every image has descriptive alt text - including the rover frames and the NASA reference figure.',
+              'Numbers are set in a tabular monospace face so columns align and digits do not shift between readings.',
+            ].map((l, i) => (
+              <li key={i} className="text-[11px] leading-relaxed text-ink-dim pl-2 border-l border-line">
+                {l}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+
         <Panel title="Credits and compliance">
           <p className="text-[11px] leading-relaxed text-ink-dim">
             Data: NASA/JPL-Caltech, NASA/JPL-Caltech/University of Arizona (HiRISE), NASA/JPL-Caltech/MSSS

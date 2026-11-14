@@ -287,6 +287,50 @@ export function Briefing() {
           </Panel>
         </div>
 
+        <Panel title="Reference — NASA's proposed path up Mount Sharp">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3">
+            <figure className="m-0">
+              <img
+                src={(import.meta.env.BASE_URL || '/') + 'data/reference/proposed-path.jpg'}
+                alt={
+                  'NASA oblique illustration of lower Mount Sharp. Coloured bands mark the clay-bearing unit in green, ' +
+                  'the Greenheugh Pediment in cyan, the Gediz Vallis Ridge in red and the sulfate-bearing unit in yellow, ' +
+                  "with Curiosity's proposed route drawn as a white line climbing between them."
+                }
+                loading="lazy"
+                className="w-full rounded-[2px] border border-line"
+              />
+              <figcaption className="text-[10px] text-ink-faint leading-relaxed mt-1.5">
+                NASA/JPL-Caltech. Oblique illustration built from HiRISE, CTX, CRISM and HRSC data.
+              </figcaption>
+            </figure>
+            <div>
+              <p className="text-[11px] leading-relaxed text-ink-dim">
+                This is the figure that names the units this EVA visits. It is shown here as context and
+                nothing more: it is an oblique perspective render with no map projection and no published
+                georeferencing control points, so it cannot be overlaid on the planner and was never traced
+                to produce the science-region corridors.
+              </p>
+              <p className="text-[11px] leading-relaxed text-ink-dim mt-2">
+                What it did contribute is the naming and the sol windows — which part of the mission worked
+                which unit. The corridors themselves are built from Curiosity&rsquo;s surveyed positions, which do
+                have coordinates.
+              </p>
+              <div className="flex items-center gap-2 mt-2.5">
+                <Badge tone="nominal">REAL</Badge>
+                <a
+                  href="https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="num text-[10px] text-probe-400 underline decoration-dotted"
+                >
+                  NASA resource ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </Panel>
+
         <Panel title="Science target package">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {getSciencePoints().map((p) => {

@@ -40,8 +40,12 @@ the forecast solar particle event, slope and hazard underfoot.
 **BRIEFING** — objective, crew, a Gantt timeline built from the solved plan, conditions at egress /
 mid-EVA / ingress.
 
-**DATA** — every source, its provenance tag, its link, and the sources we checked and rejected with
-the reason.
+**DATA** — every source, its provenance tag, its link, the sources we checked and rejected with the
+reason, and the accessibility notes.
+
+**Mission AI** — a panel in PLAN that answers questions about the plan on screen in plain language:
+*why is this GO, explain the walk-back, where should the habitat land, what changes with the rover,
+how much of this is real.* It explains; it does not compute. See [Mission AI](#mission-ai) below.
 
 A **Guided demo** button auto-plays a 60-second tour of all of it — layers, the GO verdict, the
 walk-back failure, rover mode, 3D and the visor — and restores the state it started from when it
@@ -76,6 +80,47 @@ possible. It is 17.07 km on foot and needs 11.44 h of consumables against an 8 h
 assistance takes it from five flight-rule violations to three, but does not make it legal. The
 default plan is therefore the lower three stations; the upper ones are one click away and correctly
 come back NO-GO.
+
+---
+
+## Mission AI
+
+A planner that outputs a verdict and six numbers still needs someone to read it. The **Mission AI**
+panel answers questions about the plan currently on screen — in whichever language they are asked.
+
+It runs on one of **two engines**, and the panel's badge always says which one answered:
+
+| Badge | Engine | Availability |
+|---|---|---|
+| `local analyst` | Deterministic analysis in the browser | Always. No install, no network, no model. |
+| `llama3.2:3b` | A local language model via `/api/mission-assistant` | When that endpoint is reachable. |
+
+### The model does not calculate
+
+Every distance, duration, consumable figure, walk-back margin, dose and GO/NO-GO verdict is computed
+by `lib/planner.ts` and `lib/missionInsights.ts`. The assistant is handed those results and asked to
+explain them. That is enforced in three places:
+
+1. `buildAssistantContext()` is the **only** thing the model receives. A number that is not in that
+   object is a number the model does not have.
+2. The system prompt tells the model to quote the supplied figures exactly and to answer "not
+   computed" rather than estimate.
+3. The deterministic answer is computed first, every time, and sent along as **ground truth** — the
+   model is asked to improve the wording, never the numbers.
+
+So when the model is unreachable the numbers do not change; only the prose gets plainer. The
+fallback is not a degraded mode, it is the same answer written by a simpler author. This matters for
+a data-provenance challenge: an assistant that did its own arithmetic would be a fourth provenance
+class nobody could audit.
+
+**The published site always shows `local analyst`.** GitHub Pages serves static files and runs no
+server code, and no cloud function could reach an Ollama on a laptop anyway. To demo the model, run
+`npm run dev` on the same machine as Ollama — setup in [`AI_SETUP.md`](./AI_SETUP.md).
+
+One thing the assistant adds rather than explains: asked where the habitat should land, it searches
+the real DEM — every candidate cell on a 9-cell stride, scored on mean slope, local relief, walkable
+neighbourhood and distance to the science centroid, keeping the best few at least 700 m apart. That
+is a DERIVED result and labelled as one.
 
 ---
 
@@ -178,7 +223,9 @@ npm run dev
 npm run build
 ```
 
-Node 20+. The build is fully static: no backend, no API keys, nothing to deploy server-side.
+Node 20+. The build is fully static: no backend, no API keys, nothing to deploy server-side. The
+`api/` endpoint is optional — it only adds the local-model engine for Mission AI, and the app is
+complete without it. See [`AI_SETUP.md`](./AI_SETUP.md).
 
 ## Deploy
 
@@ -222,15 +269,45 @@ src/
     models/        the MODELED environment series
   lib/
     geo.ts         the AOI frame; planner.ts A* + Dijkstra + mobility models
+    missionInsights.ts  DERIVED analysis + the deterministic analyst
+    missionAI.ts   engine detection, the two-engine ask, the daily cap
     png.ts         canvas PNG decode; raster.ts sampling and colour ramps
-  components/      map / plan / three / hud / briefing / about / ui
+  components/      map / plan / three / hud / briefing / about / ai / ui
   store/           single Zustand store
+api/
+  mission-assistant.ts  optional Ollama bridge — no mission arithmetic in it
 ```
 
 Adding a layer means writing an adapter and pushing it into `LAYER_REGISTRY`. The adapter's legend
 is the single source of colour truth — `lib/layerImage.ts` renders any grid layer from its legend
 stops, so the 2D map and the 3D drape cannot disagree, and the DATA page builds itself from the
 registry so it cannot drift out of date.
+
+---
+
+## Accessibility
+
+A console for two displays and a visor has to stay legible to the person reading it, so:
+
+- **Nothing is signalled by colour alone.** Walk-back violations are red *and* switch to a short
+  dash pattern at heavier weight; the legend names the dash, not just the colour. Hazard classes
+  carry their class name in the click readout. GO / NO-GO is a word before it is a colour.
+- **Keyboard throughout.** `1`–`5` switch modes, `G` runs the guided demo, `M` measure, `W` the
+  return-to-safety field, `L` the layer rail, `Esc` cancels. Every control is reachable by `Tab` and
+  draws a visible focus ring (`:focus-visible`, so it does not fire on mouse clicks).
+- **Screen readers.** Landmark roles on the rails and the map, `aria-label` on icon-only controls,
+  `aria-pressed` on the station and layer toggles so state is announced, and `.sr-only` labels on
+  the inputs that are visually labelled by context. The NASA reference figure carries full
+  descriptive alt text.
+- **`prefers-reduced-motion`** removes the fly-through easing, the panel transitions and the guided
+  demo's animated camera; the demo still advances through its beats, it just cuts between them.
+- **`forced-colors`** (Windows high-contrast) is honoured: borders and focus rings switch to system
+  colours instead of disappearing, and the layer legends fall back to their text labels.
+
+Not solved: the 3D terrain and the visor are inherently visual, and a canvas has no accessible
+equivalent for "this slope is 22°" beyond the numeric readouts that accompany them — which is why
+every figure on the HUD is also text in PLAN. The DATA page lists this openly rather than claiming
+a clean bill.
 
 ---
 
@@ -252,7 +329,7 @@ registry so it cannot drift out of date.
 
 - Mosaic a second HiRISE DTM to fill the stereo gaps at the AOI edges.
 - Replace the modelled RAD and REMS series with the PDS tables for a chosen sol.
-- A guided 60-second demo mode and a landing screen.
+- Serve the model engine from a hosted inference API so the published site can use it too.
 - Split an infeasible plan into a two-EVA campaign automatically.
 
 ---

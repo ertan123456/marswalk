@@ -253,12 +253,20 @@ export function MapView() {
     const flush = () => {
       if (run.length < 2) return;
       const color = runOk ? (runMode === 'rover' ? '#5ad6e8' : '#ff8f4d') : '#ef4444';
+      // Walk-back failure must not be signalled by colour alone: a violating
+      // stretch also gets a distinct heavy dash, readable without colour
+      // vision, and the stations list states it in words.
+      const dash = !runOk
+        ? '2 6'
+        : runMode === 'foot' && plan.mobility === 'rover'
+          ? '5 4'
+          : undefined;
       L.polyline(run, {
         pane: 'route',
         color,
-        weight: runMode === 'rover' ? 4 : 2.6,
+        weight: runOk ? (runMode === 'rover' ? 4 : 2.6) : 4.5,
         opacity: 0.95,
-        dashArray: runMode === 'foot' && plan.mobility === 'rover' ? '5 4' : undefined,
+        dashArray: dash,
       }).addTo(group);
       L.polyline(run, { pane: 'route', color, weight: 9, opacity: 0.14 }).addTo(group);
     };

@@ -70,7 +70,7 @@ export function ElevationProfileChart({ plan }: { plan: RoutePlan }) {
         series={[
           { label: 'Ground profile', color: '#ff8f4d' },
           { label: 'Station', color: '#ffb27a' },
-          { label: 'Past walk-back limit', color: '#ef4444' },
+          { label: 'Past walk-back limit (dotted on map)', color: '#ef4444' },
         ]}
       />
     </div>

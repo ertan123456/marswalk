@@ -161,3 +161,56 @@ input[type="range"]::-moz-range-thumb {
 .categorical-overlay {
   image-rendering: pixelated;
 }
+
+/* Visually hidden, still announced by screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- accessibility --- */
+
+/*
+ * A visible focus ring on every interactive element. The mission-control look
+ * must not cost a keyboard user the ability to see where they are.
+ */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-probe-400);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/*
+ * Respect a reduced-motion preference. The guided demo still advances - it is
+ * information, not decoration - but nothing animates, pulses or blinks.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .pulse-ring::after,
+  .blink {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Honour a forced-colours / high-contrast mode rather than fighting it. */
+@media (forced-colors: active) {
+  .leaflet-container,
+  canvas {
+    forced-color-adjust: none;
+  }
+}

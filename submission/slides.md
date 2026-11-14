@@ -1,4 +1,4 @@
-# MARSWALK — 7-slide outline
+# MARSWALK — 8-slide outline
 
 NASA Space Apps Challenge 2026 · "Interplanetary Survival Guide: Martian Map"
 
@@ -36,8 +36,11 @@ Four displays, one plan underneath:
 - **HUD** — the same plan from inside the helmet
 - **DATA** — every source, every provenance tag, and what we rejected
 
+Plus a **Mission AI** panel that explains the plan in plain language, in whichever language you ask.
+
     The point is that these are not four tools. The visor reads the same plan object the map is
-    showing, so the field view can never drift from the plan.
+    showing, so the field view can never drift from the plan. The assistant reads it too — which is
+    exactly why it is allowed to explain and not to calculate.
 
 ---
 
@@ -73,6 +76,10 @@ Live walkthrough, ~90 seconds. See `demo-script.md` for the 30-second cut.
 3. Add the upper stations → **NO-GO**, and the reason is specific
 4. Switch to rover-assisted → drop-off point appears, 62% consumables left
 5. 3D, then HUD — same plan, crew's eye
+6. Ask Mission AI *"why is this GO?"* — it answers from the planner's own numbers
+
+    Press `G` and all of this auto-plays as a 60-second guided tour, then puts the app back exactly
+    as it was. Useful if the room is noisy or the clock is tight.
 
     If anything breaks, the fallback is the DATA page: it is generated from the live layer
     registry, so it is always current.
@@ -99,7 +106,33 @@ violations to three. It still does not make it legal.
 
 ---
 
-## 6 — Impact
+## 6 — Mission AI, and who can use it
+
+**The assistant explains. The planner computes.**
+
+Ask *"explain the walk-back"* or *"what changes with the rover?"* and you get a plain-language
+answer — but every number in it was computed by the planner and handed over. Three enforcement
+points: the context builder is the only thing the model sees; the prompt forbids estimating; and a
+deterministic answer is generated first and passed as ground truth.
+
+- Two engines, and the badge always says which answered: a deterministic **local analyst** that runs
+  in the browser and always works, or a **local language model** when one is reachable
+- The published static site has no server, so it shows `local analyst` — *and the numbers are
+  identical*. The fallback is the same answer in plainer prose, not a degraded one.
+
+    An assistant that did its own arithmetic would be a fourth provenance class that nobody could
+    audit. That is why it is wired this way, and why the panel says so on screen.
+
+**Usable by more people:** nothing is signalled by colour alone — walk-back violations are red *and*
+dashed, and the legend names the dash. Full keyboard operation with visible focus. Landmark roles,
+`aria-pressed` state, described images. `prefers-reduced-motion` and Windows high-contrast honoured.
+
+    And we list what is *not* solved: a 3D canvas has no accessible equivalent, which is why every
+    figure on the visor is also text in PLAN.
+
+---
+
+## 7 — Impact
 
 **For mission design:** turns "is this traverse safe?" from a judgement call into a number you can
 check, and shows exactly where the margin runs out.
@@ -116,11 +149,13 @@ adapter seam means a different DEM and a different AOI is a config change.
 
 ---
 
-## 7 — Team
+## 8 — Team
 
 _(names, roles, affiliation)_
 
 **Built with:** Vite · React · TypeScript · Leaflet · three.js · Python (numpy, pillow, requests).
+Mission AI runs on a local Ollama model, with a deterministic in-browser analyst as the always-on
+engine.
 Claude (Anthropic) as a pair programmer for research, pipeline and application code.
 
 **Data:** NASA/JPL-Caltech · NASA/JPL-Caltech/University of Arizona · NASA/JPL-Caltech/MSSS · USGS.

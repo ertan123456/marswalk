@@ -5,9 +5,10 @@
 Voiceover with the exact on-screen action for each beat. Total 30 s at a steady reading pace
 (~85 words). Timings are cumulative.
 
-**Note on the guided mode:** the automated "Guided demo" button is *not built yet* — it is listed in
-the README under future work. Today a presenter drives these beats by hand, and they are written so
-that is easy. The beat table doubles as the spec for the automated version.
+**Two ways to run it.** A presenter can drive the beats below by hand, or press **`G`** and let the
+app's **Guided demo** auto-play a 60-second tour of the same arc, then restore the state it started
+from. Any input interrupts it. Use the automated tour when the room is noisy or the clock is tight;
+drive it by hand when you want to stop on a beat and answer a question.
 
 ---
 
@@ -35,6 +36,10 @@ that is easy. The beat table doubles as the spec for the automated version.
 - If the 30 seconds has to become 20, cut beats 0:04 and 0:20 and let the GO→NO-GO→rover arc carry
   it. If it can stretch to 45, add: 3D mode, fly-through, then HUD — "and the crew sees the same
   plan from inside the helmet."
+- **If it can stretch to 60, add the assistant.** Type *"why is this GO?"* into the Mission AI panel
+  and read the answer out. The line to land while it types: *"it explains the plan — it doesn't
+  compute it. Every number in that answer came from the planner."* Point at the badge: it says which
+  engine answered.
 
 ## Fallbacks
 
@@ -43,23 +48,35 @@ that is easy. The beat table doubles as the spec for the automated version.
 - **The 3D view is slow on the demo machine:** skip it. Nothing in the 30-second cut needs it.
 - **Asked "is any of this real?":** the DATA page lists every product, its link, and the five
   sources we checked and rejected with reasons. `scripts/sources.json` has the raw probe results.
+- **Asked "does the AI make up the numbers?":** no — and say how it is prevented. The context
+  builder is the only thing the model receives, the prompt forbids estimating, and a deterministic
+  answer is computed first and passed to the model as ground truth. The badge on the published site
+  reads `local analyst` because a static host runs no server code; the numbers are the same either
+  way. `AI_SETUP.md` covers running the model engine locally.
+- **Asked about accessibility:** walk-back violations are dashed as well as red, everything is
+  keyboard-operable (`1`–`5`, `G`, `M`, `W`, `L`, `Esc`) with visible focus, and the DATA page has an
+  Accessibility section that also lists what is *not* solved.
 
 ---
 
-## Beat spec for the automated guided mode
+## The automated guided mode, as built
 
-When the guided demo is built, it should drive the store directly rather than simulating clicks, and
-hold each beat for the duration below.
+`G` or the **Guided demo** button. Ten beats, 60 s, defined in `src/lib/tour.ts`. It drives the
+Zustand store directly rather than simulating clicks, so the captions and the state can never
+disagree; it snapshots the store on entry and restores it on exit; and any user input interrupts it.
 
-| # | Duration | Store action | Caption |
-|---|---|---|---|
-| 1 | 4 s | `setMode('PLAN')`, default layers | "Lower Mount Sharp — real HiRISE terrain and Curiosity's driven path" |
-| 2 | 6 s | `probePoint(centre of AOI)` | "Every layer, at one point, tagged for provenance" |
-| 3 | 5 s | close probe | "Three stations on foot: GO, 30% consumables left" |
-| 4 | 5 s | add GV-04, GV-05, BX-06 | "Six stations: NO-GO, and it says why" |
-| 5 | 4 s | `setShowWalkBack(true)` | "Walk-back: can they still reach safety from here?" |
-| 6 | 4 s | `setSuit({ mobility: 'rover' })` | "Rover-assisted — drop-off where it can't follow" |
-| 7 | 2 s | hold | "Same science, 62% consumables left" |
+| # | Hold | Caption |
+|---|---|---|
+| 1 | 5 s | "Lower Mount Sharp — real HiRISE terrain, and the path Curiosity actually drove" |
+| 2 | 6 s | "Click anywhere: every layer answers, each tagged REAL, DERIVED or MODELED" |
+| 3 | 5 s | "Three stations on foot — 7.92 km, 4:51, 30% of consumables left. GO." |
+| 4 | 6 s | "Add the upper stations and it fails — and it says exactly why" |
+| 5 | 6 s | "Walk-back: at every step, could the crew still reach safety with their reserve?" |
+| 6 | 6 s | "Rover-assisted — barred from steeper ground than the crew, so it drops them off" |
+| 7 | 7 s | "The same terrain in three dimensions, clipped to the real stereo footprint" |
+| 8 | 8 s | "Fly the route the planner solved" |
+| 9 | 7 s | "And the crew sees the same plan from inside the helmet" |
+| 10 | 4 s | "Every number here is computed from real NASA data. The DATA tab shows every source." |
 
-Total 30 s. The mode should be interruptible by any user input, and should restore the store to its
-pre-demo state when it ends.
+Under `prefers-reduced-motion` the tour still advances through every beat; it cuts between them
+instead of easing.

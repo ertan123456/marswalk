@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { apiDevServer } from './vite-api-dev';
 
 // The app is served from the domain root on Vercel, but from a project
 // subpath on GitHub Pages. Everything that loads a static asset goes through
@@ -10,6 +11,6 @@ const base = process.env.PAGES_BASE || '/';
 
 export default defineConfig({
   base,
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), apiDevServer()],
   build: { target: 'es2022', chunkSizeWarningLimit: 1600 },
 });

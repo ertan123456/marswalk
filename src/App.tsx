@@ -35,14 +35,14 @@ function PlanMode() {
     <div className="flex-1 min-h-0 flex">
       {/* left rail — layers */}
       {railOpen && (
-      <aside className="hidden xl:flex w-[320px] shrink-0 border-r border-line flex-col overflow-y-auto p-2 gap-2">
+      <aside aria-label="Data layers and instruments" className="hidden xl:flex w-[320px] shrink-0 border-r border-line flex-col overflow-y-auto p-2 gap-2">
         <LayerPanel />
         <InstrumentCharts />
       </aside>
       )}
 
       {/* map */}
-      <div className="relative flex-1 min-w-0">
+      <main aria-label="Planning map" className="relative flex-1 min-w-0">
         <MapView />
 
         {/* map tools */}
@@ -82,10 +82,10 @@ function PlanMode() {
             )}
           </div>
         )}
-      </div>
+      </main>
 
       {/* right rail — the plan */}
-      <aside className="hidden xl:block w-[380px] shrink-0 border-l border-line overflow-y-auto p-2">
+      <aside aria-label="EVA plan" className="hidden xl:block w-[380px] shrink-0 border-l border-line overflow-y-auto p-2">
         <PlanPanel />
       </aside>
     </div>

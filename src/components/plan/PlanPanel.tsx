@@ -9,6 +9,7 @@ import { useMission } from '../../store/useMission';
 import { Alert, Badge, KeyVal, Panel, Readout } from '../ui/primitives';
 import { ElevationProfileChart, WalkBackChart } from './RouteCharts';
 import { SuitSettings } from './SuitSettings';
+import { MissionAssistant } from '../ai/MissionAssistant';
 
 function GoNoGo() {
   const plan = useMission((s) => s.plan);
@@ -116,6 +117,8 @@ function StationList() {
                 type="button"
                 onClick={() => toggleWaypoint(p.id)}
                 title={inPlan ? 'Drop from the EVA' : 'Add to the EVA'}
+                aria-label={`${inPlan ? 'Remove' : 'Add'} station ${p.code}, ${p.title}`}
+                aria-pressed={inPlan}
                 className={
                   'num text-[10px] mt-[1px] h-[18px] w-[18px] shrink-0 rounded-[2px] border cursor-pointer ' +
                   (inPlan
@@ -149,6 +152,7 @@ function StationList() {
                     onClick={() => moveWaypoint(p.id, -1)}
                     className="text-ink-faint hover:text-ink text-[9px] leading-none px-1 cursor-pointer"
                     title="Earlier in the traverse"
+                    aria-label={`Move ${p.code} earlier in the traverse`}
                   >
                     &#9650;
                   </button>
@@ -157,6 +161,7 @@ function StationList() {
                     onClick={() => moveWaypoint(p.id, 1)}
                     className="text-ink-faint hover:text-ink text-[9px] leading-none px-1 cursor-pointer"
                     title="Later in the traverse"
+                    aria-label={`Move ${p.code} later in the traverse`}
                   >
                     &#9660;
                   </button>
@@ -382,6 +387,8 @@ export function PlanPanel() {
           </ul>
         )}
       </Panel>
+
+      <MissionAssistant />
 
       {plan && plan.samples.length > 1 && (
         <Panel title="Elevation profile">
