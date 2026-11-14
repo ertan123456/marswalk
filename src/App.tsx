@@ -11,6 +11,7 @@ import { InstrumentCharts } from './components/plan/RouteCharts';
 const TerrainView = lazy(() => import('./components/three/TerrainView').then((m) => ({ default: m.TerrainView })));
 const HudView = lazy(() => import('./components/hud/HudView').then((m) => ({ default: m.HudView })));
 const Briefing = lazy(() => import('./components/briefing/Briefing').then((m) => ({ default: m.Briefing })));
+const About = lazy(() => import('./components/about/About').then((m) => ({ default: m.About })));
 import { Button } from './components/ui/primitives';
 import { useMission } from './store/useMission';
 
@@ -122,6 +123,7 @@ export default function App() {
         {mode === '3D' && <TerrainView />}
         {mode === 'HUD' && <HudView />}
         {mode === 'BRIEFING' && <Briefing />}
+        {mode === 'ABOUT' && <About />}
       </Suspense>
     </div>
   );

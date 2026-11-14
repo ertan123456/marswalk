@@ -11,7 +11,7 @@ import type { ProbeResult } from '../lib/probe';
 import { getHabitat, getSciencePoints } from '../data/real/science';
 import { loadTerrain } from '../data/real/terrain';
 
-export type Mode = 'PLAN' | '3D' | 'HUD' | 'BRIEFING';
+export type Mode = 'PLAN' | '3D' | 'HUD' | 'BRIEFING' | 'ABOUT';
 
 export interface LayerState {
   visible: boolean;

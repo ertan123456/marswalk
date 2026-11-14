@@ -1,217 +1,159 @@
-# MARSWALK — Layered EVA Planning Map for Human Mars Explorers
+# MARSWALK — an EVA planning map for the ground Curiosity has actually driven
 
 **NASA Space Apps Challenge 2026 — "Interplanetary Survival Guide: Martian Map"**
 
-A working planning-and-execution tool for a single Mars surface excursion: layer orbital and
-in-situ data over a 4 km × 4 km patch of ground, solve a safe walking route across it, and carry
-that same plan into a first-person helmet display.
+Plan one Mars surface excursion across lower Mount Sharp: layer real orbital and in-situ data over a
+6.77 × 14.62 km strip of Gale Crater, solve a safe route across it, prove the crew can always get
+home, and carry the same plan into a first-person helmet display.
 
-Every layer is currently a **deterministic synthetic stand-in** behind a clean adapter interface.
-Real NASA products drop in behind that interface without a single change to the UI — see
-[DATA_TODO.md](./DATA_TODO.md).
+**Live:** _(add the Vercel URL here after deploying — see [Deploy](#deploy))_
 
 ---
 
-## The scenario
+## The problem
+
+An EVA is not a hike. A crew on Mars has a fixed amount of consumables, no rescue, and a surface
+that is mostly unwalkable. The question a planner has to answer is not "what is the shortest path to
+the science?" but:
+
+> At every single step of this traverse, if something fails right now, can these two people still
+> reach safety with their reserve intact?
+
+That is a different question, and it is the one this tool is built around. Everything else — the
+layers, the 3D view, the visor — exists to support that answer.
+
+## What it does
+
+**PLAN** — the habitat display. Nine toggleable layers with opacity, legend, source and provenance
+tag. Click anywhere and get *every* layer's value at that point, each tagged REAL / DERIVED /
+MODELED. Measure tool cuts an elevation profile between two points.
+
+**3D** — the real DTM as a terrain mesh with any raster draped over it, clipped to the actual stereo
+footprint so no invented cliffs appear. Traverse drawn on it, fly-through along the route.
+
+**HUD** — the same terrain from eye height at 78° field of view: heading tape with a bearing bug,
+distance and ETA to the next station, consumables against the reserve floor, dose accrued, time to
+the forecast solar particle event, slope and hazard underfoot.
+
+**BRIEFING** — objective, crew, a Gantt timeline built from the solved plan, conditions at egress /
+mid-EVA / ingress.
+
+**DATA** — every source, its provenance tag, its link, and the sources we checked and rejected with
+the reason.
+
+### The two things that make it a planner rather than a map
+
+**The walk-back check.** At every one of ~1,000 route samples the crew must be able to abandon the
+EVA on the spot and reach a safe haven with the mandatory reserve untouched. Getting that right
+needs the cost of returning from *anywhere*, not just from the stations, so the planner runs a
+multi-source Dijkstra from every safe haven, relaxing edges in the direction of travel *toward* the
+haven — climbing out and walking back down are not the same cost. Samples past the limit turn red on
+the map, in the elevation profile, on the 3D line and in the visor.
+
+**Mobility modes.** On foot, or rover-assisted. The rover is not simply a faster crew member: it is
+barred from steeper ground than the crew is (15° against 25°) and from broken ground a walker can
+pick through. That asymmetry creates *drop-off points* — the planner drives as far as the rover can
+go, dismounts the crew, walks them in, and treats the waiting rover as a safe haven, because
+reaching it ends the emergency.
+
+| three stations, default plan | distance | duration | consumables left | verdict |
+|---|---|---|---|---|
+| On foot | 7.92 km | 4:51 | 30% | GO |
+| Rover-assisted | 10.20 km | 3:54 | 62% | GO |
+
+The rover route is *longer* — the 15° limit forces real detours around Mount Sharp's flank — and
+still an hour quicker and twice as cheap in consumables.
+
+**A finding worth stating plainly:** walking Curiosity's full six-station traverse in one EVA is not
+possible. It is 17.07 km on foot and needs 11.44 h of consumables against an 8 h budget. Rover
+assistance takes it from five flight-rule violations to three, but does not make it legal. The
+default plan is therefore the lower three stations; the upper ones are one click away and correctly
+come back NO-GO.
+
+---
+
+## The area of interest
 
 | | |
 |---|---|
-| **Location** | Gale Crater, Mount Sharp foothills — the boxwork formations region Curiosity studied in 2025 |
-| **Area of interest** | 4 km × 4 km centred on 4.720° S, 137.403° E, worked on a 512 × 512 grid (7.81 m/post) |
-| **Objective** | Characterise the boxwork vein network: one groundwater episode or several, and where the system terminates up-slope |
-| **Crew** | Two astronauts (EV1 field geologist, EV2 suit systems), optional pressurised rover support |
-| **Habitat** | Graded pad on the low northern bench; the ground climbs ~290 m south toward Mount Sharp |
-| **Targets** | Five ranked sampling stations, BX-01 through BX-05 |
+| **Where** | Gale Crater, lower Mount Sharp — 137.353°E to 137.468°E, 4.676°S to 4.923°S |
+| **Why there** | It is the footprint of the HiRISE stereo DTM that covers Curiosity's real traverse |
+| **Size** | 6.77 × 14.62 km, worked on a 474 × 1024 grid at ~14.3 m/cell |
+| **Relief** | −4406 m to −2271 m on the areoid: 2.13 km of climb |
+| **Ground truth** | 1,039 surveyed rover positions, sols 1167 – 5073 |
+| **Passable** | 58.4% of the AOI is walkable by suited crew; 25.2% has no stereo coverage at all |
 
-Boxwork formations are polygonal networks of resistant mineral veins left behind by groundwater.
-They are the reason this patch of ground is worth walking across, and — because the ridges stand
-proud of eroded bedrock — they are also the reason walking across it is awkward. The whole app is
-built around that tension.
+The six science stations are pinned to positions Curiosity was *actually surveyed at*, each labelled
+with its sol: Glen Torridon clay unit (2300) → Greenheugh Pediment (2700) → sulfate-bearing unit
+(3504) → Gediz Vallis Ridge (3899) → Gediz Vallis Channel (4301) → boxwork region (4893).
 
----
-
-## Four modes
-
-**PLAN** — the habitat display. Toggleable data layers with per-layer opacity, legend, source
-mission/instrument and provenance. Click anywhere for a readout of *every* layer at that point.
-Measure tool cuts an elevation profile between two points. The right rail holds the solved EVA:
-GO/NO-GO, totals, per-station ETAs, elevation profile, the walk-back chart, and an editable suit
-model.
-
-**3D** — the DEM as a terrain mesh with any raster layer draped over it, the traverse drawn as a
-glowing line (red where it violates walk-back), hazard polygons outlined on the surface, and a
-fly-through that follows the route.
-
-**HUD** — the same terrain from eye height at 78° field of view, with a minimal visor overlay:
-heading tape with a bearing bug for the next station, distance and ETA, consumables with the
-reserve floor marked, dose accrued and time to the forecast solar particle event, slope and hazard
-state underfoot, and the next science task.
-
-**BRIEFING** — objective, crew, a Gantt timeline built from the solved plan, the conditions table
-for egress/mid-EVA/ingress, the radiation picture, the science target package, and a layer-by-layer
-provenance list.
+They are ordered by sol, which is also ascending elevation. That differs from the order in the
+original brief, which put the sulfate unit after the Gediz Vallis features; on the real traverse
+Curiosity entered the sulfate unit first. Walking order follows the ground.
 
 ---
 
-## The route planner
+## Data sources
 
-The planner is the centre of the app. It does four things.
+Every endpoint was opened and probed before use. What each probe returned is recorded next to it in
+[`scripts/sources.json`](./scripts/sources.json), along with a `rejected` section for the sources we
+checked and did **not** use.
 
-### 1. A\* over the DEM grid
+| Layer | Provenance | Product | Source |
+|---|---|---|---|
+| Elevation | **REAL** | HiRISE stereo DTM `DTEEC_009149_1750_009294_1750_U01`, 32-bit float, 1.01 m/post | [HiRISE DTM archive](https://www.uahirise.org/dtm/) |
+| Orbital basemap | **REAL** | `curiosity_hirise_mosaic`, 78 WMTS tiles at zoom 13 (~5.1 m/px) | [NASA Mars Trek](https://trek.nasa.gov/mars/) |
+| Curiosity's driven path | **REAL** | MSL waypoints + traverse GeoJSON | [NASA MMGIS](https://mars.nasa.gov/msl/mission/where-is-the-rover/) |
+| Station ground views | **REAL** | 18 Navcam/Mastcam frames near each station's sol | [MSL raw images](https://mars.nasa.gov/msl/multimedia/raw-images/) |
+| Slope | **DERIVED** | Horn 3×3 on the real DTM at its true 14.29 × 14.27 m baseline | — |
+| Mobility hazards | **DERIVED** | Slope + detrended relief against EVA flight rules | — |
+| Science regions | **DERIVED** | Corridors from the rover's own traverse, by sol window | [Proposed Path figure](https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/) |
+| Radiation | **MODELED** | Surface dose rate from published Curiosity RAD results | [Hassler et al. 2014](https://doi.org/10.1126/science.1244797) |
+| Surface weather | **MODELED** | Daily cycle from published REMS values | [REMS](https://mars.nasa.gov/msl/spacecraft/instruments/rems/) |
 
-Eight-connected A\* across all 262,144 cells, with the cost the brief asks for:
+**What the tags mean.** REAL = downloaded from a NASA/USGS product. DERIVED = computed by us from
+REAL data. MODELED = built from published measurements, not ingested telemetry. Nothing DERIVED or
+MODELED is presented as a raw measurement anywhere in the app.
 
-```
-cost = distance × (1 + slopePenaltyPerDeg × slope°) + hazardPenalty
-```
+### Things we checked and did not use
 
-`hazardPenalty` is `distance × (costFactor − 1)`, so it scales with how far the crew actually walks
-through the hazard rather than with the grid resolution. Cells are **barred outright** where slope
-≥ 20° (editable) or boulder cover ≥ 50%. Flagged steep ground costs 2.6×, loose sand 4.2×.
-
-### 2. Suit mobility
-
-Walking speed follows Tobler's hiking function, rescaled so level ground equals the configured
-suited speed. Peak speed sits at a slight downhill, and steep descent is slower than the flat —
-which is what suited field crews actually report.
-
-Consumables are tracked in **hours at nominal workload**, not wall-clock hours. Standing on station
-burns 1.00×; walking burns 1.15× plus 1.10× per unit of uphill grade. An 8-hour budget therefore
-does not buy 8 hours of climbing, and the difference is exactly what the planner exists to surface.
-
-### 3. The walk-back check
-
-This is the part that matters. At every one of the ~1,000 route samples the crew must be able to
-abandon the EVA *on the spot* and reach a safe haven with the mandatory reserve untouched.
-
-Getting that right needs the cost of returning from anywhere, not just from the stations — so the
-planner runs a **multi-source Dijkstra from every safe haven** (the habitat, plus the pressurised
-rover when it is committed forward), relaxing edges in the direction of travel *toward* the haven.
-Climbing out and walking back down are not the same cost, and the return field preserves that
-asymmetry. The result is a per-cell consumables-to-home field that the route, the charts, the map
-overlay and the HUD all read from.
-
-Route samples past the limit turn **red** — on the 2D map, in the elevation profile, on the 3D line
-and in the visor. Turn on the walk-back envelope and the whole AOI is tinted by how much of it is
-reachable at all.
-
-### 4. Radiation and space weather
-
-EVA dose is integrated over the actual solved duration from the RAD dose-rate series. If the
-forecast solar particle event intersects the EVA window, the plan is NO-GO and the panel offers the
-latest egress time that clears it with 30 minutes of pad — one click to apply.
+- **Trek's `Gale_DEM_SMG_1m`** — Trek serves it as 8-bit greyscale PNG tiles: a whole z=14 tile holds
+  about five distinct grey levels, roughly 14 m of elevation per level once stretched over Gale's
+  relief. Fine as a picture, unusable for slope or hazard derivation. Replaced by the PDS float DTM.
+- **USGS SIM 3292 global geologic map** — the only geologic map covering this AOI, and it is global
+  at 1:20,000,000. One millimetre on that map is 20 km; the entire AOI is smaller than a single unit.
+  Drawing it would imply detail the product cannot support, so there is no geology layer.
+- **MOLA 463 m global DEM** — real and reachable, but gives ~15 × 32 pixels over this AOI.
+- **NASA Worldview** — Earth data. Used only as design inspiration for the layer-panel interaction,
+  credited on the DATA page. No Earth data is on the Mars map.
+- **Perseverance raw images** — Mars 2020 is in Jezero, not Gale. Listed as a related resource only.
 
 ---
 
-## Architecture
+## The pipeline
 
-```
-src/
-  data/
-    types.ts          LayerAdapter + LayerData contract — the whole seam
-    sources.ts        the mock→real switch and every external endpoint (import-free)
-    config.ts         THE registry: list of adapters, layer ids, memoised loader
-    adapters/         one adapter per data product
-      optical.ts        MRO HiRISE / CTX orthoimage
-      topography.ts     HiRISE DTM — elevation + derived slope
-      thermal.ts        Mars Odyssey THEMIS thermal inertia
-      spectral.ts       MRO CRISM mineral units
-      radiation.ts      Curiosity RAD dose rate + SPE forecast
-      atmospheric.ts    Curiosity REMS weather + dust opacity
-      hazards.ts        derived mobility-hazard vectors
-      science.ts        science target package
-    mock/             deterministic generators behind those adapters
-      terrain.ts        the keystone: one seeded 512² DEM
-      surface.ts        thermal inertia + mineral units, from the DEM masks
-      imagery.ts        orbital basemap, from the DEM hillshade
-      environment.ts    RAD + REMS time series
-      hazards.ts        hazard polygons traced off the DEM
-      science.ts        targets, crew, mission text
-  lib/
-    geo.ts            local planar frame, areographic conversion
-    noise.ts          seeded value noise, fBm, precomputed coarse fields
-    raster.ts         grid sampling, colour ramps, grid → PNG
-    contour.ts        mask → polygon rings (marching cell edges)
-    planner.ts        A*, Dijkstra return field, suit model, plan assembly
-    probe.ts          read every loaded layer at one point
-    layerImage.ts     LayerData + legend → overlay image (2D and 3D share it)
-    format.ts         MLST, durations, distances
-  components/         map / plan / three / hud / briefing / ui
-  store/useMission.ts single Zustand store
+Everything runs offline and writes static assets to `public/data`, so the app makes **no network
+call to NASA at demo time**. Total shipped data: 6.6 MB.
+
+```bash
+cd scripts
+python fetch_dem.py        # REAL    HiRISE DTM -> heightmap.png + meta.json
+python fetch_ortho.py      # REAL    Trek WMTS tiles -> basemap.webp
+python fetch_traverse.py   # REAL    MMGIS GeoJSON -> waypoints + path
+python derive_terrain.py   # DERIVED slope, ruggedness, hazard classes
+python derive_regions.py   # DERIVED science-region corridors
+python fetch_pov.py        # REAL    Curiosity frames per station
 ```
 
-### The adapter contract
+Requires Python 3.11+ with `numpy`, `pillow`, `requests`. No GDAL — the PDS reader is ~120 lines in
+`scripts/common.py`.
 
-```ts
-interface LayerAdapter {
-  id: string; name: string; mission: string; instrument: string;
-  kind: 'optical'|'topographic'|'thermal'|'spectral'|'radiation'|'atmospheric'|'hazard'|'science';
-  load(): Promise<LayerData>;
-  legend: LegendSpec;
-  isMock: boolean;
-  provenance: string;
-  defaultVisible: boolean; defaultOpacity: number; mapRenderable: boolean;
-}
-```
-
-Two properties make the swap cheap:
-
-- **The legend is the single source of colour truth.** `lib/layerImage.ts` renders any
-  `raster-grid` or `categorical-grid` into an overlay using the adapter's own legend stops. Adding
-  a layer never means writing rendering code, and the 2D map and the 3D drape can never disagree.
-- **Nothing downstream knows whether data is real.** The planner reads grids, the probe reads
-  `LayerData`, the HUD reads the plan. `isMock` only drives a badge.
-
-Every layer card in the UI shows its mission, instrument, provenance note and a **MOCK DATA** badge
-while `isMock` is true.
-
-### Why the mock data is coherent rather than merely plausible
-
-There is exactly one synthetic surface. `mock/terrain.ts` builds a seeded 512 × 512 DEM from a
-regional ramp toward Mount Sharp, broad bedrock undulation, a **jittered-Voronoi boxwork vein
-network** (cell boundaries reproduce the polygonal ridge geometry), five impact craters with raised
-rims, three boulder fields, three sand patches and a graded habitat pad. It then derives slope,
-aspect, hillshade, roughness and the ridge/sand/boulder masks.
-
-Everything else reads those masks. A vein that stands proud in topography is bright in the orbital
-image, high in thermal inertia, sulfate-bearing on the mineral map, and a routing cost to the
-planner. Clay sits low and north, sulfate climbs south — the actual Gale stratigraphy. That
-internal consistency is what makes the tool behave like the real thing: the layers agree because in
-reality they would be measuring the same rock.
-
-Same seed in, identical dataset out, every run.
-
----
-
-## Swapping mock → real
-
-1. Open `src/data/sources.ts`. Paste a product URL you have actually opened into `ENDPOINTS`.
-   Nothing is guessed: every endpoint ships as `null` and every adapter falls back to its generator.
-2. Flip the matching flag in `USE_REAL_DATA`.
-3. Edit that adapter's `load()` to fetch and reshape the product into the `LayerData` variant it
-   already returns. Keep the units — the legend, the probe readout and the planner all assume them.
-4. Nothing else changes. The badge flips to **LIVE** on its own.
-
-Worked example — the DTM, which the whole app hangs off:
-
-```ts
-// src/data/adapters/topography.ts
-async load(): Promise<LayerData> {
-  if (USE_REAL_DATA.topography && ENDPOINTS.hiriseDtm) {
-    const { values, width, height } = await loadDtmResampled(ENDPOINTS.hiriseDtm, AOI.grid);
-    return { type: 'raster-grid', width, height, values,
-             bounds: { ...BOUNDS_M }, min, max, unit: 'm' };
-  }
-  …
-}
-```
-
-Slope, hillshade, hazards, the cost field, the return field and the 3D mesh are all derived from
-that same grid, so they follow automatically.
-
-For a tiled basemap (Mars Trek WMTS, CTX global mosaic), point `ENDPOINTS.hirise` at the tile
-template and swap the Leaflet `ImageOverlay` in `components/map/MapView.tsx` for a `TileLayer` —
-the only UI change any of this requires, and only because tiles are a different transport.
+**Two details worth knowing.** The source DTM is 390 MB; we never download it. The server supports
+HTTP range requests, so the pipeline reads the PDS label, works out the byte offset of each image
+row, and pulls only the ~1,000 rows the AOI needs. And the heightmap ships as an RGB PNG with
+elevation split across two channels and the stereo coverage mask in the third — a 16-bit greyscale
+PNG loses its low byte the moment a browser draws it to a canvas, which would quantise 2.13 km of
+relief to ~8 m steps.
 
 ---
 
@@ -229,35 +171,94 @@ npm run dev
 npm run build
 ```
 
-```bash
-npm run preview
-```
+Node 20+. The build is fully static: no backend, no API keys, nothing to deploy server-side.
 
-Node 20+. The build is fully static — no backend, no API keys, nothing to deploy server-side.
+## Deploy
 
-### Deploy to Vercel
-
-The repo is deploy-ready as-is: framework preset **Vite**, build `npm run build`, output `dist`.
-`vercel.json` rewrites everything to `/` for client-side routing.
+Framework preset **Vite**, build `npm run build`, output `dist`. `vercel.json` rewrites everything
+to `/` for client-side routing.
 
 ```bash
 npx vercel --prod
 ```
 
-Any static host works identically (Netlify, GitHub Pages, S3) — it is just the `dist` folder.
+Any static host works identically — it is just the `dist` folder.
 
 ---
 
-## Notes on the coordinate frame
+## Architecture
 
-The map runs on Leaflet with `CRS.Simple`: the AOI is a planar frame in **metres**, latitude =
-northing, longitude = easting. That is how Mars raster products are delivered at this scale, it
-avoids pretending an Earth datum applies, and it maps the pixel grid 1:1 onto the DEM the planner
-runs on. Areographic lat/lon is derived for display and for matching PDS products
-(`lib/geo.ts`), using the IAU Mars radius of 3,396,190 m.
+```
+scripts/           the offline data pipeline (Python)
+  sources.json     every endpoint, what the probe returned, and what we rejected
+  common.py        PDS3 label parser + HTTP range reader
+src/
+  data/
+    types.ts       LayerAdapter + LayerData contract — the seam
+    config.ts      THE registry: every layer, its provenance, the memoised loader
+    adapters/      one adapter per product
+    real/          loaders for the shipped assets (terrain, science, POV)
+    models/        the MODELED environment series
+  lib/
+    geo.ts         the AOI frame; planner.ts A* + Dijkstra + mobility models
+    png.ts         canvas PNG decode; raster.ts sampling and colour ramps
+  components/      map / plan / three / hud / briefing / about / ui
+  store/           single Zustand store
+```
+
+Adding a layer means writing an adapter and pushing it into `LAYER_REGISTRY`. The adapter's legend
+is the single source of colour truth — `lib/layerImage.ts` renders any grid layer from its legend
+stops, so the 2D map and the 3D drape cannot disagree, and the DATA page builds itself from the
+registry so it cannot drift out of date.
+
+---
+
+## Limitations
+
+- At ~14.3 m/cell a DEM cannot resolve metre-scale boulders. The ruggedness term in the hazard layer
+  is an index, **not** a rock count, and is labelled as such everywhere.
+- 25.2% of the AOI is outside the stereo swath. Those cells are filled so the terrain stays
+  continuous, flagged in the coverage mask, and barred by the planner — the crew is never routed
+  across ground we have no data for.
+- Science-region corridors show where the rover *worked* each unit, not where the unit ends. They
+  were built from the traverse rather than traced off the NASA annotated figure, because that figure
+  publishes no georeferencing control points and eyeballed boundaries are not defensible.
+- Radiation and weather are modelled, and the solar particle event is an illustrative scenario,
+  labelled as one.
+- Suit and rover constants are plausible and editable, but not taken from a published vehicle spec.
+
+## Future work
+
+- Mosaic a second HiRISE DTM to fill the stereo gaps at the AOI edges.
+- Replace the modelled RAD and REMS series with the PDS tables for a chosen sol.
+- A guided 60-second demo mode and a landing screen.
+- Split an infeasible plan into a two-EVA campaign automatically.
+
+---
+
+## AI tools used
+
+Built with **Claude (Anthropic)** as a pair programmer: data-source research and verification,
+the Python pipeline, the TypeScript application, and the DATA page. Every external endpoint was
+opened and probed before use rather than guessed, and the probe results are committed in
+`scripts/sources.json`.
+
+Several design decisions came directly out of checking the data instead of trusting the first
+result — the Trek DEM rejection, the detrended roughness metric, the sky-polarity of raw Navcam
+frames, and the discovery that the full traverse is not walkable. The commit history records each
+one with its evidence.
+
+## Credits and compliance
+
+Data: NASA/JPL-Caltech; NASA/JPL-Caltech/University of Arizona (HiRISE); NASA/JPL-Caltech/MSSS
+(Mastcam); USGS.
+
+This project is **not affiliated with, endorsed by, or sponsored by NASA**. No NASA logo, insignia or
+mission identifier is used as branding. NASA data is used under its open data policy and credited at
+every point of use.
 
 ## Tech
 
 Vite · React 19 · TypeScript (strict) · Tailwind CSS v4 · Leaflet 1.9 (CRS.Simple) · three.js via
-react-three-fiber + drei · Zustand. Charts are hand-rolled SVG — no charting dependency. No unused
-dependencies.
+react-three-fiber + drei · Zustand · Python 3.11 (numpy, pillow, requests). Charts are hand-rolled
+SVG. No unused dependencies.

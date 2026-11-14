@@ -12,6 +12,7 @@ const MODES: { id: Mode; label: string; hint: string }[] = [
   { id: '3D', label: '3D', hint: 'Terrain view with the traverse draped on it' },
   { id: 'HUD', label: 'HUD', hint: 'Helmet visor overlay — field mode' },
   { id: 'BRIEFING', label: 'BRIEFING', hint: 'Objective, crew, timeline, conditions' },
+  { id: 'ABOUT', label: 'DATA', hint: 'Every source, its provenance tag, and what we rejected' },
 ];
 
 export function TopBar() {
