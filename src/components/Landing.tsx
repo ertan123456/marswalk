@@ -10,10 +10,12 @@
 import { AOI } from '../lib/geo';
 import { useMission } from '../store/useMission';
 import { TOUR_SECONDS } from '../lib/tour';
+import { useT } from '../i18n/useT';
 
 const BASE = import.meta.env.BASE_URL || '/';
 
 export function Landing() {
+  const t = useT();
   const booted = useMission((s) => s.booted);
   const stage = useMission((s) => s.bootStage);
   const error = useMission((s) => s.bootError);
@@ -67,7 +69,7 @@ export function Landing() {
                   : 'bg-deck-800 border-line text-ink-faint cursor-wait')
               }
             >
-              {error ? 'unavailable' : booted ? 'Start mission planning' : 'Loading…'}
+              {error ? 'unavailable' : booted ? t('landing.start') : 'Loading…'}
             </button>
             <button
               type="button"
@@ -83,7 +85,7 @@ export function Landing() {
                   : 'bg-deck-900 border-line/50 text-ink-faint cursor-wait')
               }
             >
-              Guided demo · {TOUR_SECONDS}s
+              {t('landing.demo', { n: TOUR_SECONDS })}
             </button>
           </div>
 

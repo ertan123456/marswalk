@@ -13,6 +13,7 @@ const HudView = lazy(() => import('./components/hud/HudView').then((m) => ({ def
 const Briefing = lazy(() => import('./components/briefing/Briefing').then((m) => ({ default: m.Briefing })));
 const About = lazy(() => import('./components/about/About').then((m) => ({ default: m.About })));
 import { Button, Segmented } from './components/ui/primitives';
+import { useT } from './i18n/useT';
 import { TourOverlay } from './components/TourOverlay';
 import { Landing } from './components/Landing';
 import { useMission } from './store/useMission';
@@ -28,6 +29,7 @@ function ModeLoading() {
 function PlanMode() {
   const [drawer, setDrawer] = useState<'layers' | 'plan' | null>(null);
   const [rail, setRail] = useState<'layers' | 'instruments'>('layers');
+  const t = useT();
   const measureMode = useMission((s) => s.measureMode);
   const setMeasureMode = useMission((s) => s.setMeasureMode);
   const railOpen = useMission((s) => s.railOpen);
@@ -50,15 +52,15 @@ function PlanMode() {
     <div className="flex-1 min-h-0 flex">
       {/* left rail — layers or instruments, one at a time */}
       {railOpen && (
-      <aside aria-label="Data layers and instruments" className="hidden xl:flex w-[320px] shrink-0 border-r border-line flex-col overflow-y-auto p-2 gap-2">
+      <aside aria-label={t('rail.leftLabel')} className="hidden xl:flex w-[320px] shrink-0 border-r border-line flex-col overflow-y-auto p-2 gap-2">
         <Segmented
           idPrefix="left-rail"
-          ariaLabel="Left rail contents"
+          ariaLabel={t('rail.leftLabel')}
           value={rail}
           onChange={setRail}
           options={[
-            { value: 'layers', label: 'layers' },
-            { value: 'instruments', label: 'instruments' },
+            { value: 'layers', label: t('rail.layers') },
+            { value: 'instruments', label: t('rail.instruments') },
           ]}
         />
         <div
@@ -73,32 +75,32 @@ function PlanMode() {
       )}
 
       {/* map */}
-      <main aria-label="Planning map" className="relative flex-1 min-w-0">
+      <main aria-label={t('map.label')} className="relative flex-1 min-w-0">
         <MapView />
 
         {/* map tools */}
         <div className="absolute top-2.5 right-2.5 z-[500] flex flex-col items-end gap-1.5">
-          <Button active={measureMode} onClick={() => setMeasureMode(!measureMode)} title="Measure distance and cut an elevation profile">
-            measure
+          <Button active={measureMode} onClick={() => setMeasureMode(!measureMode)} title={t('map.measureTitle')}>
+            {t('map.measure')}
           </Button>
           <div className="xl:hidden flex flex-col gap-1.5">
             <Button
               active={drawer === 'layers'}
               ariaExpanded={drawer === 'layers'}
               ariaControls="plan-drawer"
-              title="Show the data layers and instruments"
+              title={t('map.layersTitle')}
               onClick={() => setDrawer(drawer === 'layers' ? null : 'layers')}
             >
-              layers
+              {t('rail.layers')}
             </Button>
             <Button
               active={drawer === 'plan'}
               ariaExpanded={drawer === 'plan'}
               ariaControls="plan-drawer"
-              title="Show the EVA plan and Mission AI"
+              title={t('map.planTitle')}
               onClick={() => setDrawer(drawer === 'plan' ? null : 'plan')}
             >
-              plan
+              {t('rail.stations')}
             </Button>
           </div>
         </div>
@@ -113,24 +115,24 @@ function PlanMode() {
         {drawer && (
           <aside
             id="plan-drawer"
-            aria-label={drawer === 'layers' ? 'Data layers and instruments' : 'EVA plan'}
+            aria-label={drawer === 'layers' ? t('rail.leftLabel') : t('plan.title')}
             className="xl:hidden absolute inset-y-0 right-0 z-[600] w-[min(380px,92vw)] border-l border-line bg-void/97 backdrop-blur overflow-y-auto p-2 space-y-2"
           >
             <div className="flex justify-end">
-              <Button onClick={() => setDrawer(null)} title="Close this panel (Esc)">
-                close
+              <Button onClick={() => setDrawer(null)} title={t('map.closeTitle')}>
+                {t('map.close')}
               </Button>
             </div>
             {drawer === 'layers' ? (
               <>
                 <Segmented
                   idPrefix="drawer-rail"
-                  ariaLabel="Drawer contents"
+                  ariaLabel={t('rail.drawerLabel')}
                   value={rail}
                   onChange={setRail}
                   options={[
-                    { value: 'layers', label: 'layers' },
-                    { value: 'instruments', label: 'instruments' },
+                    { value: 'layers', label: t('rail.layers') },
+                    { value: 'instruments', label: t('rail.instruments') },
                   ]}
                 />
                 {rail === 'layers' ? <LayerPanel /> : <InstrumentCharts />}
@@ -143,7 +145,7 @@ function PlanMode() {
       </main>
 
       {/* right rail — the plan */}
-      <aside aria-label="EVA plan" className="hidden xl:block w-[380px] shrink-0 border-l border-line overflow-y-auto p-2">
+      <aside aria-label={t('plan.title')} className="hidden xl:block w-[380px] shrink-0 border-l border-line overflow-y-auto p-2">
         <PlanPanel />
       </aside>
     </div>
@@ -166,6 +168,13 @@ export default function App() {
   useEffect(() => {
     void boot();
   }, [boot]);
+
+  // index.html ships lang="en"; a remembered Turkish choice has to reach the
+  // document on the first paint too, not only when the switch is clicked.
+  const locale = useMission((s) => s.locale);
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   // Keyboard shortcuts. Ignored while the user is typing in a field, and the
   // tour swallows them so a stray key cannot fight the demo.

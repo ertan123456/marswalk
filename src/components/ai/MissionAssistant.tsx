@@ -19,18 +19,20 @@ import type { AiTurn, Engine } from '../../lib/missionAI';
 import { buildMissionSnapshot } from '../../lib/missionInsights';
 import { useMission } from '../../store/useMission';
 import { Badge, Button, Panel } from '../ui/primitives';
+import { useT } from '../../i18n/useT';
 
 function EngineBadge({ engine, model }: { engine: Engine; model?: string }) {
+  const t = useT();
   if (engine === 'ollama') {
     return (
-      <Badge tone="accent" title={`Answered by a local language model (${model ?? 'ollama'})`}>
+      <Badge tone="accent" title={t('ai.modelTitle', { model: model ?? 'ollama' })}>
         {model ?? 'ollama'}
       </Badge>
     );
   }
   return (
-    <Badge tone="nominal" title="Deterministic analysis computed in the browser from the solved plan">
-      local analyst
+    <Badge tone="nominal" title={t('ai.localAnalystTitle')}>
+      {t('ai.localAnalyst')}
     </Badge>
   );
 }
@@ -38,6 +40,7 @@ function EngineBadge({ engine, model }: { engine: Engine; model?: string }) {
 export function MissionAssistant() {
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
+  const t = useT();
 
   const [engine, setEngine] = useState<{ engine: Engine; model?: string }>({ engine: 'analyst' });
   const [question, setQuestion] = useState('');
@@ -78,21 +81,23 @@ export function MissionAssistant() {
 
   return (
     <Panel
-      title="Mission AI"
+      title={t('ai.title')}
       right={<EngineBadge engine={engine.engine} model={engine.model} />}
     >
       {snapshot && (
         <div className="flex items-center gap-2 flex-wrap pb-2.5 mb-2.5 border-b border-line/60">
           <Badge tone={snapshot.status === 'GO' ? 'nominal' : 'danger'}>{snapshot.status}</Badge>
-          <span className="num text-[11px] text-ink">
-            safety {snapshot.safetyScore}/100
-          </span>
+          <span className="num text-[11px] text-ink">{t('ai.safety', { n: snapshot.safetyScore })}</span>
           <Badge
             tone={
               snapshot.safetyBand === 'LOW' ? 'nominal' : snapshot.safetyBand === 'MEDIUM' ? 'caution' : 'danger'
             }
           >
-            {snapshot.safetyBand} risk
+            {snapshot.safetyBand === 'LOW'
+              ? t('ai.riskLow')
+              : snapshot.safetyBand === 'MEDIUM'
+                ? t('ai.riskMedium')
+                : t('ai.riskHigh')}
           </Badge>
         </div>
       )}
@@ -129,7 +134,7 @@ export function MissionAssistant() {
       )}
 
       <label className="sr-only" htmlFor="mission-ai-question">
-        Ask Mission AI about the plan
+        {t('ai.inputLabel')}
       </label>
       <textarea
         id="mission-ai-question"
@@ -143,24 +148,21 @@ export function MissionAssistant() {
         }}
         disabled={spent}
         rows={2}
-        placeholder={spent ? 'Daily limit reached' : 'Ask about the route, the walk-back, the data…'}
+        placeholder={spent ? t('ai.placeholderSpent') : t('ai.placeholder')}
         className="w-full resize-y bg-deck-800 border border-line rounded-[2px] px-2.5 py-2 text-[11px] text-ink outline-none focus:border-mars-400 disabled:opacity-50"
       />
 
       <div className="flex items-center justify-between gap-2 mt-2">
         <span className="num text-[9px] text-ink-faint">
-          {remaining}/{DAILY_LIMIT} today
+          {t('ai.remaining', { n: remaining, total: DAILY_LIMIT })}
         </span>
-        <Button tone="accent" onClick={() => void ask(question)} title="Ask Mission AI (Enter)">
-          {busy ? 'thinking…' : spent ? 'limit reached' : 'ask'}
+        <Button tone="accent" onClick={() => void ask(question)} title={t('ai.askTitle')}>
+          {busy ? t('ai.thinking') : spent ? t('ai.limitReached') : t('ai.ask')}
         </Button>
       </div>
 
       <p className="text-[10px] leading-relaxed text-ink-faint mt-2.5 pt-2.5 border-t border-line/40">
-        Every distance, consumable figure, walk-back margin and verdict is computed by the planner, not by
-        a model — the assistant only explains them. The deterministic analyst runs in the browser and is
-        always available; a local Ollama model is used instead when one is reachable, which on the
-        published static site it is not.
+        {t('ai.standingNote')}
       </p>
     </Panel>
   );

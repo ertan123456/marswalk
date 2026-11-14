@@ -11,6 +11,8 @@ import type { ProbeResult } from '../lib/probe';
 import { getHabitat, getSciencePoints } from '../data/real/science';
 import { AOI } from '../lib/geo';
 import { TOUR_BEATS, TOUR_SECONDS } from '../lib/tour';
+import { initialLocale, rememberLocale } from '../i18n';
+import type { Locale } from '../i18n';
 import type { TourApi } from '../lib/tour';
 import { loadTerrain } from '../data/real/terrain';
 
@@ -77,6 +79,10 @@ interface MissionState {
   /* --- left rail + guided tour --- */
   railOpen: boolean;
   toggleRail: () => void;
+
+  /** UI language. English by default; the choice is remembered per browser. */
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
 
   tourRunning: boolean;
   tourBeat: number;
@@ -274,6 +280,12 @@ export const useMission = create<MissionState>((set, get) => ({
 
   railOpen: true,
   toggleRail: () => set((s) => ({ railOpen: !s.railOpen })),
+
+  locale: initialLocale(),
+  setLocale: (locale) => {
+    rememberLocale(locale);
+    set({ locale });
+  },
 
   tourRunning: false,
   tourBeat: -1,

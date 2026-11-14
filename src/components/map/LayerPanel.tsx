@@ -3,9 +3,12 @@ import { groupedLayers } from '../../data/config';
 import type { LayerAdapter, LegendSpec } from '../../data/types';
 import { rampCssGradient } from '../../lib/raster';
 import { useMission } from '../../store/useMission';
+import { useT } from '../../i18n/useT';
+import type { MessageKey } from '../../i18n';
 import { Badge, Button, Panel, ProvenanceBadge, Switch } from '../ui/primitives';
 
 function LegendBody({ legend }: { legend: LegendSpec }) {
+  const t = useT();
   if (legend.type === 'continuous') {
     return (
       <div>
@@ -43,7 +46,7 @@ function LegendBody({ legend }: { legend: LegendSpec }) {
             <div>
               <div className="text-[11px] text-ink leading-tight">
                 {c.label}
-                {c.unpainted && <span className="text-ink-faint"> — not shaded</span>}
+                {c.unpainted && <span className="text-ink-faint">{t('panel.notShaded')}</span>}
               </div>
               {c.note && <div className="text-[10px] text-ink-faint leading-relaxed">{c.note}</div>}
             </div>
@@ -77,6 +80,7 @@ function LegendBody({ legend }: { legend: LegendSpec }) {
 
 function LayerCard({ adapter }: { adapter: LayerAdapter }) {
   const state = useMission((s) => s.layers[adapter.id]);
+  const t = useT();
   const toggleLayer = useMission((s) => s.toggleLayer);
   const setOpacity = useMission((s) => s.setLayerOpacity);
   const [open, setOpen] = useState(false);
@@ -94,7 +98,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
       <div className="flex items-start gap-2 px-2.5 py-2">
         {controllable ? (
           <div className="pt-[3px]">
-            <Switch checked={state.visible} onChange={() => toggleLayer(adapter.id)} label={'Toggle ' + adapter.name} />
+            <Switch checked={state.visible} onChange={() => toggleLayer(adapter.id)} label={t(`layer.${adapter.id}` as MessageKey)} />
           </div>
         ) : (
           <div className="pt-[2px]">
@@ -109,7 +113,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
         >
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className={'text-[12px] leading-tight ' + (state.visible ? 'text-ink' : 'text-ink-dim')}>
-              {adapter.name}
+              {t(`layer.${adapter.id}` as MessageKey)}
             </span>
             <ProvenanceBadge provenance={adapter.provenance} />
           </div>
@@ -120,7 +124,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
       {open && controllable && state.visible && (
         <div className="px-2.5 pb-2">
           <div className="flex items-center gap-2">
-            <span className="label shrink-0">opacity</span>
+            <span className="label shrink-0">{t('panel.opacity')}</span>
             <input
               type="range"
               min={0}
@@ -142,7 +146,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
           </div>
           <LegendBody legend={adapter.legend} />
           <div>
-            <span className="label !text-ink-faint">how this layer was made</span>
+            <span className="label !text-ink-faint">{t('panel.howMade')}</span>
             <p className="text-[10px] leading-relaxed text-ink-faint mt-0.5">{adapter.sourceNote}</p>
           </div>
           <div className="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-line/40">
@@ -154,7 +158,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
                 rel="noreferrer"
                 className="num text-[10px] text-probe-400 underline decoration-dotted hover:text-probe-500"
               >
-                source ↗
+                {t('panel.source')}
               </a>
             )}
           </div>
@@ -166,22 +170,23 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
 
 export function LayerPanel() {
   const setOnlyBasemap = useMission((s) => s.setOnlyBasemap);
+  const t = useT();
   const groups = groupedLayers();
 
   return (
     <Panel
-      title="Data layers"
+      title={t('panel.dataLayers')}
       right={
-        <Button onClick={setOnlyBasemap} title="Hide every analysis layer">
-          reset
+        <Button onClick={setOnlyBasemap} title={t('panel.resetTitle')}>
+          {t('panel.reset')}
         </Button>
       }
       dense
     >
       <div className="p-2 space-y-2">
         {groups.map(({ group, layers }) => (
-          <section key={group} aria-label={group}>
-            <h3 className="label pb-1 px-0.5">{group}</h3>
+          <section key={group} aria-label={t(`group.${group}`)}>
+            <h3 className="label pb-1 px-0.5">{t(`group.${group}`)}</h3>
             <div className="space-y-1.5">
               {layers.map((a) => (
                 <LayerCard key={a.id} adapter={a} />

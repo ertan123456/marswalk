@@ -10,8 +10,10 @@ import { Alert, Badge, KeyVal, Panel, Readout, Segmented } from '../ui/primitive
 import { ElevationProfileChart, WalkBackChart } from './RouteCharts';
 import { SuitSettings } from './SuitSettings';
 import { MissionAssistant } from '../ai/MissionAssistant';
+import { useT } from '../../i18n/useT';
 
 function GoNoGo() {
+  const t = useT();
   const plan = useMission((s) => s.plan);
   if (!plan) return null;
   const ok = plan.feasible;
@@ -31,11 +33,11 @@ function GoNoGo() {
       />
       <div className="min-w-0">
         <div className={'font-mono text-sm tracking-[0.2em] ' + (ok ? 'text-nominal' : 'text-danger')}>
-          {ok ? 'GO' : 'NO-GO'}
+          {ok ? t('verdict.go') : t('verdict.noGo')}
         </div>
         <div className="text-[10px] text-ink-dim leading-tight">
           {ok
-            ? 'All flight rules satisfied for the planned window.'
+            ? t('verdict.goDetail')
             : plan.violations.length + ' flight-rule violation' + (plan.violations.length === 1 ? '' : 's')}
         </div>
       </div>
@@ -44,6 +46,7 @@ function GoNoGo() {
 }
 
 function Totals() {
+  const t = useT();
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
   if (!plan) return null;
@@ -58,29 +61,33 @@ function Totals() {
   return (
     <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
       <Readout
-        label={plan.mobility === 'rover' ? 'traverse (driven + walked)' : 'traverse'}
+        label={plan.mobility === 'rover' ? t('plan.traverseRover') : t('plan.traverse')}
         value={formatDistance(plan.totalDistanceM)}
         hint={
           plan.mobility === 'rover'
-            ? `${formatDistance(plan.roverDistanceM)} driven, ${formatDistance(plan.footDistanceM)} on foot`
+            ? t('plan.traverseHint', {
+                driven: formatDistance(plan.roverDistanceM),
+                foot: formatDistance(plan.footDistanceM),
+              })
             : undefined
         }
       />
-      <Readout label="EVA duration" value={formatDuration(plan.totalTimeH)} unit="h" />
+      <Readout label={t('plan.duration')} value={formatDuration(plan.totalTimeH)} unit="h" />
       <Readout
-        label="consumables left"
+        label={t('plan.consumablesLeft')}
         value={remainingPct + '%'}
         tone={consTone}
-        hint={'Budget ' + suit.evaBudgetH + ' h at nominal workload; reserve ' + reservePct + '%'}
+        hint={t('plan.consumablesHint', { budget: suit.evaBudgetH, reserve: reservePct })}
       />
-      <Readout label="EVA dose" value={plan.doseMgy.toFixed(2)} unit="mGy" tone={doseTone} />
-      <Readout label="airlock out" value={formatMLST(suit.evaStartHour)} size="sm" />
-      <Readout label="airlock in" value={formatMLST(suit.evaStartHour + plan.totalTimeH)} size="sm" />
+      <Readout label={t('plan.dose')} value={plan.doseMgy.toFixed(2)} unit="mGy" tone={doseTone} />
+      <Readout label={t('plan.airlockOut')} value={formatMLST(suit.evaStartHour)} size="sm" />
+      <Readout label={t('plan.airlockIn')} value={formatMLST(suit.evaStartHour + plan.totalTimeH)} size="sm" />
     </div>
   );
 }
 
 function StationList() {
+  const t = useT();
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
   const order = useMission((s) => s.waypointOrder);
@@ -172,23 +179,23 @@ function StationList() {
             {station && (
               <div className="mt-1.5 pt-1.5 border-t border-line/40">
                 <KeyVal
-                  k="arrive"
+                  k={t('station.arrive')}
                   v={formatMLST(suit.evaStartHour + station.arrivalTimeH) + ' (T+' + formatDuration(station.arrivalTimeH) + ')'}
                 />
                 <KeyVal
-                  k="leg"
+                  k={t('station.leg')}
                   v={formatDistance(station.legDistanceM) + ' · ' + compassLabel(station.bearingFromPrev) + ' ' + Math.round(station.bearingFromPrev) + '°'}
                 />
                 {station.walkFromDropOffM !== undefined && (
                   <KeyVal
-                    k="rover drop-off"
+                    k={t('station.dropOff')}
                     v={'dismount, walk ' + formatDistance(station.walkFromDropOffM)}
                     tone="caution"
                   />
                 )}
-                <KeyVal k="on station" v={Math.round(station.taskMinutes) + ' min'} />
+                <KeyVal k={t('station.onStation')} v={Math.round(station.taskMinutes) + ' min'} />
                 <KeyVal
-                  k="consumables at depart"
+                  k={t('station.consumablesAtDepart')}
                   v={Math.round(((suit.evaBudgetH - station.departConsumablesH) / suit.evaBudgetH) * 100) + '%'}
                   tone={
                     (suit.evaBudgetH - station.departConsumablesH) / suit.evaBudgetH < suit.reserveFraction
@@ -197,11 +204,11 @@ function StationList() {
                   }
                 />
                 <KeyVal
-                  k="walk-back margin"
+                  k={t('station.walkBackMargin')}
                   v={formatMinutes(station.walkBackMarginH)}
                   tone={station.walkBackOk ? 'nominal' : 'danger'}
                 />
-                <KeyVal k="return to haven" v={formatDuration(station.returnTimeH) + ' h'} />
+                <KeyVal k={t('station.returnToHaven')} v={formatDuration(station.returnTimeH) + ' h'} />
               </div>
             )}
           </div>
@@ -324,6 +331,7 @@ function SelectedTarget() {
 
 export function PlanPanel() {
   const [tab, setTab] = useState<'stations' | 'charts' | 'ai'>('stations');
+  const t = useT();
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
   const setSuit = useMission((s) => s.setSuit);
@@ -331,7 +339,7 @@ export function PlanPanel() {
 
   return (
     <div className="space-y-2">
-      <Panel title="EVA traverse" right={planning ? <Badge tone="accent">solving</Badge> : undefined}>
+      <Panel title={t('plan.title')} right={planning ? <Badge tone="accent">{t('plan.solving')}</Badge> : undefined}>
         <GoNoGo />
         <div className="mt-3">
           <Totals />
@@ -339,16 +347,16 @@ export function PlanPanel() {
         {plan && (
           <div className="mt-2 flex items-center gap-1.5 flex-wrap">
             <Badge tone={plan.mobility === 'rover' ? 'accent' : 'default'}>
-              {plan.mobility === 'rover' ? 'rover-assisted' : 'on foot'}
+              {plan.mobility === 'rover' ? t('plan.roverAssisted') : t('plan.onFoot')}
             </Badge>
             {plan.mobility === 'rover' && (
               <>
-                <Badge>{formatDistance(plan.roverDistanceM)} driven</Badge>
-                <Badge>{formatDistance(plan.footDistanceM)} walked</Badge>
+                <Badge>{t('plan.driven', { d: formatDistance(plan.roverDistanceM) })}</Badge>
+                <Badge>{t('plan.walked', { d: formatDistance(plan.footDistanceM) })}</Badge>
                 <Badge tone={plan.dropOffs.length ? 'caution' : 'nominal'}>
                   {plan.dropOffs.length
                     ? `${plan.dropOffs.length} drop-off${plan.dropOffs.length === 1 ? '' : 's'}`
-                    : 'no dismount needed'}
+                    : t('plan.noDismount')}
                 </Badge>
               </>
             )}
@@ -357,7 +365,7 @@ export function PlanPanel() {
         {plan && plan.violations.length > 0 && (
           <div className="mt-3 space-y-1.5">
             {plan.violations.map((v, i) => (
-              <Alert key={i} tone="danger" title="flight rule">
+              <Alert key={i} tone="danger" title={t('plan.flightRule')}>
                 {v}
               </Alert>
             ))}
@@ -365,7 +373,7 @@ export function PlanPanel() {
         )}
         {plan && plan.spe.overlaps && (
           <div className="mt-2">
-            <Alert tone="caution" title="space weather mitigation">
+            <Alert tone="caution" title={t('plan.spe')}>
               {SPE_EVENT.detail} Shifting egress to{' '}
               <button
                 type="button"
@@ -397,13 +405,13 @@ export function PlanPanel() {
       */}
       <Segmented
         idPrefix="plan-rail"
-        ariaLabel="Plan rail contents"
+        ariaLabel={t('rail.planLabel')}
         value={tab}
         onChange={setTab}
         options={[
-          { value: 'stations', label: 'stations' },
-          { value: 'charts', label: 'charts' },
-          { value: 'ai', label: 'ai' },
+          { value: 'stations', label: t('rail.stations') },
+          { value: 'charts', label: t('rail.charts') },
+          { value: 'ai', label: t('rail.ai') },
         ]}
       />
 
@@ -415,7 +423,7 @@ export function PlanPanel() {
       >
         {tab === 'stations' && (
           <>
-            <Panel title="Science stations" dense>
+            <Panel title={t('plan.scienceStations')} dense>
               <div className="p-2">
                 <StationList />
               </div>
@@ -428,23 +436,19 @@ export function PlanPanel() {
         {tab === 'charts' &&
           (plan && plan.samples.length > 1 ? (
             <>
-              <Panel title="Elevation profile">
+              <Panel title={t('plan.elevationProfile')}>
                 <ElevationProfileChart plan={plan} />
               </Panel>
-              <Panel title="Walk-back check">
+              <Panel title={t('plan.walkBack')}>
                 <WalkBackChart plan={plan} />
                 <p className="text-[10px] text-ink-faint leading-relaxed mt-1.5">
-                  The crew must be able to abandon the EVA at any instant and reach a safe haven with the{' '}
-                  {Math.round(suit.reserveFraction * 100)}% reserve untouched. Where the red line rises above the
-                  green one, that is no longer true.
+                  {t('plan.walkBackNote', { pct: Math.round(suit.reserveFraction * 100) })}
                 </p>
               </Panel>
             </>
           ) : (
-            <Panel title="Charts">
-              <p className="text-[11px] text-ink-faint leading-relaxed">
-                Charts appear once a route is solved. Add at least one station.
-              </p>
+            <Panel title={t('plan.charts')}>
+              <p className="text-[11px] text-ink-faint leading-relaxed">{t('plan.chartsEmpty')}</p>
             </Panel>
           ))}
 
