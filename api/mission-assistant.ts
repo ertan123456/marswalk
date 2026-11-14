@@ -34,6 +34,18 @@ const usage = new Map<string, { day: string; count: number }>();
 const DAILY_LIMIT = 10;
 const MAX_QUESTION = 1200;
 
+/**
+ * Measured on the development machine: loading llama3.2:3b into memory takes
+ * ~46 s and the first answer lands at ~99 s; once resident, answers come back
+ * in under 2 s. An earlier 40 s budget therefore failed every first question
+ * and — worse — reported it as "Ollama is unreachable", which sent you looking
+ * for a network problem that did not exist.
+ */
+const CHAT_TIMEOUT_MS = 150_000;
+const PROBE_TIMEOUT_MS = 2_000;
+/** How long Ollama keeps the model resident after a request. */
+const KEEP_ALIVE = '30m';
+
 function header(request: RequestLike, name: string): string {
   const value = request.headers?.[name] ?? request.headers?.[name.toLowerCase()];
   return Array.isArray(value) ? value[0] || '' : value || '';
@@ -72,13 +84,28 @@ export default async function handler(request: RequestLike, response: ResponseLi
   if (request.method === 'GET') {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 2000);
+      const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
       const tags = await fetch(`${baseUrl}/api/tags`, { signal: controller.signal });
       clearTimeout(timer);
       if (!tags.ok) return response.status(200).json({ ready: false, model });
       const data = (await tags.json()) as { models?: { name?: string }[] };
       const names = (data.models ?? []).map((m) => m.name ?? '');
       const present = names.some((n) => n === model || n.startsWith(model.split(':')[0]));
+
+      // The UI probes once on load, which is a good moment to pull the model
+      // into memory: an empty prompt makes Ollama load it and generate
+      // nothing. Deliberately not awaited — the badge should appear at once,
+      // and if the host tears the process down before this lands the only
+      // cost is that the first question pays the load time, which
+      // CHAT_TIMEOUT_MS now allows for.
+      if (present) {
+        void fetch(`${baseUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model, prompt: '', keep_alive: KEEP_ALIVE }),
+        }).catch(() => undefined);
+      }
+
       return response.status(200).json({ ready: present, model, available: names.slice(0, 12) });
     } catch {
       return response.status(200).json({ ready: false, model });
@@ -122,9 +149,9 @@ export default async function handler(request: RequestLike, response: ResponseLi
   ].join('\n');
 
   let upstream: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS);
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 40000);
     upstream = await fetch(`${baseUrl}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -132,13 +159,21 @@ export default async function handler(request: RequestLike, response: ResponseLi
       body: JSON.stringify({
         model,
         stream: false,
+        keep_alive: KEEP_ALIVE,
         options: { temperature: 0.4, top_p: 0.9, repeat_penalty: 1.15 },
         messages: [{ role: 'system', content: SYSTEM }, ...history, { role: 'user', content: userMessage }],
       }),
     });
-    clearTimeout(timer);
   } catch {
-    return response.status(503).json({ error: `Ollama is unreachable at ${baseUrl}` });
+    // Saying "unreachable" for a timeout sends you debugging the wrong thing.
+    const timedOut = controller.signal.aborted;
+    return response.status(timedOut ? 504 : 503).json({
+      error: timedOut
+        ? `Ollama did not answer within ${Math.round(CHAT_TIMEOUT_MS / 1000)}s — the model may still be loading`
+        : `Ollama is unreachable at ${baseUrl}`,
+    });
+  } finally {
+    clearTimeout(timer);
   }
 
   if (!upstream.ok) {

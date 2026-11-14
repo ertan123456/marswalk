@@ -115,7 +115,13 @@ class nobody could audit.
 
 **The published site always shows `local analyst`.** GitHub Pages serves static files and runs no
 server code, and no cloud function could reach an Ollama on a laptop anyway. To demo the model, run
-`npm run dev` on the same machine as Ollama — setup in [`AI_SETUP.md`](./AI_SETUP.md).
+`npm run dev` on the same machine as Ollama — setup and measured timings in
+[`AI_SETUP.md`](./AI_SETUP.md). Loading a 3B model costs ~46 s, so the health probe the UI fires on
+load also warms it; by the time a question is typed, answers come back in under two seconds.
+
+Asked for a figure it was not given — a boulder count, a RAD dose rate for a specific sol — the
+model answers that it is not computed and points at the right provenance class, rather than
+producing a number. That is tested, not assumed.
 
 One thing the assistant adds rather than explains: asked where the habitat should land, it searches
 the real DEM — every candidate cell on a 9-cell stride, scored on mean slope, local relief, walkable

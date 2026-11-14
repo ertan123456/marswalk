@@ -125,7 +125,9 @@ export async function askMissionAI({ question, plan, suit, history = [] }: AskAr
 
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 45000);
+    // Must outlast the endpoint's own budget, or a cold model load shows up
+    // here as a failure while the server is still waiting on a good answer.
+    const timer = setTimeout(() => controller.abort(), 165_000);
     const r = await fetch(API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Mission-User': operatorId() },
@@ -136,6 +138,13 @@ export async function askMissionAI({ question, plan, suit, history = [] }: AskAr
 
     if (r.status === 429) {
       return { answer: analyst, engine: 'analyst', note: 'Daily model limit reached — answered locally.' };
+    }
+    if (r.status === 504) {
+      return {
+        answer: analyst,
+        engine: 'analyst',
+        note: 'The model was still loading, so this is the deterministic analysis. Ask again in a moment.',
+      };
     }
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
 

@@ -28,12 +28,18 @@ the fallback is not a degraded mode; it is the same answer, written by a simpler
 
 ## Running it locally with Ollama
 
-```bash
-ollama pull llama3.2:3b
-```
+On Windows, install it with the OS package manager — this is what was used here, and it verifies
+the installer hash against the official GitHub release:
 
 ```bash
-ollama serve
+winget install --id Ollama.Ollama --exact --source winget
+```
+
+The Windows installer starts the service itself (an `ollama` process plus a tray app), so
+`ollama serve` is only needed if you stopped it. Then pull the model — about 2 GB:
+
+```bash
+ollama pull llama3.2:3b
 ```
 
 Copy `.env.example` to `.env` and adjust if your Ollama is not on the default port:
@@ -63,6 +69,29 @@ Ollama is not running or the model is not pulled, and the panel will say `local 
 
 The panel probes `GET /api/mission-assistant` on load. If that returns `{ ready: true }` the badge
 reads the model name; otherwise it reads **local analyst**.
+
+### Timing, and why the probe also warms the model
+
+Measured on the development machine (llama3.2:3b, Q4_K_M, running on GPU):
+
+| | |
+|---|---|
+| Loading the model into memory | ~46 s |
+| First answer, from cold | ~99 s |
+| Every answer once resident | **~1.7 s** |
+
+That gap is a trap. The first version of this endpoint allowed 40 s and reported anything slower as
+*"Ollama is unreachable"* — so the first question of every session failed, and failed with an error
+message that sent you looking for a network problem that did not exist.
+
+Two fixes. The endpoint now allows 150 s and distinguishes a timeout (504, "the model may still be
+loading") from a refused connection (503, "unreachable"); the panel falls back to the analyst in
+both cases but says which happened. And the health probe, which the UI fires once on load, now also
+sends an empty prompt with `keep_alive: '30m'` — Ollama loads the model and generates nothing. It is
+not awaited, so the badge still appears in well under a second.
+
+The effect: the model is resident about 10 s after the page opens, and by the time anyone has typed
+a question it answers in under two seconds.
 
 ## Why the published site always says "local analyst"
 
