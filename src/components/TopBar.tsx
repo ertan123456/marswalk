@@ -1,7 +1,7 @@
 import { AOI } from '../lib/geo';
-import { EVA_SOL } from '../data/mock/environment';
-import { MISSION } from '../data/mock/science';
-import { anyMock } from '../data/config';
+import { EVA_SOL } from '../data/models/environment';
+import { MISSION } from '../data/real/science';
+import { provenanceCounts } from '../data/config';
 import { formatMLST } from '../lib/format';
 import { useMission } from '../store/useMission';
 import type { Mode } from '../store/useMission';
@@ -32,7 +32,9 @@ export function TopBar() {
           <span className="num text-[11px] text-ink-dim truncate">{AOI.name}</span>
           <Badge>{'SOL ' + EVA_SOL}</Badge>
           <Badge>{MISSION.designator}</Badge>
-          {anyMock() && <Badge tone="mock">mock data</Badge>}
+          <Badge tone="nominal" title="Layers downloaded from NASA/USGS products">{provenanceCounts().REAL} REAL</Badge>
+          <Badge tone="accent" title="Layers computed from real data">{provenanceCounts().DERIVED} DERIVED</Badge>
+          <Badge tone="caution" title="Layers modelled from published measurements">{provenanceCounts().MODELED} MODELED</Badge>
         </div>
 
         <div className="flex-1" />

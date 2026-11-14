@@ -9,11 +9,10 @@
  * All of it is pure: grids in, plan out. Nothing here touches React or the DOM.
  */
 
-import { AOI, bearingDeg, distanceM, gridToLocal, localToGrid } from './geo';
+import { CELL_X_M, CELL_Y_M, bearingDeg, distanceM, gridToLocal, localToGrid } from './geo';
 import type { LocalPoint } from './geo';
-import { getTerrain } from '../data/mock/terrain';
-import { HAZARD_SLOPE_DEG } from '../data/mock/hazards';
-import { doseOverWindow, speOverlap, SPE_EVENT } from '../data/mock/environment';
+import { getTerrain, HAZARD } from '../data/real/terrain';
+import { doseOverWindow, speOverlap, SPE_EVENT } from '../data/models/environment';
 
 /* ------------------------------------------------------------- suit model */
 
@@ -36,8 +35,8 @@ export interface SuitModel {
   slopePenaltyPerDeg: number;
   /** A* cost multiplier for crossing flagged steep ground */
   steepCostFactor: number;
-  /** A* cost multiplier for crossing loose sand */
-  sandCostFactor: number;
+  /** A* cost multiplier for crossing rugged / broken ground */
+  roughCostFactor: number;
   /** pressurised rover shadows the traverse and counts as a safe haven */
   roverSupport: boolean;
   /** local hour the crew steps outside */
@@ -48,13 +47,13 @@ export const DEFAULT_SUIT: SuitModel = {
   evaBudgetH: 8,
   reserveFraction: 0.2,
   flatSpeedMs: 1.25,
-  maxSlopeDeg: 20,
+  maxSlopeDeg: 25,
   walkBurnBase: 1.15,
   walkBurnPerGrade: 1.1,
   taskTimeScale: 1,
   slopePenaltyPerDeg: 0.08,
   steepCostFactor: 2.6,
-  sandCostFactor: 4.2,
+  roughCostFactor: 3.4,
   roverSupport: true,
   evaStartHour: 7.25,
 };
@@ -78,7 +77,8 @@ export function walkBurnRate(suit: SuitModel, grade: number): number {
 /* ------------------------------------------------------------- cost field */
 
 export interface CostField {
-  grid: number;
+  width: number;
+  height: number;
   /** per-cell multiplier; Infinity = barred */
   factor: Float32Array;
   passable: Uint8Array;
@@ -87,7 +87,7 @@ export interface CostField {
 let costCache: { key: string; field: CostField } | null = null;
 
 function costKey(suit: SuitModel): string {
-  return [suit.maxSlopeDeg, suit.slopePenaltyPerDeg, suit.steepCostFactor, suit.sandCostFactor].join('|');
+  return [suit.maxSlopeDeg, suit.slopePenaltyPerDeg, suit.steepCostFactor, suit.roughCostFactor].join('|');
 }
 
 export function buildCostField(suit: SuitModel): CostField {
@@ -95,12 +95,21 @@ export function buildCostField(suit: SuitModel): CostField {
   if (costCache && costCache.key === key) return costCache.field;
 
   const t = getTerrain();
-  const n = t.grid * t.grid;
+  const n = t.width * t.height;
   const factor = new Float32Array(n);
   const passable = new Uint8Array(n);
 
+  const cautionDeg = t.derivedMeta.thresholds_deg.caution;
+
   for (let i = 0; i < n; i++) {
-    const barred = t.boulder[i] >= 0.5 || t.slopeDeg[i] >= suit.maxSlopeDeg;
+    const cls = t.hazard[i];
+    // No stereo coverage is a hard bar: we will not route a crew across ground
+    // the DTM does not actually cover.
+    const barred =
+      cls === HAZARD.NO_DATA ||
+      cls === HAZARD.ROUGH ||
+      cls === HAZARD.SLOPE_IMPASSABLE ||
+      t.slopeDeg[i] >= suit.maxSlopeDeg;
     if (barred) {
       factor[i] = Infinity;
       passable[i] = 0;
@@ -108,14 +117,16 @@ export function buildCostField(suit: SuitModel): CostField {
     }
     // cost = distance x (1 + slopePenalty) + hazardPenalty
     let f = 1 + suit.slopePenaltyPerDeg * t.slopeDeg[i];
-    if (t.slopeDeg[i] >= HAZARD_SLOPE_DEG) f += suit.steepCostFactor - 1;
-    if (t.sand[i] >= 0.62) f += suit.sandCostFactor - 1;
-    else if (t.sand[i] >= 0.45) f += (suit.sandCostFactor - 1) * 0.35;
+    if (t.slopeDeg[i] >= cautionDeg) f += suit.steepCostFactor - 1;
+    if (cls === HAZARD.CAUTION) f += (suit.roughCostFactor - 1) * 0.6;
+    if (t.roughness[i] >= t.derivedMeta.thresholds_roughness_m.caution) {
+      f += (suit.roughCostFactor - 1) * 0.4;
+    }
     factor[i] = f;
     passable[i] = 1;
   }
 
-  const field: CostField = { grid: t.grid, factor, passable };
+  const field: CostField = { width: t.width, height: t.height, factor, passable };
   costCache = { key, field };
   return field;
 }
@@ -196,9 +207,20 @@ const NEIGHBOURS: [number, number][] = [
   [-1, -1],
 ];
 
-/** Nearest passable cell to a requested one, so a target on a boulder still plans. */
+/**
+ * Ground distance for one grid step. The DEM cells are 14.29 m across and
+ * 14.27 m down, so a diagonal is not simply sqrt(2) times a side.
+ */
+export function stepLength(dx: number, dy: number): number {
+  if (dx === 0) return Math.abs(dy) * CELL_Y_M;
+  if (dy === 0) return Math.abs(dx) * CELL_X_M;
+  return Math.hypot(dx * CELL_X_M, dy * CELL_Y_M);
+}
+
+/** Nearest passable cell to a requested one, so a target in a hazard still plans. */
 export function nearestPassable(col: number, row: number, field: CostField): { col: number; row: number } {
-  const g = field.grid;
+  const g = field.width;
+  const gh = field.height;
   if (field.passable[row * g + col]) return { col, row };
   for (let r = 1; r < 40; r++) {
     for (let dy = -r; dy <= r; dy++) {
@@ -206,7 +228,7 @@ export function nearestPassable(col: number, row: number, field: CostField): { c
         if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
         const c = col + dx;
         const w = row + dy;
-        if (c < 0 || w < 0 || c >= g || w >= g) continue;
+        if (c < 0 || w < 0 || c >= g || w >= gh) continue;
         if (field.passable[w * g + c]) return { col: c, row: w };
       }
     }
@@ -216,9 +238,9 @@ export function nearestPassable(col: number, row: number, field: CostField): { c
 
 /** A* between two grid cells. Returns cell indices, start to goal. */
 export function astar(startIdx: number, goalIdx: number, field: CostField): number[] | null {
-  const g = field.grid;
-  const n = g * g;
-  const cell = AOI.sizeM / g;
+  const g = field.width;
+  const gh = field.height;
+  const n = g * gh;
   const gScore = new Float64Array(n).fill(Infinity);
   const cameFrom = new Int32Array(n).fill(-1);
   const closed = new Uint8Array(n);
@@ -229,7 +251,7 @@ export function astar(startIdx: number, goalIdx: number, field: CostField): numb
   const h = (i: number) => {
     const c = i % g;
     const r = (i / g) | 0;
-    return Math.hypot(c - gc, r - gr) * cell;
+    return Math.hypot((c - gc) * CELL_X_M, (r - gr) * CELL_Y_M);
   };
 
   gScore[startIdx] = 0;
@@ -246,10 +268,10 @@ export function astar(startIdx: number, goalIdx: number, field: CostField): numb
     for (const [dx, dy] of NEIGHBOURS) {
       const nc = cc + dx;
       const nr = cr + dy;
-      if (nc < 0 || nr < 0 || nc >= g || nr >= g) continue;
+      if (nc < 0 || nr < 0 || nc >= g || nr >= gh) continue;
       const ni = nr * g + nc;
       if (!field.passable[ni] || closed[ni]) continue;
-      const step = (dx === 0 || dy === 0 ? 1 : Math.SQRT2) * cell;
+      const step = stepLength(dx, dy);
       // average the two cells' cost factors so a step across a boundary is fair
       const cost = step * 0.5 * (field.factor[cur] + field.factor[ni]);
       const tentative = gScore[cur] + cost;
@@ -302,9 +324,9 @@ export function buildReturnField(suit: SuitModel, havens: { label: string; point
 
   const t = getTerrain();
   const field = buildCostField(suit);
-  const g = t.grid;
-  const n = g * g;
-  const cell = AOI.sizeM / g;
+  const g = t.width;
+  const gh = t.height;
+  const n = g * gh;
 
   const consumablesH = new Float32Array(n).fill(Infinity);
   const timeH = new Float32Array(n).fill(Infinity);
@@ -330,12 +352,12 @@ export function buildReturnField(suit: SuitModel, havens: { label: string; point
     for (const [dx, dy] of NEIGHBOURS) {
       const nc = cc + dx;
       const nr = cr + dy;
-      if (nc < 0 || nr < 0 || nc >= g || nr >= g) continue;
+      if (nc < 0 || nr < 0 || nc >= g || nr >= gh) continue;
       const ni = nr * g + nc;
       if (!field.passable[ni] || done[ni]) continue;
 
       // travelling FROM ni TO cur (toward the haven)
-      const step = (dx === 0 || dy === 0 ? 1 : Math.SQRT2) * cell;
+      const step = stepLength(dx, dy);
       const rise = t.elevation[cur] - t.elevation[ni];
       const grade = rise / step;
       const speed = walkSpeedMs(suit, grade);
@@ -428,8 +450,7 @@ export interface PlanRequest {
 
 export function planRoute(req: PlanRequest): RoutePlan {
   const t = getTerrain();
-  const g = t.grid;
-  const cell = AOI.sizeM / g;
+  const g = t.width;
   const field = buildCostField(req.suit);
 
   const havens: { label: string; point: LocalPoint }[] = [{ label: 'Habitat', point: req.start }];
@@ -543,7 +564,7 @@ export function planRoute(req: PlanRequest): RoutePlan {
       const ar = (a / g) | 0;
       const bc = b % g;
       const br = (b / g) | 0;
-      const step = (ac === bc || ar === br ? 1 : Math.SQRT2) * cell;
+      const step = stepLength(bc - ac, br - ar);
       const rise = t.elevation[b] - t.elevation[a];
       const grade = rise / step;
       const speed = walkSpeedMs(req.suit, grade);
@@ -643,8 +664,8 @@ export function planRoute(req: PlanRequest): RoutePlan {
   notes.push(
     'Routing bars slopes at or above ' +
       req.suit.maxSlopeDeg +
-      '° and all boulder fields; sand is crossed only at ' +
-      req.suit.sandCostFactor.toFixed(1) +
+      '°, broken ground and anything with no stereo coverage; caution ground is crossed at ' +
+      req.suit.roughCostFactor.toFixed(1) +
       '× cost.',
   );
 
@@ -680,7 +701,7 @@ export interface ProfilePoint {
 /** Straight-line elevation profile between two points, for the measure tool. */
 export function straightProfile(a: LocalPoint, b: LocalPoint, steps = 160): ProfilePoint[] {
   const t = getTerrain();
-  const g = t.grid;
+  const g = t.width;
   const total = distanceM(a, b);
   const out: ProfilePoint[] = [];
   for (let i = 0; i <= steps; i++) {

@@ -7,8 +7,7 @@
  * the charts need no change.
  */
 
-import { getWeather, SOL_HOURS } from '../mock/environment';
-import { USE_REAL_DATA } from '../sources';
+import { getWeather, SOL_HOURS } from '../models/environment';
 import type { LayerAdapter, LayerData } from '../types';
 
 export const atmosphericAdapter: LayerAdapter = {
@@ -17,8 +16,11 @@ export const atmosphericAdapter: LayerAdapter = {
   mission: 'Mars Science Laboratory (Curiosity)',
   instrument: 'REMS + Mastcam tau',
   kind: 'atmospheric',
-  isMock: !USE_REAL_DATA.atmospheric,
-  provenance:
+  group: 'Environment',
+  provenance: 'MODELED',
+  credit: 'NASA/JPL-Caltech/CAB',
+  sourceUrl: 'https://mars.nasa.gov/msl/spacecraft/instruments/rems/',
+  sourceNote:
     'Hourly over one sol (' +
     SOL_HOURS.toFixed(2) +
     ' h). Air temperature at 1.6 m boom height; column dust opacity from direct-sun imaging.',

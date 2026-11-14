@@ -59,10 +59,11 @@ export function sampleGridBilinear(
   width: number,
   height: number,
   p: LocalPoint,
-  sizeM = AOI.sizeM,
+  sizeX = AOI.sizeXM,
+  sizeY = AOI.sizeYM,
 ): number {
-  const fx = (p.x / sizeM) * width - 0.5;
-  const fy = ((sizeM - p.y) / sizeM) * height - 0.5;
+  const fx = (p.x / sizeX) * width - 0.5;
+  const fy = ((sizeY - p.y) / sizeY) * height - 0.5;
   const x0 = Math.floor(fx);
   const y0 = Math.floor(fy);
   const tx = fx - x0;
@@ -84,10 +85,11 @@ export function sampleGridNearest(
   width: number,
   height: number,
   p: LocalPoint,
-  sizeM = AOI.sizeM,
+  sizeX = AOI.sizeXM,
+  sizeY = AOI.sizeYM,
 ): number {
-  const col = Math.min(width - 1, Math.max(0, Math.floor((p.x / sizeM) * width)));
-  const row = Math.min(height - 1, Math.max(0, Math.floor(((sizeM - p.y) / sizeM) * height)));
+  const col = Math.min(width - 1, Math.max(0, Math.floor((p.x / sizeX) * width)));
+  const row = Math.min(height - 1, Math.max(0, Math.floor(((sizeY - p.y) / sizeY) * height)));
   return values[row * width + col];
 }
 

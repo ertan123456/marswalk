@@ -12,19 +12,22 @@ import { Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { AOI } from '../../lib/geo';
 import type { LocalPoint } from '../../lib/geo';
-import { getTerrain } from '../../data/mock/terrain';
-import { getHazards } from '../../data/mock/hazards';
+import { getTerrain } from '../../data/real/terrain';
 import { layerImageURL } from '../../lib/layerImage';
 import { getAdapter } from '../../data/config';
 import { useMission } from '../../store/useMission';
 
-/** Mesh resolution: every other DEM post, which is plenty at this scale. */
-const MESH_SEG = 255;
+/**
+ * Mesh resolution. The AOI is a tall strip (474 x 1024 posts), so the mesh
+ * keeps that aspect instead of forcing a square grid.
+ */
+const MESH_SEG_X = 236;
+const MESH_SEG_Y = 511;
 const EYE_HEIGHT_M = 1.72;
 
 /** AOI-local metres -> three.js world (X east, Y up, Z south). */
 export function toWorld(p: LocalPoint, elevation: number, exag: number, base: number): THREE.Vector3 {
-  return new THREE.Vector3(p.x - AOI.sizeM / 2, (elevation - base) * exag, AOI.sizeM / 2 - p.y);
+  return new THREE.Vector3(p.x - AOI.sizeXM / 2, (elevation - base) * exag, AOI.sizeYM / 2 - p.y);
 }
 
 function useDrapeTexture(layerId: string): THREE.Texture | null {
@@ -49,18 +52,43 @@ function Terrain({ exag, base }: { exag: number; base: number }) {
 
   const geometry = useMemo(() => {
     const t = getTerrain();
-    const geo = new THREE.PlaneGeometry(AOI.sizeM, AOI.sizeM, MESH_SEG, MESH_SEG);
+    const geo = new THREE.PlaneGeometry(AOI.sizeXM, AOI.sizeYM, MESH_SEG_X, MESH_SEG_Y);
     geo.rotateX(-Math.PI / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
-    const n = MESH_SEG + 1;
-    const stride = (t.grid - 1) / MESH_SEG;
-    for (let row = 0; row < n; row++) {
-      const gr = Math.min(t.grid - 1, Math.round(row * stride));
-      for (let col = 0; col < n; col++) {
-        const gc = Math.min(t.grid - 1, Math.round(col * stride));
-        pos.setY(row * n + col, (t.elevation[gr * t.grid + gc] - base) * exag);
+    const nx = MESH_SEG_X + 1;
+    const ny = MESH_SEG_Y + 1;
+    const strideX = (t.width - 1) / MESH_SEG_X;
+    const strideY = (t.height - 1) / MESH_SEG_Y;
+    for (let row = 0; row < ny; row++) {
+      const gr = Math.min(t.height - 1, Math.round(row * strideY));
+      for (let col = 0; col < nx; col++) {
+        const gc = Math.min(t.width - 1, Math.round(col * strideX));
+        pos.setY(row * nx + col, (t.elevation[gr * t.width + gc] - base) * exag);
       }
     }
+    // Drop every triangle that touches a cell with no stereo coverage. The
+    // heightmap fills those cells so the raster stays continuous, but rendering
+    // them would invent cliffs that are not on Mars. The mesh therefore shows
+    // the real data footprint - a tilted HiRISE stereo swath - and nothing else.
+    const idx: number[] = [];
+    const covered = (col: number, row: number) => {
+      const gr = Math.min(t.height - 1, Math.round(row * strideY));
+      const gc = Math.min(t.width - 1, Math.round(col * strideX));
+      return t.coverage[gr * t.width + gc] === 1;
+    };
+    for (let row = 0; row < MESH_SEG_Y; row++) {
+      for (let col = 0; col < MESH_SEG_X; col++) {
+        if (!covered(col, row) || !covered(col + 1, row) ||
+            !covered(col, row + 1) || !covered(col + 1, row + 1)) continue;
+        const a = row * nx + col;
+        const b = a + 1;
+        const c = a + nx;
+        const d = c + 1;
+        idx.push(a, c, b, b, c, d);
+      }
+    }
+    geo.setIndex(idx);
+
     pos.needsUpdate = true;
     geo.computeVertexNormals();
     return geo;
@@ -69,9 +97,9 @@ function Terrain({ exag, base }: { exag: number; base: number }) {
   return (
     <mesh geometry={geometry} receiveShadow>
       {texture ? (
-        <meshStandardMaterial map={texture} roughness={0.95} metalness={0} />
+        <meshStandardMaterial map={texture} roughness={0.95} metalness={0} side={THREE.DoubleSide} />
       ) : (
-        <meshStandardMaterial color="#8a6a4f" roughness={1} metalness={0} />
+        <meshStandardMaterial color="#8a6a4f" roughness={1} metalness={0} side={THREE.DoubleSide} />
       )}
     </mesh>
   );
@@ -113,40 +141,9 @@ function TraverseLine({ exag, base }: { exag: number; base: number }) {
   );
 }
 
-function HazardOutlines({ exag, base }: { exag: number; base: number }) {
-  const t = getTerrain();
-  const rings = useMemo(() => {
-    return getHazards()
-      .filter((f) => !f.passable)
-      .slice(0, 8)
-      .map((f) => {
-        const step = Math.max(1, Math.floor(f.ring.length / 160));
-        const pts: [number, number, number][] = [];
-        for (let i = 0; i < f.ring.length; i += step) {
-          const p = f.ring[i];
-          const col = Math.min(t.grid - 1, Math.max(0, Math.floor((p.x / AOI.sizeM) * t.grid)));
-          const row = Math.min(t.grid - 1, Math.max(0, Math.floor(((AOI.sizeM - p.y) / AOI.sizeM) * t.grid)));
-          const v = toWorld(p, t.elevation[row * t.grid + col], exag, base);
-          pts.push([v.x, v.y + 1.5, v.z]);
-        }
-        if (pts.length > 1) pts.push(pts[0]);
-        return pts;
-      })
-      .filter((p) => p.length > 2);
-  }, [exag, base, t]);
-
-  return (
-    <group>
-      {rings.map((pts, i) => (
-        <Line key={i} points={pts} color="#ef4444" lineWidth={1.4} transparent opacity={0.72} />
-      ))}
-    </group>
-  );
-}
-
 /**
  * A station marker that holds a roughly constant screen size: the same marker
- * has to read from 3.5 km up in the orbit view and from 20 m away on the walk.
+ * has to read from kilometres up in the orbit view and from 20 m away on the walk.
  */
 function Marker({
   position,
@@ -264,7 +261,7 @@ function Sky() {
   }, []);
   return (
     <mesh material={material} scale={[1, 1, 1]}>
-      <sphereGeometry args={[9000, 32, 20]} />
+      <sphereGeometry args={[70000, 32, 20]} />
     </mesh>
   );
 }
@@ -344,12 +341,11 @@ export function MarsScene({ firstPerson = false }: { firstPerson?: boolean }) {
   return (
     <>
       <Sky />
-      <fogExp2 attach="fog" args={[0xc9a37f, firstPerson ? 0.00032 : 0.00008]} />
+      <fogExp2 attach="fog" args={[0xc9a37f, firstPerson ? 0.00032 : 0.000035]} />
       <hemisphereLight args={[0xd9b48f, 0x3a2a22, 1.05]} />
-      <directionalLight position={[-2600, 2100, -2600]} intensity={1.25} color={0xfff0dd} />
+      <directionalLight position={[-12000, 9000, -12000]} intensity={1.25} color={0xfff0dd} />
       <ambientLight intensity={0.28} />
       <Terrain exag={exag} base={base} />
-      <HazardOutlines exag={exag} base={base} />
       <TraverseLine exag={exag} base={base} />
       <StationMarkers exag={exag} base={base} />
       <FlyThrough exag={exag} base={base} firstPerson={firstPerson} />

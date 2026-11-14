@@ -8,8 +8,7 @@
  */
 
 import { BOUNDS_M } from '../../lib/geo';
-import { getSciencePoints } from '../mock/science';
-import { USE_REAL_DATA } from '../sources';
+import { getSciencePoints } from '../real/science';
 import type { LayerAdapter, LayerData } from '../types';
 
 export const scienceAdapter: LayerAdapter = {
@@ -18,8 +17,11 @@ export const scienceAdapter: LayerAdapter = {
   mission: 'Science team target package',
   instrument: 'Target list + rover context frames',
   kind: 'science',
-  isMock: !USE_REAL_DATA.science,
-  provenance:
+  group: 'Geology & Minerals',
+  provenance: 'REAL',
+  credit: 'Positions NASA/JPL-Caltech; narrative by MARSWALK',
+  sourceUrl: 'https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/',
+  sourceNote:
     'Five ranked sampling stations across the boxwork network, ordered up-slope. Task times are crew-rehearsed estimates including drill setup and sample handoff.',
   defaultVisible: true,
   defaultOpacity: 1,

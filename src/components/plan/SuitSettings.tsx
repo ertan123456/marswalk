@@ -2,7 +2,7 @@ import { DEFAULT_SUIT, walkSpeedMs } from '../../lib/planner';
 import { formatMLST } from '../../lib/format';
 import { useMission } from '../../store/useMission';
 import { Button, Panel, Slider, Switch } from '../ui/primitives';
-import { MISSION } from '../../data/mock/science';
+import { MISSION } from '../../data/real/science';
 
 export function SuitSettings() {
   const suit = useMission((s) => s.suit);
@@ -91,13 +91,13 @@ export function SuitSettings() {
           format={(v) => '+' + (v * 100).toFixed(0) + '% / °'}
         />
         <Slider
-          label="Sand crossing cost"
-          value={suit.sandCostFactor}
+          label="Rough ground cost"
+          value={suit.roughCostFactor}
           min={1}
           max={8}
           step={0.1}
           unit="×"
-          onChange={(v) => setSuit({ sandCostFactor: v })}
+          onChange={(v) => setSuit({ roughCostFactor: v })}
           format={(v) => v.toFixed(1)}
         />
 

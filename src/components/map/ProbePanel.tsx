@@ -1,4 +1,4 @@
-import { AOI } from '../../lib/geo';
+import { CELL_X_M } from '../../lib/geo';
 import { profileStats } from '../../lib/planner';
 import { useMission } from '../../store/useMission';
 import { Badge, Button, Panel } from '../ui/primitives';
@@ -49,7 +49,7 @@ export function ProbePanel() {
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="text-[9px] text-ink-faint truncate">{r.instrument}</span>
-              {r.isMock && <Badge tone="mock">mock</Badge>}
+              <Badge tone={r.provenance === 'REAL' ? 'nominal' : r.provenance === 'DERIVED' ? 'accent' : 'caution'}>{r.provenance}</Badge>
             </div>
           </div>
         ))}
@@ -137,7 +137,7 @@ export function MeasurePanel() {
             ]}
           />
           <p className="text-[10px] text-ink-faint mt-1">
-            Straight-line cut through the HiRISE DTM at {(AOI.sizeM / AOI.grid).toFixed(2)} m posting. The planner
+            Straight-line cut through the HiRISE DTM at {(CELL_X_M).toFixed(2)} m posting. The planner
             routes around what this cut walks straight through.
           </p>
         </div>

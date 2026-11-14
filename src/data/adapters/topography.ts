@@ -1,57 +1,55 @@
 /**
- * Topographic adapters — elevation and slope, both from the HiRISE DTM.
+ * Topography — elevation (REAL) and slope (DERIVED).
  *
- * TO GO LIVE: load the DTEEC .IMG/GeoTIFF for the AOI, resample to the working
- * grid, and return it as a raster-grid. Slope is then recomputed with Horn's
- * method from the real DEM — no other change needed, because the planner, the
- * hazard tracer and the 3D mesh all read the same grid.
+ * Elevation is the HiRISE stereo DTM itself, decoded from the packed heightmap
+ * the pipeline ships. Slope is recomputed in the browser from that same grid by
+ * Horn's method, so it can never disagree with the terrain the planner routes
+ * across.
  */
 
-import { AOI, BOUNDS_M } from '../../lib/geo';
-import { ELEV_CEIL, ELEV_FLOOR, getTerrain } from '../mock/terrain';
-import { USE_REAL_DATA } from '../sources';
+import { BOUNDS_M } from '../../lib/geo';
+import { getTerrain } from '../real/terrain';
 import type { LayerAdapter, LayerData } from '../types';
 
 export const demAdapter: LayerAdapter = {
   id: 'dem-elevation',
   name: 'Elevation (DTM)',
   mission: 'Mars Reconnaissance Orbiter',
-  instrument: 'HiRISE stereo DTM (DTEEC)',
+  instrument: 'HiRISE stereo DTM',
   kind: 'topographic',
-  isMock: !USE_REAL_DATA.topography,
-  provenance:
-    'Digital terrain model, 1 m posting, resampled to a ' +
-    AOI.grid +
-    '×' +
-    AOI.grid +
-    ' grid at ' +
-    (AOI.sizeM / AOI.grid).toFixed(2) +
-    ' m/post. Heights are relative to the Mars areoid (MOLA datum).',
+  group: 'Terrain',
+  provenance: 'REAL',
+  sourceNote:
+    'PDS product DTEEC_009149_1750_009294_1750_U01, 32-bit float at 1.01 m/post, ' +
+    'resampled to this 474 x 1024 grid (~14.3 m/px). Heights are relative to the Mars areoid. ' +
+    'Read by HTTP range from the PDS archive rather than downloading the full 390 MB file.',
+  sourceUrl: 'https://www.uahirise.org/dtm/',
+  credit: 'NASA/JPL-Caltech/University of Arizona',
   defaultVisible: true,
-  defaultOpacity: 0.34,
+  defaultOpacity: 0.38,
   mapRenderable: true,
   legend: {
     type: 'continuous',
     unit: 'm (areoid)',
-    min: ELEV_FLOOR,
-    max: ELEV_CEIL,
+    min: -4406,
+    max: -2271,
     stops: [
-      { value: -4500, color: '#1b2a4a' },
-      { value: -4440, color: '#2f5d7c' },
-      { value: -4380, color: '#4f9a86' },
-      { value: -4330, color: '#c9b464' },
-      { value: -4280, color: '#d9793c' },
-      { value: -4240, color: '#b23a2a' },
-      { value: -4200, color: '#f2e4d8' },
+      { value: -4406, color: '#17213f' },
+      { value: -4050, color: '#2f5d7c' },
+      { value: -3700, color: '#4f9a86' },
+      { value: -3350, color: '#c9b464' },
+      { value: -3000, color: '#d9793c' },
+      { value: -2650, color: '#b23a2a' },
+      { value: -2271, color: '#f2e4d8' },
     ],
-    note: 'Ground climbs ~290 m south-south-east toward Mount Sharp. The habitat pad sits on the low northern bench.',
+    note: 'The ground climbs 2.13 km from the crater floor in the north onto Mount Sharp in the south.',
   },
   async load(): Promise<LayerData> {
     const t = getTerrain();
     return {
       type: 'raster-grid',
-      width: t.grid,
-      height: t.grid,
+      width: t.width,
+      height: t.height,
       values: t.elevation,
       bounds: { ...BOUNDS_M },
       min: t.minElev,
@@ -64,14 +62,16 @@ export const demAdapter: LayerAdapter = {
 export const slopeAdapter: LayerAdapter = {
   id: 'dem-slope',
   name: 'Slope',
-  mission: 'Mars Reconnaissance Orbiter',
-  instrument: 'HiRISE DTM (derived)',
+  mission: 'Derived product',
+  instrument: 'HiRISE DTM (Horn 3x3)',
   kind: 'topographic',
-  isMock: !USE_REAL_DATA.topography,
-  provenance:
-    "Slope magnitude computed from the DTM with Horn's 3×3 method at " +
-    (AOI.sizeM / AOI.grid).toFixed(2) +
-    ' m baseline. Flight rule: flag at 15°, bar suited crew at 20°.',
+  group: 'Terrain',
+  provenance: 'DERIVED',
+  sourceNote:
+    "Computed from the real DTM with Horn's 3x3 method at its true 14.29 x 14.27 m baseline. " +
+    'Flight rules: flagged at 15 degrees, barred to suited crew at 25. ' +
+    'Median across the AOI is 10.4 degrees, 95th percentile 33.6.',
+  credit: 'Derived by MARSWALK from NASA/JPL-Caltech/University of Arizona HiRISE data',
   defaultVisible: false,
   defaultOpacity: 0.6,
   mapRenderable: true,
@@ -79,16 +79,16 @@ export const slopeAdapter: LayerAdapter = {
     type: 'continuous',
     unit: '°',
     min: 0,
-    max: 30,
+    max: 45,
     stops: [
       { value: 0, color: '#0d2a24' },
-      { value: 5, color: '#1d6b4f' },
-      { value: 10, color: '#8dbf4a' },
-      { value: 15, color: '#f2b53a' },
-      { value: 20, color: '#ef4444' },
-      { value: 30, color: '#7f1d1d' },
+      { value: 8, color: '#1d6b4f' },
+      { value: 15, color: '#8dbf4a' },
+      { value: 22, color: '#f2b53a' },
+      { value: 30, color: '#ef4444' },
+      { value: 45, color: '#7f1d1d' },
     ],
-    note: 'Amber from 15° (flagged), red from 20° (impassable to suited crew in the planner).',
+    note: 'Amber from 15° (flagged), red from 25° (barred). Slope is zeroed where there is no stereo coverage.',
   },
   async load(): Promise<LayerData> {
     const t = getTerrain();
@@ -100,8 +100,8 @@ export const slopeAdapter: LayerAdapter = {
     }
     return {
       type: 'raster-grid',
-      width: t.grid,
-      height: t.grid,
+      width: t.width,
+      height: t.height,
       values: t.slopeDeg,
       bounds: { ...BOUNDS_M },
       min,

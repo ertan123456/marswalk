@@ -1,7 +1,7 @@
 import { compassLabel } from '../../lib/geo';
 import { formatDistance, formatDuration, formatMinutes, formatMLST } from '../../lib/format';
-import { SCIENCE_POINTS } from '../../data/mock/science';
-import { SPE_EVENT } from '../../data/mock/environment';
+import { getSciencePoints } from '../../data/real/science';
+import { SPE_EVENT } from '../../data/models/environment';
 import { useMission } from '../../store/useMission';
 import { Alert, Badge, KeyVal, Panel, Readout } from '../ui/primitives';
 import { ElevationProfileChart, WalkBackChart } from './RouteCharts';
@@ -79,7 +79,7 @@ function StationList() {
 
   return (
     <div className="space-y-1.5">
-      {SCIENCE_POINTS.map((p) => {
+      {getSciencePoints().map((p) => {
         const inPlan = order.includes(p.id);
         const station = plan?.stations.find((s) => s.id === p.id);
         const idx = order.indexOf(p.id);
@@ -190,7 +190,7 @@ function StationList() {
 
 function SelectedTarget() {
   const selected = useMission((s) => s.selectedWaypointId);
-  const p = SCIENCE_POINTS.find((x) => x.id === selected);
+  const p = getSciencePoints().find((x) => x.id === selected);
   if (!p) return null;
   return (
     <Panel title={'Target brief · ' + p.code}>

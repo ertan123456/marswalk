@@ -120,6 +120,10 @@ export interface SciencePoint {
   whyItMatters: string;
   /** minutes of crew task time on station */
   taskMinutes: number;
+  /** sol whose surveyed rover position anchors this station (REAL) */
+  sol?: number;
+  /** elevation from the rover waypoint record, metres (REAL) */
+  surveyedElevM?: number;
   /** ground-level view: real rover frame once adapters are swapped */
   groundViewSlot: {
     caption: string;
@@ -133,13 +137,24 @@ export interface PointsData {
   bounds: BoundsM;
 }
 
+/** A polyline product, e.g. the rover's driven traverse. */
+export interface PathData {
+  type: 'path';
+  segments: LocalPoint[][];
+  bounds: BoundsM;
+  /** sols spanned by the segments inside the AOI, if known */
+  solRange?: [number, number];
+  waypoints?: { position: LocalPoint; sol: number | null; elevation: number | null }[];
+}
+
 export type LayerData =
   | RasterGridData
   | RasterImageData
   | CategoricalGridData
   | VectorData
   | TimeSeriesData
-  | PointsData;
+  | PointsData
+  | PathData;
 
 export interface ColorStop {
   value: number;
@@ -154,20 +169,37 @@ export type LegendSpec =
   | { type: 'points'; note?: string };
 
 /**
- * One adapter per data product. Swapping mock -> real means replacing the body
- * of load() (and flipping isMock); nothing in the UI changes.
+ * How a layer's numbers came to exist. Shown on every layer card and on the
+ * About page, because a reviewer has to be able to tell a measurement from a
+ * computation from a model.
+ *
+ *   REAL     downloaded from a NASA/USGS product (cite product name + URL)
+ *   DERIVED  computed by us from REAL data (slope from a DEM, hazard classes)
+ *   MODELED  built from published measurements, not a raw dataset
  */
+export type Provenance = 'REAL' | 'DERIVED' | 'MODELED';
+
+/** Which group the layer sits in, in the layer panel. */
+export type LayerGroup = 'Base' | 'Terrain' | 'Geology & Minerals' | 'Safety' | 'Environment';
+
+/** One adapter per data product. The UI never knows where the bytes came from. */
 export interface LayerAdapter {
   id: string;
   name: string;
   mission: string;
   instrument: string;
   kind: LayerKind;
+  group: LayerGroup;
   load(): Promise<LayerData>;
   legend: LegendSpec;
-  isMock: boolean;
+  /** REAL / DERIVED / MODELED — drives the badge. */
+  provenance: Provenance;
   /** Human note shown in the layer card: resolution, product id, caveats. */
-  provenance: string;
+  sourceNote: string;
+  /** Canonical link for the info button. */
+  sourceUrl?: string;
+  /** Who to credit, e.g. "NASA/JPL-Caltech/University of Arizona". */
+  credit: string;
   /** Default map visibility + opacity. */
   defaultVisible: boolean;
   defaultOpacity: number;
@@ -183,5 +215,5 @@ export interface ProbeReading {
   instrument: string;
   value: string;
   tone?: 'nominal' | 'caution' | 'danger';
-  isMock: boolean;
+  provenance: Provenance;
 }

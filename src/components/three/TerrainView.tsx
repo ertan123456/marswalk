@@ -27,7 +27,7 @@ function DrapeSelector() {
           >
             <div className="flex items-center gap-1.5">
               <span className={'text-[11px] ' + (active ? 'text-mars-300' : 'text-ink-dim')}>{a.name}</span>
-              {a.isMock && <Badge tone="mock">mock</Badge>}
+              {(a.provenance !== 'REAL') && <Badge tone="mock">mock</Badge>}
             </div>
             <div className="text-[9px] text-ink-faint truncate">{a.instrument}</div>
           </button>
@@ -55,7 +55,7 @@ export function TerrainView() {
   return (
     <div className="flex-1 min-h-0 relative">
       <Canvas
-        camera={{ position: [-2100, 1500, 2400], fov: 42, near: 1, far: 20000 }}
+        camera={{ position: [-6400, 8600, 13200], fov: 42, near: 5, far: 90000 }}
         gl={{ antialias: true }}
         dpr={[1, 1.8]}
       >
@@ -65,8 +65,8 @@ export function TerrainView() {
             enableDamping
             dampingFactor={0.08}
             maxPolarAngle={Math.PI / 2.08}
-            minDistance={120}
-            maxDistance={9000}
+            minDistance={200}
+            maxDistance={42000}
             target={[0, 0, 0]}
           />
         )}

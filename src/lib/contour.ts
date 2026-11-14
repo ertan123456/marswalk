@@ -72,7 +72,8 @@ export function maskToRings(
   opts: RingOptions = {},
 ): LocalPoint[][] {
   const { minAreaM2 = 0, simplify = true } = opts;
-  const cell = AOI.sizeM / width;
+  const cellX = AOI.sizeXM / width;
+  const cellY = AOI.sizeYM / height;
   const inside = (c: number, r: number) =>
     c >= 0 && r >= 0 && c < width && r < height && mask[r * width + c] === 1;
 
@@ -86,12 +87,12 @@ export function maskToRings(
   };
 
   for (let r = 0; r < height; r++) {
-    const yTop = AOI.sizeM - r * cell;
-    const yBot = yTop - cell;
+    const yTop = AOI.sizeYM - r * cellY;
+    const yBot = yTop - cellY;
     for (let c = 0; c < width; c++) {
       if (!inside(c, r)) continue;
-      const x0 = c * cell;
-      const x1 = x0 + cell;
+      const x0 = c * cellX;
+      const x1 = x0 + cellX;
       if (!inside(c, r - 1)) push({ x: x1, y: yTop }, { x: x0, y: yTop });
       if (!inside(c, r + 1)) push({ x: x0, y: yBot }, { x: x1, y: yBot });
       if (!inside(c - 1, r)) push({ x: x0, y: yTop }, { x: x0, y: yBot });

@@ -150,13 +150,23 @@ def main() -> int:
     zmax = float(np.nanmax(filled))
     log(f"  elevation {zmin:.2f} .. {zmax:.2f} m (areoid), relief {zmax - zmin:.1f} m")
 
-    # --- write 16-bit heightmap PNG -----------------------------------------
+    # --- write heightmap as a canvas-readable packed PNG ---------------------
+    #
+    # A 16-bit greyscale PNG loses its low byte the moment a browser draws it to
+    # a canvas, which would quantise this DEM to ~8 m steps. So pack the 16-bit
+    # value across two 8-bit channels and carry the coverage mask in the third:
+    #   R = high byte, G = low byte, B = 255 where the stereo DTM has real data.
+    # Lossless through canvas, and one request instead of two.
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     norm = (filled - zmin) / max(1e-6, zmax - zmin)
-    png = (norm * 65535.0).round().astype(np.uint16)
-    Image.fromarray(png, mode="I;16").save(OUT_DIR / "heightmap.png", optimize=True)
+    v16 = (norm * 65535.0).round().astype(np.uint16)
+    rgb = np.zeros((out_h, out_w, 3), dtype=np.uint8)
+    rgb[:, :, 0] = (v16 >> 8).astype(np.uint8)
+    rgb[:, :, 1] = (v16 & 0xFF).astype(np.uint8)
+    rgb[:, :, 2] = (valid * 255).astype(np.uint8)
+    Image.fromarray(rgb, mode="RGB").save(OUT_DIR / "heightmap.png", optimize=True)
     size_kb = (OUT_DIR / "heightmap.png").stat().st_size / 1024
-    log(f"  wrote public/data/dem/heightmap.png ({size_kb:.0f} KB, 16-bit)")
+    log(f"  wrote public/data/dem/heightmap.png ({size_kb:.0f} KB, RGB-packed 16-bit + coverage)")
 
     # --- coverage mask: 255 where the DTM really has data, 0 where it does not
     cov = (valid * 255).astype(np.uint8)
@@ -181,7 +191,9 @@ def main() -> int:
         "grid": {"width": out_w, "height": out_h},
         "ground_resolution_m": {"x": width_m / out_w, "y": height_m / out_h},
         "elevation_m": {"min": zmin, "max": zmax},
-        "encoding": "16-bit greyscale PNG; elevation = min + value/65535 * (max - min)",
+        "encoding": ("RGB PNG. elevation = min + ((R << 8) | G) / 65535 * (max - min). "
+                     "B = 255 where the stereo DTM has real data, 0 where it does not. "
+                     "Packed this way because a canvas drops the low byte of a 16-bit PNG."),
         "coverage_mask": "coverage.png - 255 where the stereo DTM has real data, 0 where it does not",
         "stereo_coverage_percent": round(pct, 1),
         "nodata_filled_cells": int((~valid).sum()),

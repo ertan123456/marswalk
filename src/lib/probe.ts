@@ -12,7 +12,7 @@ import { sampleGridBilinear, sampleGridNearest } from './raster';
 import { pointInRing } from './contour';
 import { LAYER_REGISTRY } from '../data/config';
 import type { LayerData, ProbeReading } from '../data/types';
-import { radDoseRateAt, weatherAt } from '../data/mock/environment';
+import { radDoseRateAt, weatherAt } from '../data/models/environment';
 
 function fmt(v: number, digits = 1): string {
   return v.toFixed(digits);
@@ -41,7 +41,7 @@ export function probeAt(
       layerName: adapter.name,
       mission: adapter.mission,
       instrument: adapter.instrument,
-      isMock: adapter.isMock,
+      provenance: adapter.provenance,
     };
 
     if (data.type === 'raster-grid') {

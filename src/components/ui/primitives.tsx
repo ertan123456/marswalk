@@ -97,11 +97,19 @@ export function Badge({
   );
 }
 
-export function MockBadge({ isMock }: { isMock: boolean }) {
-  if (!isMock) return <Badge tone="nominal" title="Live mission data">LIVE</Badge>;
+export type ProvenanceTag = 'REAL' | 'DERIVED' | 'MODELED';
+
+const PROVENANCE_TITLE: Record<ProvenanceTag, string> = {
+  REAL: 'Downloaded from a NASA or USGS product. See the layer info for the exact product and link.',
+  DERIVED: 'Computed by MARSWALK from REAL data — not a measurement in its own right.',
+  MODELED: 'Built from published measurements rather than ingested telemetry. Cited on the layer card.',
+};
+
+export function ProvenanceBadge({ provenance }: { provenance: ProvenanceTag }) {
+  const tone = provenance === 'REAL' ? 'nominal' : provenance === 'DERIVED' ? 'accent' : 'caution';
   return (
-    <Badge tone="mock" title="Synthetic stand-in. Swap the adapter to go live — see DATA_TODO.md">
-      Mock data
+    <Badge tone={tone} title={PROVENANCE_TITLE[provenance]}>
+      {provenance}
     </Badge>
   );
 }

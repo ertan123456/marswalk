@@ -1,38 +1,68 @@
 /**
- * Mobility hazard adapter — derived flight-rules product.
+ * EVA mobility hazards.
  *
- * TO GO LIVE: swap in the reviewed hazard GeoJSON for the AOI (or re-trace it
- * from the real DTM slope raster plus a HiRISE rock-abundance product). Keep
- * `costFactor` / `passable`: the A* planner reads them directly.
+ * PROVENANCE: DERIVED. Classified by scripts/derive_terrain.py from the real
+ * DTM: slope by Horn's method, plus detrended local relief as a ruggedness
+ * index. Shipped as a class raster so the map, the 3D view and the A* planner
+ * all read exactly the same cells.
+ *
+ * The "no stereo coverage" class is a first-class hazard, not a gap: the crew
+ * is not routed across ground the DTM does not cover.
  */
 
 import { BOUNDS_M } from '../../lib/geo';
-import { getHazards, HAZARD_STYLE } from '../mock/hazards';
-import { USE_REAL_DATA } from '../sources';
-import type { LayerAdapter, LayerData } from '../types';
+import { getTerrain } from '../real/terrain';
+import type { CategoryDef, LayerAdapter, LayerData } from '../types';
+
+export function hazardCategories(): CategoryDef[] {
+  const t = getTerrain();
+  return t.derivedMeta.classes.map((c) => ({
+    code: c.code,
+    label: c.label,
+    color: c.color,
+    note: c.detail,
+  }));
+}
 
 export const hazardAdapter: LayerAdapter = {
   id: 'mobility-hazards',
   name: 'Mobility hazards',
   mission: 'Derived product',
-  instrument: 'HiRISE DTM + rock abundance',
+  instrument: 'HiRISE DTM (slope + ruggedness)',
   kind: 'hazard',
-  isMock: !USE_REAL_DATA.hazards,
-  provenance:
-    'Traced from the DTM slope raster and surface-unit masks, then classified against EVA mobility flight rules. Boundaries follow DEM cell edges, as an un-smoothed GIS hazard polygon does.',
+  group: 'Safety',
+  provenance: 'DERIVED',
+  sourceNote:
+    'Slope and detrended local relief from the real DTM, thresholded against EVA mobility ' +
+    'flight rules: caution at 15° or 1.0 m relief, barred at 25° or 2.2 m. ' +
+    'At ~14 m/px the DEM cannot resolve individual boulders, so the relief term is a ' +
+    'ruggedness index, not a rock count. 58.4% of the AOI is passable to suited crew.',
+  credit: 'Derived by MARSWALK from NASA/JPL-Caltech/University of Arizona HiRISE data',
   defaultVisible: true,
-  defaultOpacity: 0.8,
+  defaultOpacity: 0.3,
   mapRenderable: true,
   legend: {
-    type: 'vector',
-    items: [
-      { label: HAZARD_STYLE['boulder-field'].label + ' — barred', color: HAZARD_STYLE['boulder-field'].color, passable: false },
-      { label: HAZARD_STYLE['steep-slope'].label + ' — 2.6× cost', color: HAZARD_STYLE['steep-slope'].color, passable: true },
-      { label: HAZARD_STYLE['sand-trap'].label + ' — 4.2× cost', color: HAZARD_STYLE['sand-trap'].color, passable: true },
-    ],
-    note: 'The planner routes around barred polygons outright and pays the cost multiplier to cross the others.',
+    type: 'categorical',
+    items: [],
+    note: 'The planner routes around the barred classes and pays a cost penalty to cross caution ground.',
   },
   async load(): Promise<LayerData> {
-    return { type: 'vector', features: getHazards(), bounds: { ...BOUNDS_M } };
+    const t = getTerrain();
+    const categories = hazardCategories();
+    // The class list lives in the shipped metadata, so fill the legend in once
+    // the terrain is available rather than duplicating it here.
+    hazardAdapter.legend = {
+      type: 'categorical',
+      items: categories,
+      note: 'The planner routes around the barred classes and pays a cost penalty to cross caution ground.',
+    };
+    return {
+      type: 'categorical-grid',
+      width: t.width,
+      height: t.height,
+      codes: t.hazard,
+      categories,
+      bounds: { ...BOUNDS_M },
+    };
   },
 };

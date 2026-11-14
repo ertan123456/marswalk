@@ -3,7 +3,7 @@ import { LAYER_REGISTRY } from '../../data/config';
 import type { LayerAdapter, LegendSpec } from '../../data/types';
 import { rampCssGradient } from '../../lib/raster';
 import { useMission } from '../../store/useMission';
-import { Badge, Button, MockBadge, Panel, Switch } from '../ui/primitives';
+import { Badge, Button, Panel, ProvenanceBadge, Switch } from '../ui/primitives';
 
 function LegendBody({ legend }: { legend: LegendSpec }) {
   if (legend.type === 'continuous') {
@@ -96,7 +96,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
             <span className={'text-[12px] leading-tight ' + (state.visible ? 'text-ink' : 'text-ink-dim')}>
               {adapter.name}
             </span>
-            <MockBadge isMock={adapter.isMock} />
+            <ProvenanceBadge provenance={adapter.provenance} />
           </div>
           <div className="text-[10px] text-ink-faint leading-tight mt-0.5 truncate">
             {adapter.mission + ' · ' + adapter.instrument}
@@ -129,7 +129,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
           <p className="text-[10px] leading-relaxed text-ink-faint">
             <span className="label !text-ink-faint">provenance</span>
             <br />
-            {adapter.provenance}
+            {adapter.sourceNote}
           </p>
         </div>
       )}

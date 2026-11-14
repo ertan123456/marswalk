@@ -11,11 +11,11 @@ import { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { MarsScene } from '../three/Scene';
 import { bearingDeg, compassLabel, localToGrid } from '../../lib/geo';
-import { getTerrain } from '../../data/mock/terrain';
-import { hazardAt } from '../../data/mock/hazards';
-import { doseOverWindow, SPE_EVENT } from '../../data/mock/environment';
+import { getTerrain } from '../../data/real/terrain';
+import { hazardClass } from '../../data/real/terrain';
+import { doseOverWindow, SPE_EVENT } from '../../data/models/environment';
 import { formatDistance, formatDuration, formatMLST } from '../../lib/format';
-import { SCIENCE_POINTS } from '../../data/mock/science';
+import { getSciencePoints } from '../../data/real/science';
 import { useMission } from '../../store/useMission';
 
 function CompassTape({ heading, targetBearing }: { heading: number; targetBearing: number | null }) {
@@ -105,15 +105,24 @@ export function HudView() {
 
     const t = getTerrain();
     const gi = localToGrid(cur.point);
-    const haz = hazardAt(gi.col, gi.row);
-    const slope = t.slopeDeg[gi.row * t.grid + gi.col];
+    const cell = gi.row * t.width + gi.col;
+    const cls = hazardClass(t.hazard[cell]);
+    const haz = {
+      label: cls ? cls.label.toUpperCase() : 'UNKNOWN',
+      tone: (cls?.passable === false
+        ? 'danger'
+        : t.hazard[cell] > 0
+          ? 'caution'
+          : 'nominal') as 'nominal' | 'caution' | 'danger',
+    };
+    const slope = t.slopeDeg[cell];
 
     const consumablesPct = ((suit.evaBudgetH - cur.consumablesH) / suit.evaBudgetH) * 100;
     const dose = doseOverWindow(suit.evaStartHour, Math.max(0.001, cur.timeH));
     const mlst = suit.evaStartHour + cur.timeH;
     const speIn = SPE_EVENT.startHour - mlst;
 
-    const target = SCIENCE_POINTS.find((p) => p.id === nextStation.id);
+    const target = getSciencePoints().find((p) => p.id === nextStation.id);
 
     return {
       cur,

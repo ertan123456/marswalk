@@ -1,48 +1,63 @@
 /**
  * Local planar coordinate frame for the area of interest.
  *
- * The map works in LOCAL METRES (x = east, y = north, origin = SW corner of the
- * AOI) because Mars raster products at this scale are delivered in a local
- * equirectangular / polar-stereographic projection, and Leaflet's CRS.Simple
- * maps metres to screen pixels without any Earth-datum assumptions.
+ * The AOI is the footprint of the HiRISE stereo DTM that covers Curiosity's
+ * real traverse through lower Mount Sharp. It is NOT square: the stereo swath
+ * is a tall, narrow strip, so the frame carries separate X and Y extents.
  *
- * Areographic lat/lon is derived only for display + for matching real PDS
- * products once the mock adapters are swapped out.
+ * x = metres east of the AOI's west edge
+ * y = metres north of the AOI's south edge
+ *
+ * These constants mirror public/data/dem/meta.json, which the pipeline writes.
+ * `assertAoiMatches()` checks them against the loaded metadata at boot, so if
+ * the pipeline is re-run over a different footprint the mismatch is reported
+ * instead of silently mis-registering every layer.
  */
 
 export const MARS_RADIUS_M = 3_396_190;
 
-/** Gale Crater, Mount Sharp foothills — boxwork formations region. */
+/** Gale Crater, lower Mount Sharp — the HiRISE DTM footprint. */
 export const AOI = {
-  name: 'Gale Crater — Mount Sharp Boxwork Region',
-  /** AOI centre, areographic (planetocentric) degrees. */
-  centerLat: -4.72,
-  centerLon: 137.403,
-  /** Square AOI edge length, metres. */
-  sizeM: 4000,
-  /** DEM grid resolution. */
-  grid: 512,
+  name: 'Gale Crater — Lower Mount Sharp',
+  subtitle: "Curiosity's traverse, Glen Torridon to the boxwork region",
+
+  /** areographic bounds, degrees */
+  west: 137.35334875,
+  south: -4.923,
+  east: 137.468,
+  north: -4.6764,
+
+  /** ground extent, metres */
+  sizeXM: 6772.0869,
+  sizeYM: 14617.1404,
+
+  /** working grid (matches the shipped rasters) */
+  gridW: 474,
+  gridH: 1024,
 } as const;
 
-/** Metres per DEM cell. */
-export const CELL_M = AOI.sizeM / AOI.grid; // 7.8125 m
+export const CELL_X_M = AOI.sizeXM / AOI.gridW; // 14.287 m
+export const CELL_Y_M = AOI.sizeYM / AOI.gridH; // 14.275 m
+
+export const CENTER_LAT = (AOI.north + AOI.south) / 2;
+export const CENTER_LON = (AOI.east + AOI.west) / 2;
 
 export const METRES_PER_DEG_LAT = (Math.PI * MARS_RADIUS_M) / 180;
 export const METRES_PER_DEG_LON =
-  (Math.PI * MARS_RADIUS_M * Math.cos((AOI.centerLat * Math.PI) / 180)) / 180;
+  (Math.PI * MARS_RADIUS_M * Math.cos((CENTER_LAT * Math.PI) / 180)) / 180;
 
 /** AOI bounds in local metres. */
 export const BOUNDS_M = {
   west: 0,
   south: 0,
-  east: AOI.sizeM,
-  north: AOI.sizeM,
+  east: AOI.sizeXM,
+  north: AOI.sizeYM,
 } as const;
 
 export interface LocalPoint {
-  /** metres east of AOI south-west corner */
+  /** metres east of the AOI west edge */
   x: number;
-  /** metres north of AOI south-west corner */
+  /** metres north of the AOI south edge */
   y: number;
 }
 
@@ -51,26 +66,40 @@ export interface GridIndex {
   row: number;
 }
 
+export interface AoiBounds {
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+}
+
 export function localToLatLon(p: LocalPoint): { lat: number; lon: number } {
-  const dx = p.x - AOI.sizeM / 2;
-  const dy = p.y - AOI.sizeM / 2;
   return {
-    lat: AOI.centerLat + dy / METRES_PER_DEG_LAT,
-    lon: AOI.centerLon + dx / METRES_PER_DEG_LON,
+    lat: AOI.south + (p.y / AOI.sizeYM) * (AOI.north - AOI.south),
+    lon: AOI.west + (p.x / AOI.sizeXM) * (AOI.east - AOI.west),
   };
 }
 
-/** Local metres -> DEM cell. Row 0 is the NORTH edge (raster convention). */
-export function localToGrid(p: LocalPoint, grid = AOI.grid): GridIndex {
-  const col = Math.min(grid - 1, Math.max(0, Math.floor((p.x / AOI.sizeM) * grid)));
-  const row = Math.min(grid - 1, Math.max(0, Math.floor(((AOI.sizeM - p.y) / AOI.sizeM) * grid)));
+export function latLonToLocal(lat: number, lon: number): LocalPoint {
+  return {
+    x: ((lon - AOI.west) / (AOI.east - AOI.west)) * AOI.sizeXM,
+    y: ((lat - AOI.south) / (AOI.north - AOI.south)) * AOI.sizeYM,
+  };
+}
+
+/** Local metres -> grid cell. Row 0 is the NORTH edge (raster convention). */
+export function localToGrid(p: LocalPoint, w: number = AOI.gridW, h: number = AOI.gridH): GridIndex {
+  const col = Math.min(w - 1, Math.max(0, Math.floor((p.x / AOI.sizeXM) * w)));
+  const row = Math.min(h - 1, Math.max(0, Math.floor(((AOI.sizeYM - p.y) / AOI.sizeYM) * h)));
   return { col, row };
 }
 
-/** Centre of a DEM cell, in local metres. */
-export function gridToLocal(col: number, row: number, grid = AOI.grid): LocalPoint {
-  const cell = AOI.sizeM / grid;
-  return { x: (col + 0.5) * cell, y: AOI.sizeM - (row + 0.5) * cell };
+/** Centre of a grid cell, in local metres. */
+export function gridToLocal(col: number, row: number, w: number = AOI.gridW, h: number = AOI.gridH): LocalPoint {
+  return {
+    x: ((col + 0.5) / w) * AOI.sizeXM,
+    y: AOI.sizeYM - ((row + 0.5) / h) * AOI.sizeYM,
+  };
 }
 
 export function distanceM(a: LocalPoint, b: LocalPoint): number {
@@ -86,13 +115,36 @@ export function bearingDeg(from: LocalPoint, to: LocalPoint): number {
 const COMPASS = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 
 export function compassLabel(bearing: number): string {
-  return COMPASS[Math.round(((bearing % 360) / 22.5)) % 16];
+  return COMPASS[Math.round((bearing % 360) / 22.5) % 16];
 }
 
 /** Areographic degrees formatted the way PDS products label them. */
 export function formatLatLon(p: LocalPoint): string {
   const { lat, lon } = localToLatLon(p);
-  const latStr = `${Math.abs(lat).toFixed(5)}${lat < 0 ? 'S' : 'N'}`;
-  const lonStr = `${lon.toFixed(5)}E`;
+  const latStr = `${Math.abs(lat).toFixed(5)}°${lat < 0 ? 'S' : 'N'}`;
+  const lonStr = `${lon.toFixed(5)}°E`;
   return `${latStr} ${lonStr}`;
+}
+
+/**
+ * Guard against the baked-in frame drifting from the shipped rasters.
+ * Returns a human-readable complaint, or null when everything agrees.
+ */
+export function assertAoiMatches(meta: {
+  bounds: AoiBounds;
+  grid: { width: number; height: number };
+}): string | null {
+  const b = meta.bounds;
+  const near = (a: number, c: number, tol: number) => Math.abs(a - c) <= tol;
+  const problems: string[] = [];
+  if (!near(b.west, AOI.west, 1e-6)) problems.push(`west ${b.west} vs ${AOI.west}`);
+  if (!near(b.east, AOI.east, 1e-6)) problems.push(`east ${b.east} vs ${AOI.east}`);
+  if (!near(b.south, AOI.south, 1e-6)) problems.push(`south ${b.south} vs ${AOI.south}`);
+  if (!near(b.north, AOI.north, 1e-6)) problems.push(`north ${b.north} vs ${AOI.north}`);
+  if (meta.grid.width !== AOI.gridW) problems.push(`grid width ${meta.grid.width} vs ${AOI.gridW}`);
+  if (meta.grid.height !== AOI.gridH) problems.push(`grid height ${meta.grid.height} vs ${AOI.gridH}`);
+  return problems.length
+    ? `AOI in lib/geo.ts does not match public/data/dem/meta.json: ${problems.join(', ')}. ` +
+        'Re-run scripts/fetch_dem.py or update the constants.'
+    : null;
 }

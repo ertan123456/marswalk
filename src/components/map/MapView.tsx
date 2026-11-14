@@ -11,14 +11,13 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { AOI } from '../../lib/geo';
 import { layerImageURL } from '../../lib/layerImage';
-import { HAZARD_STYLE } from '../../data/mock/hazards';
 import { LAYER_IDS, mapLayers } from '../../data/config';
 import { buildReturnField } from '../../lib/planner';
 import { renderGridToDataURL } from '../../lib/raster';
 import { useMission } from '../../store/useMission';
-import { getHabitat, MISSION, SCIENCE_POINTS } from '../../data/mock/science';
+import { getHabitat, MISSION, getSciencePoints } from '../../data/real/science';
 
-const AOI_BOUNDS = L.latLngBounds([0, 0], [AOI.sizeM, AOI.sizeM]);
+const AOI_BOUNDS = L.latLngBounds([0, 0], [AOI.sizeYM, AOI.sizeXM]);
 
 function toLatLng(p: { x: number; y: number }): L.LatLngExpression {
   return [p.y, p.x];
@@ -62,7 +61,7 @@ export function MapView() {
     map.fitBounds(AOI_BOUNDS, { padding: [12, 12] });
     map.attributionControl.setPrefix('');
     map.attributionControl.addAttribution(
-      'AOI 4 km × 4 km · Gale Crater · local planar frame (m)',
+      'AOI ' + (AOI.sizeXM / 1000).toFixed(2) + ' × ' + (AOI.sizeYM / 1000).toFixed(2) + ' km · Gale Crater, lower Mount Sharp · HiRISE DTM frame',
     );
 
     // One pane per layer so draw order follows the registry.
@@ -83,7 +82,7 @@ export function MapView() {
 
     map.on('click', (e: L.LeafletMouseEvent) => {
       const p = { x: e.latlng.lng, y: e.latlng.lat };
-      if (p.x < 0 || p.y < 0 || p.x > AOI.sizeM || p.y > AOI.sizeM) return;
+      if (p.x < 0 || p.y < 0 || p.x > AOI.sizeXM || p.y > AOI.sizeYM) return;
       const st = useMission.getState();
       if (st.measureMode) st.pushMeasurePoint(p);
       else st.probePoint(p);
@@ -134,40 +133,41 @@ export function MapView() {
         ov.setOpacity(state.opacity);
         if (state.visible && !map.hasLayer(ov)) ov.addTo(map);
         if (!state.visible && map.hasLayer(ov)) map.removeLayer(ov);
-      } else if (data.type === 'vector') {
+      } else if (data.type === 'path') {
+        // Curiosity's real driven traverse. Ground truth, drawn under the plan.
         if (!existing) {
           const group = L.layerGroup([], { pane: 'layer-' + adapter.id });
-          for (const f of data.features) {
-            const style = HAZARD_STYLE[f.hazardClass];
-            const poly = L.polygon(f.ring.map(toLatLng), {
+          for (const seg of data.segments) {
+            if (seg.length < 2) continue;
+            L.polyline(seg.map(toLatLng), {
               pane: 'layer-' + adapter.id,
-              color: style.color,
-              weight: f.passable ? 1 : 1.4,
-              opacity: 0.95,
-              fillColor: style.color,
-              fillOpacity: f.passable ? 0.14 : 0.26,
-              dashArray: f.passable ? '4 3' : undefined,
-              interactive: true,
-            });
-            poly.bindTooltip(
-              '<div style="font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.08em;color:' +
-                style.color +
-                '">' +
-                f.label.toUpperCase() +
-                '</div><div style="font-size:11px;max-width:230px;line-height:1.45;color:#9aa3b2;margin-top:3px">' +
-                f.detail +
-                '</div>',
-              { className: 'mw-tip', sticky: true, opacity: 1 },
-            );
-            group.addLayer(poly);
+              color: '#f2d06b',
+              weight: 1.6,
+              opacity: 0.9,
+              interactive: false,
+            }).addTo(group);
           }
+          const sols = data.solRange;
+          const tip =
+            '<div style="font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.08em;color:#f2d06b">' +
+            "CURIOSITY'S DRIVEN PATH</div>" +
+            '<div style="font-size:11px;color:#9aa3b2;margin-top:3px;max-width:230px;line-height:1.45">' +
+            (sols ? 'Sols ' + sols[0] + '–' + sols[1] + '. ' : '') +
+            'Surveyed rover positions from NASA MMGIS — a route a real vehicle drove.</div>';
+          const hit = L.polyline(
+            (data.segments[0] ?? []).map(toLatLng),
+            { pane: 'layer-' + adapter.id, color: 'transparent', weight: 12 },
+          );
+          hit.bindTooltip(tip, { className: 'mw-tip', sticky: true, opacity: 1 });
+          hit.addTo(group);
           overlayRef.current.set(key, group);
           existing = group;
         }
         const group = existing as L.LayerGroup;
         group.eachLayer((l) => {
-          const p = l as L.Polygon;
-          p.setStyle({ opacity: state.opacity, fillOpacity: state.opacity * 0.22 });
+          const pl = l as L.Polyline;
+          if ((pl.options as L.PolylineOptions).color === 'transparent') return;
+          pl.setStyle({ opacity: state.opacity });
         });
         if (state.visible && !map.hasLayer(group)) group.addTo(map);
         if (!state.visible && map.hasLayer(group)) map.removeLayer(group);
@@ -190,7 +190,7 @@ export function MapView() {
       { label: 'Habitat', point: getHabitat() },
     ];
     if (suit.roverSupport) {
-      const bx3 = SCIENCE_POINTS.find((p) => p.code === 'BX-03');
+      const bx3 = getSciencePoints().find((p) => p.code === 'BX-03');
       if (bx3) havens.push({ label: 'Rover', point: bx3.position });
     }
     const field = buildReturnField(suit, havens);

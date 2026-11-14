@@ -8,7 +8,8 @@ import { DEFAULT_SUIT, planRoute, straightProfile } from '../lib/planner';
 import type { ProfilePoint, RoutePlan, SuitModel } from '../lib/planner';
 import { probeAt } from '../lib/probe';
 import type { ProbeResult } from '../lib/probe';
-import { getHabitat, SCIENCE_POINTS } from '../data/mock/science';
+import { getHabitat, getSciencePoints } from '../data/real/science';
+import { loadTerrain } from '../data/real/terrain';
 
 export type Mode = 'PLAN' | '3D' | 'HUD' | 'BRIEFING';
 
@@ -85,7 +86,7 @@ const initialLayers = (): Record<string, LayerState> => {
 
 /** Rover stages forward at BX-03, per the mission plan. */
 function roverStaging(): LocalPoint | null {
-  const bx3 = SCIENCE_POINTS.find((p) => p.code === 'BX-03');
+  const bx3 = getSciencePoints().find((p) => p.code === 'BX-03');
   return bx3 ? bx3.position : null;
 }
 
@@ -110,7 +111,9 @@ export const useMission = create<MissionState>((set, get) => ({
         setTimeout(done, 60);
       });
 
-    set({ bootStage: 'Building HiRISE DTM grid (512 × 512)' });
+    set({ bootStage: 'Loading HiRISE stereo DTM' });
+    await yieldFrame();
+    await loadTerrain((stage) => set({ bootStage: stage }));
     await yieldFrame();
 
     const data: Record<string, LayerData | undefined> = {};
@@ -163,13 +166,17 @@ export const useMission = create<MissionState>((set, get) => ({
     get().replan();
   },
 
-  waypointOrder: SCIENCE_POINTS.map((p) => p.id),
+  // Default to the lower section (EVA-214A). The full six-station traverse is
+  // 17 km round trip over real Mount Sharp terrain and needs 11.4 h of
+  // consumables against an 8 h budget - it is not walkable in one EVA, which is
+  // exactly what the planner is for. The upper stations are one click away.
+  waypointOrder: getSciencePoints().slice(0, 3).map((p) => p.id),
   toggleWaypoint: (id) => {
     set((s) => {
       const has = s.waypointOrder.includes(id);
       if (has) return { waypointOrder: s.waypointOrder.filter((w) => w !== id) };
       // reinsert in canonical order
-      const canonical = SCIENCE_POINTS.map((p) => p.id);
+      const canonical = getSciencePoints().map((p) => p.id);
       const next = [...s.waypointOrder, id].sort((a, b) => canonical.indexOf(a) - canonical.indexOf(b));
       return { waypointOrder: next };
     });
@@ -193,8 +200,8 @@ export const useMission = create<MissionState>((set, get) => ({
     const { suit, waypointOrder } = get();
     set({ planning: true });
     const waypoints = waypointOrder
-      .map((id) => SCIENCE_POINTS.find((p) => p.id === id))
-      .filter((p): p is (typeof SCIENCE_POINTS)[number] => Boolean(p))
+      .map((id) => getSciencePoints().find((p) => p.id === id))
+      .filter((p): p is ReturnType<typeof getSciencePoints>[number] => Boolean(p))
       .map((p) => ({
         id: p.id,
         code: p.code,

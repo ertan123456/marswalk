@@ -7,8 +7,7 @@
  * particle event alert from a space-weather feed is injected.
  */
 
-import { getRadiation, RAD_BASELINE_MGY_DAY } from '../mock/environment';
-import { USE_REAL_DATA } from '../sources';
+import { getRadiation, RAD_BASELINE_MGY_DAY } from '../models/environment';
 import type { LayerAdapter, LayerData } from '../types';
 
 export const radiationAdapter: LayerAdapter = {
@@ -17,8 +16,11 @@ export const radiationAdapter: LayerAdapter = {
   mission: 'Mars Science Laboratory (Curiosity)',
   instrument: 'RAD (Radiation Assessment Detector)',
   kind: 'radiation',
-  isMock: !USE_REAL_DATA.radiation,
-  provenance:
+  group: 'Environment',
+  provenance: 'MODELED',
+  credit: 'NASA/JPL-Caltech/SwRI',
+  sourceUrl: 'https://doi.org/10.1126/science.1244797',
+  sourceNote:
     'Surface dose rate in the shadow of the atmosphere, one sol at 30 min cadence. GCR baseline ~' +
     RAD_BASELINE_MGY_DAY.toFixed(2) +
     ' mGy/day. The solar particle event in this sol is injected for the exercise.',

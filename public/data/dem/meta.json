@@ -31,7 +31,7 @@
     "min": -4405.95166015625,
     "max": -2271.041748046875
   },
-  "encoding": "16-bit greyscale PNG; elevation = min + value/65535 * (max - min)",
+  "encoding": "RGB PNG. elevation = min + ((R << 8) | G) / 65535 * (max - min). B = 255 where the stereo DTM has real data, 0 where it does not. Packed this way because a canvas drops the low byte of a 16-bit PNG.",
   "coverage_mask": "coverage.png - 255 where the stereo DTM has real data, 0 where it does not",
   "stereo_coverage_percent": 74.8,
   "nodata_filled_cells": 122502,

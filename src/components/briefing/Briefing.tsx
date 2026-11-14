@@ -6,9 +6,9 @@
  * typed in, so editing the suit model in PLAN mode rewrites this page.
  */
 
-import { EVA_SOL, SOL_HOURS, SPE_EVENT, weatherAt } from '../../data/mock/environment';
-import { MISSION, SCIENCE_POINTS } from '../../data/mock/science';
-import { AOI, formatLatLon } from '../../lib/geo';
+import { EVA_SOL, SOL_HOURS, SPE_EVENT, weatherAt } from '../../data/models/environment';
+import { MISSION, getSciencePoints } from '../../data/real/science';
+import { AOI, CENTER_LAT, CENTER_LON, formatLatLon } from '../../lib/geo';
 import { formatDistance, formatDuration, formatMLST } from '../../lib/format';
 import { LAYER_REGISTRY } from '../../data/config';
 import { useMission } from '../../store/useMission';
@@ -175,7 +175,7 @@ export function Briefing() {
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
   const order = useMission((s) => s.waypointOrder);
-  const mockCount = LAYER_REGISTRY.filter((a) => a.isMock).length;
+  const mockCount = LAYER_REGISTRY.filter((a) => (a.provenance !== 'REAL')).length;
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
@@ -289,7 +289,7 @@ export function Briefing() {
 
         <Panel title="Science target package">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-            {SCIENCE_POINTS.map((p) => {
+            {getSciencePoints().map((p) => {
               const inPlan = order.includes(p.id);
               const station = plan?.stations.find((s) => s.id === p.id);
               return (
@@ -324,15 +324,15 @@ export function Briefing() {
                 <span className="text-[11px] text-ink-dim truncate">
                   {a.name} <span className="text-ink-faint">&middot; {a.mission}</span>
                 </span>
-                <Badge tone={a.isMock ? 'mock' : 'nominal'}>{a.isMock ? 'mock' : 'live'}</Badge>
+                <Badge tone={(a.provenance !== 'REAL') ? 'mock' : 'nominal'}>{(a.provenance !== 'REAL') ? 'mock' : 'live'}</Badge>
               </div>
             ))}
           </div>
           <p className="text-[11px] text-ink-dim leading-relaxed mt-3">
             {mockCount} of {LAYER_REGISTRY.length} layers are synthetic stand-ins generated from one seeded terrain
             model, so they are mutually consistent even though none of them is real yet. The area of interest is{' '}
-            {(AOI.sizeM / 1000).toFixed(0)} km &times; {(AOI.sizeM / 1000).toFixed(0)} km centred on{' '}
-            {AOI.centerLat.toFixed(3)}&deg;, {AOI.centerLon.toFixed(3)}&deg;E. Each adapter documents the real product
+            {(AOI.sizeXM / 1000).toFixed(2)} km &times; {(AOI.sizeYM / 1000).toFixed(2)} km centred on{' '}
+            {CENTER_LAT.toFixed(3)}&deg;, {CENTER_LON.toFixed(3)}&deg;E. Each adapter documents the real product
             it stands in for, and DATA_TODO.md lists what to plug in.
           </p>
         </Panel>

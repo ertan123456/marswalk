@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { getRadiation, SOL_HOURS, SPE_EVENT } from '../../data/mock/environment';
-import { getWeather } from '../../data/mock/environment';
+import { getRadiation, SOL_HOURS, SPE_EVENT } from '../../data/models/environment';
+import { getWeather } from '../../data/models/environment';
 import type { RoutePlan } from '../../lib/planner';
 import { formatMLST } from '../../lib/format';
 import { useMission } from '../../store/useMission';
