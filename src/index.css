@@ -1,0 +1,163 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --font-mono: "JetBrains Mono", "SF Mono", "Cascadia Mono", ui-monospace, "Courier New", monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Mission-control surfaces */
+  --color-void: #07080a;
+  --color-deck-900: #0b0d11;
+  --color-deck-800: #11141a;
+  --color-deck-700: #171b23;
+  --color-deck-600: #1f242e;
+  --color-deck-500: #2b313d;
+  --color-line: #2a303b;
+
+  /* Text */
+  --color-ink: #e8eaee;
+  --color-ink-dim: #9aa3b2;
+  --color-ink-faint: #616b7c;
+
+  /* Mars accent */
+  --color-mars-300: #ffb27a;
+  --color-mars-400: #ff8f4d;
+  --color-mars-500: #e2652a;
+  --color-mars-600: #b84a19;
+
+  /* Instrument cyan — data/geometry */
+  --color-probe-400: #5ad6e8;
+  --color-probe-500: #2bb6cc;
+
+  /* Safety */
+  --color-caution: #f2b53a;
+  --color-danger: #ef4444;
+  --color-nominal: #3ddc97;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* Numeric readouts */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-deck-500) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: var(--color-deck-500); border-radius: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* Range inputs */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--color-deck-500);
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--color-mars-400);
+  cursor: pointer;
+  border: 2px solid var(--color-deck-900);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border: 2px solid var(--color-deck-900);
+  border-radius: 50%;
+  background: var(--color-mars-400);
+  cursor: pointer;
+}
+
+/* Leaflet dark theme overrides */
+.leaflet-container {
+  background: #05060a;
+  font-family: var(--font-sans);
+  outline: none;
+}
+.leaflet-container img.leaflet-image-layer { image-rendering: auto; }
+.leaflet-bar, .leaflet-control-zoom a {
+  background: var(--color-deck-800) !important;
+  color: var(--color-ink) !important;
+  border-color: var(--color-line) !important;
+}
+.leaflet-control-zoom a:hover { background: var(--color-deck-600) !important; }
+.leaflet-control-attribution {
+  background: rgba(7, 8, 10, 0.75) !important;
+  color: var(--color-ink-faint) !important;
+  font-family: var(--font-mono);
+  font-size: 9px !important;
+}
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: var(--color-deck-800);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  border-radius: 2px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+.leaflet-popup-content { margin: 0; width: auto !important; }
+.leaflet-popup-close-button { color: var(--color-ink-faint) !important; }
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+.pulse-ring::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 9999px;
+  border: 1px solid currentColor;
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+
+@keyframes blink { 50% { opacity: 0.25; } }
+.blink { animation: blink 1.2s step-end infinite; }
+
+/* Leaflet tooltips, styled as mission-control callouts */
+.leaflet-tooltip.mw-tip {
+  background: rgba(17, 20, 26, 0.96);
+  border: 1px solid var(--color-line);
+  border-radius: 2px;
+  color: var(--color-ink);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  padding: 6px 8px;
+  font-size: 11px;
+}
+.leaflet-tooltip.mw-tip::before { display: none; }
+
+/* Categorical rasters must not be smoothed across unit boundaries */
+.categorical-overlay {
+  image-rendering: pixelated;
+}

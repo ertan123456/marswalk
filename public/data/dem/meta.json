@@ -1,0 +1,38 @@
+{
+  "provenance": "REAL",
+  "product_name": "HiRISE stereo DTM DTEEC_009149_1750_009294_1750_U01",
+  "title": "MRO HiRISE Digital Terrain Model, Gale Crater filled channel and fan deposit",
+  "mission": "Mars Reconnaissance Orbiter",
+  "instrument": "HiRISE",
+  "source_url": "https://www.uahirise.org/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/DTEEC_009149_1750_009294_1750_U01.IMG",
+  "credit": "NASA/JPL-Caltech/University of Arizona",
+  "native_map_scale_m_per_px": 1.0117467945795,
+  "projection": "EQUIRECTANGULAR, A_AXIS_RADIUS 3396.19 km",
+  "elevation_datum": "Mars areoid (MOLA)",
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "size_m": {
+    "width": 6772.086900330999,
+    "height": 14617.14040924731
+  },
+  "grid": {
+    "width": 474,
+    "height": 1024
+  },
+  "ground_resolution_m": {
+    "x": 14.287103165255273,
+    "y": 14.274551180905576
+  },
+  "elevation_m": {
+    "min": -4405.95166015625,
+    "max": -2271.041748046875
+  },
+  "encoding": "16-bit greyscale PNG; elevation = min + value/65535 * (max - min)",
+  "nodata_filled_cells": 122502,
+  "mars_radius_m": 3396190.0,
+  "retrieved": "2026-11-13"
+}

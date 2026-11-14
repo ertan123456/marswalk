@@ -1,0 +1,149 @@
+{
+  "_comment": [
+    "Every external endpoint used by the MARSWALK data pipeline.",
+    "Each entry was opened and verified on 2026-11-13; 'verified' records what",
+    "the probe actually returned. Nothing in this file is a guessed URL.",
+    "provenance: REAL = downloaded from NASA/USGS; DERIVED = computed by us from",
+    "REAL data; MODELED = built from published measurements, not a raw dataset."
+  ],
+
+  "aoi": {
+    "_comment": [
+      "AOI = footprint of the HiRISE DTM that covers Curiosity's traverse from",
+      "the Glen Torridon clay-bearing unit (sol ~1167) through Gediz Vallis to",
+      "the sulfate-bearing unit and the 2025 boxwork campaign (sol 5070).",
+      "This is NOT the 5.4S/137.8E point in the original brief: no HiRISE DTM",
+      "covers that point, and Curiosity has never been there. See README."
+    ],
+    "west": 137.353,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764,
+    "grid": 1024,
+    "mars_radius_m": 3396190.0
+  },
+
+  "dem": {
+    "provenance": "REAL",
+    "product_name": "HiRISE stereo DTM DTEEC_009149_1750_009294_1750_U01",
+    "title": "MRO HiRISE Digital Terrain Model, Gale Crater filled channel and fan deposit",
+    "mission": "Mars Reconnaissance Orbiter",
+    "instrument": "HiRISE",
+    "url": "https://www.uahirise.org/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/DTEEC_009149_1750_009294_1750_U01.IMG",
+    "archive_page": "https://www.uahirise.org/dtm/",
+    "index_used": "https://www.uahirise.org/PDS/INDEX/DTMCUMINDEX.TAB",
+    "format": "PDS3 attached-label raster, 32-bit PC_REAL (little-endian float)",
+    "map_scale_m_per_px": 1.0117467945795,
+    "projection": "EQUIRECTANGULAR, A_AXIS_RADIUS 3396.19 km",
+    "elevation_datum": "Mars areoid (MOLA)",
+    "access": "HTTP range requests (server sends Accept-Ranges: bytes), so only the AOI rows are downloaded, not the full ~540 MB file",
+    "verified": "2026-11-13: HEAD 200, Accept-Ranges bytes; label parsed; sample row returned continuous float elevations",
+    "credit": "NASA/JPL-Caltech/University of Arizona"
+  },
+
+  "ortho": {
+    "provenance": "REAL",
+    "product_name": "curiosity_hirise_mosaic",
+    "title": "MRO HiRISE, Curiosity Roving Site Mosaic",
+    "mission": "Mars Reconnaissance Orbiter",
+    "instrument": "HiRISE RED",
+    "catalog": "https://trek.nasa.gov/mars/TrekServices/ws/index/eq/searchItems",
+    "capabilities": "https://trek.nasa.gov/tiles/Mars/EQ/curiosity_hirise_mosaic/1.0.0/WMTSCapabilities.xml",
+    "tile_template": "https://trek.nasa.gov/tiles/Mars/EQ/curiosity_hirise_mosaic/1.0.0//default/default028mm/{z}/{row}/{col}.png",
+    "tile_matrix_set": "default028mm",
+    "tile_scheme": "geographic, top-left (-180, 90), matrix 2^(z+1) x 2^z, 256 px tiles",
+    "max_zoom": 16,
+    "native_m_per_px_at_max_zoom": 0.64,
+    "bbox": [137.1224669, -4.9254743, 137.7298129, -4.2489588],
+    "verified": "2026-11-13: WMTSCapabilities parsed; tiles return 8-bit greyscale PNG",
+    "credit": "NASA/JPL-Caltech/University of Arizona"
+  },
+
+  "traverse": {
+    "provenance": "REAL",
+    "product_name": "MSL rover traverse and waypoints",
+    "title": "Curiosity actual driven path",
+    "mission": "Mars Science Laboratory (Curiosity)",
+    "waypoints_url": "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json",
+    "traverse_url": "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_traverse.json",
+    "format": "GeoJSON",
+    "fields": "RMC, site, drive, sol, easting, northing, elev_geoid, lon, lat, roll, pitch, yaw, tilt",
+    "verified": "2026-11-13: 1388 waypoints, sols 3-5070, lon 137.353-137.449, lat -4.826 to -4.589",
+    "credit": "NASA/JPL-Caltech"
+  },
+
+  "pov_images": {
+    "provenance": "REAL",
+    "product_name": "MSL raw images",
+    "title": "Curiosity raw image archive",
+    "mission": "Mars Science Laboratory (Curiosity)",
+    "api": "https://mars.nasa.gov/rss/api/?feed=raw_images&category=msl&feedtype=json&num={num}&page={page}&order=sol+desc",
+    "browse_page": "https://mars.nasa.gov/msl/multimedia/raw-images/",
+    "verified": "2026-11-13: returned JSON, most recent sol 5072",
+    "credit_mastcam": "NASA/JPL-Caltech/MSSS",
+    "credit_navcam": "NASA/JPL-Caltech"
+  },
+
+  "geology": {
+    "provenance": "REAL",
+    "product_name": "SIM3292_Global_Geology",
+    "title": "Global Geologic Map of Mars (USGS SIM 3292)",
+    "source": "USGS Astrogeology, served via NASA Mars Trek",
+    "capabilities": "https://trek.nasa.gov/tiles/Mars/EQ/SIM3292_Global_Geology/1.0.0/WMTSCapabilities.xml",
+    "interactive_maps": "https://astrogeology-usgs.hub.arcgis.com/pages/interactive-maps-mars",
+    "verified": "2026-11-13: present in the Trek catalog as a global product",
+    "credit": "USGS / NASA"
+  },
+
+  "science_regions": {
+    "provenance": "REAL (digitized)",
+    "product_name": "Curiosity's Proposed Path up Mount Sharp",
+    "url": "https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/",
+    "note": "Annotated regions (clay-bearing unit, Greenheugh pediment, Gediz Vallis ridge, Gediz Vallis channel, sulfate-bearing unit) digitized as GeoJSON and georeferenced to the DTM. Labelled 'digitized from NASA/JPL-Caltech annotated map' in the UI.",
+    "credit": "NASA/JPL-Caltech"
+  },
+
+  "radiation": {
+    "provenance": "MODELED",
+    "basis": "Curiosity RAD surface measurements",
+    "citation": "Hassler, D. M. et al. (2014), Mars' Surface Radiation Environment Measured with the Mars Science Laboratory's Curiosity Rover, Science 343, 1244797",
+    "doi": "https://doi.org/10.1126/science.1244797",
+    "note": "Baseline surface dose rate and the solar-particle-event scenario are modelled from published RAD results, not ingested telemetry. The SPE is explicitly labelled a scenario in the UI.",
+    "credit": "NASA/JPL-Caltech/SwRI"
+  },
+
+  "weather": {
+    "provenance": "MODELED",
+    "basis": "Curiosity REMS published seasonal values for Gale Crater",
+    "note": "Daily temperature, pressure and wind cycle modelled from published REMS ranges; dust opacity is a user-selectable scenario, not a measurement.",
+    "credit": "NASA/JPL-Caltech/CAB"
+  },
+
+  "rejected": {
+    "_comment": "Sources checked and NOT used, with the reason. Kept so the choice is auditable.",
+    "trek_gale_dem_tiles": {
+      "url": "https://trek.nasa.gov/tiles/Mars/EQ/Gale_DEM_SMG_1m/1.0.0/WMTSCapabilities.xml",
+      "reason": "Trek serves this DEM as 8-bit greyscale PNG tiles: a whole z=14 tile contains only ~5 distinct grey levels, i.e. roughly 14 m of elevation per level once stretched over Gale's relief. Adequate as a picture, unusable for slope or hazard derivation. Replaced by the 32-bit float PDS DTM."
+    },
+    "usgs_mola_463m": {
+      "url": "https://planetarymaps.usgs.gov/mosaic/Mars_MGS_MOLA_DEM_mosaic_global_463m.tif",
+      "reason": "Real and reachable (2.1 GB GeoTIFF) but 463 m/px gives ~15 x 32 pixels over this AOI. Too coarse for EVA routing."
+    },
+    "usgs_hrsc_mola_blend_200m": {
+      "url": "https://planetarymaps.usgs.gov/mosaic/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif",
+      "reason": "404 - the filename guessed from memory does not exist. Not used."
+    },
+    "murray_lab_ctx": {
+      "url": "https://murray-lab.caltech.edu/CTX/",
+      "reason": "Host unreachable from the build environment at probe time."
+    },
+    "nasa_worldview": {
+      "url": "https://worldview.earthdata.nasa.gov/",
+      "reason": "Earth observation data. Used only as design inspiration for the layer UX, credited on the About page. No Earth data is placed on the Mars map."
+    },
+    "perseverance_raw_images": {
+      "url": "https://mars.nasa.gov/mars2020/multimedia/raw-images/",
+      "reason": "Mars 2020 operates in Jezero Crater, not Gale. Listed on the About page as a related resource only."
+    }
+  }
+}
