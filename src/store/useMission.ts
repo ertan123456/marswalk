@@ -9,6 +9,9 @@ import type { ProfilePoint, RoutePlan, SuitModel } from '../lib/planner';
 import { probeAt } from '../lib/probe';
 import type { ProbeResult } from '../lib/probe';
 import { getHabitat, getSciencePoints } from '../data/real/science';
+import { AOI } from '../lib/geo';
+import { TOUR_BEATS, TOUR_SECONDS } from '../lib/tour';
+import type { TourApi } from '../lib/tour';
 import { loadTerrain } from '../data/real/terrain';
 
 export type Mode = 'PLAN' | '3D' | 'HUD' | 'BRIEFING' | 'ABOUT';
@@ -22,6 +25,10 @@ interface MissionState {
   /* --- boot --- */
   booted: boolean;
   bootStage: string;
+  bootError: string | null;
+  /** the landing screen is dismissed once the crew starts planning */
+  started: boolean;
+  start: () => void;
   boot: () => Promise<void>;
 
   /* --- mode --- */
@@ -67,6 +74,17 @@ interface MissionState {
   selectedWaypointId: string | null;
   selectWaypoint: (id: string | null) => void;
 
+  /* --- left rail + guided tour --- */
+  railOpen: boolean;
+  toggleRail: () => void;
+
+  tourRunning: boolean;
+  tourBeat: number;
+  tourCaption: string;
+  tourSeconds: number;
+  startTour: () => void;
+  stopTour: () => void;
+
   /* --- 3D + HUD --- */
   drapeLayerId: string;
   setDrapeLayerId: (id: string) => void;
@@ -84,9 +102,17 @@ const initialLayers = (): Record<string, LayerState> => {
   return out;
 };
 
+// Tour timer and restore hook live outside the store: they are machinery, not
+// state anything renders.
+let tourTimer: number | null = null;
+let tourRestore: (() => void) | null = null;
+
 export const useMission = create<MissionState>((set, get) => ({
   booted: false,
   bootStage: 'Standing by',
+  bootError: null,
+  started: false,
+  start: () => set({ started: true }),
 
   async boot() {
     if (get().booted) return;
@@ -107,7 +133,18 @@ export const useMission = create<MissionState>((set, get) => ({
 
     set({ bootStage: 'Loading HiRISE stereo DTM' });
     await yieldFrame();
-    await loadTerrain((stage) => set({ bootStage: stage }));
+    try {
+      await loadTerrain((stage) => set({ bootStage: stage }));
+    } catch (e) {
+      set({
+        bootError:
+          'Could not load the terrain data. ' +
+          (e instanceof Error ? e.message : String(e)) +
+          ' — check that public/data was built (see scripts/ in the README).',
+        bootStage: 'Failed',
+      });
+      return;
+    }
     await yieldFrame();
 
     const data: Record<string, LayerData | undefined> = {};
@@ -234,6 +271,83 @@ export const useMission = create<MissionState>((set, get) => ({
 
   showWalkBack: false,
   setShowWalkBack: (v) => set({ showWalkBack: v }),
+
+  railOpen: true,
+  toggleRail: () => set((s) => ({ railOpen: !s.railOpen })),
+
+  tourRunning: false,
+  tourBeat: -1,
+  tourCaption: '',
+  tourSeconds: TOUR_SECONDS,
+
+  startTour: () => {
+    const st = get();
+    if (st.tourRunning) return;
+
+    // Snapshot everything the tour touches, so stopping restores exactly.
+    const before = {
+      mode: st.mode,
+      suit: { ...st.suit },
+      waypointOrder: [...st.waypointOrder],
+      showWalkBack: st.showWalkBack,
+      flying: st.flying,
+      traverseProgress: st.traverseProgress,
+    };
+    tourRestore = () => {
+      set({
+        mode: before.mode,
+        showWalkBack: before.showWalkBack,
+        flying: before.flying,
+        traverseProgress: before.traverseProgress,
+        waypointOrder: before.waypointOrder,
+        suit: before.suit,
+        probe: null,
+      });
+      get().replan();
+    };
+
+    const api: TourApi = {
+      setMode: (m) => set({ mode: m }),
+      probePoint: (p) => get().probePoint(p),
+      clearProbe: () => set({ probe: null }),
+      setWaypoints: (ids) => {
+        set({ waypointOrder: ids });
+        get().replan();
+      },
+      setSuit: (patch) => get().setSuit(patch),
+      setShowWalkBack: (v) => set({ showWalkBack: v }),
+      setFlying: (v) => set({ flying: v }),
+      setTraverseProgress: (v) => set({ traverseProgress: v }),
+      allWaypointIds: getSciencePoints().map((p) => p.id),
+      lowerThreeIds: getSciencePoints().slice(0, 3).map((p) => p.id),
+      aoiCentre: { x: AOI.sizeXM * 0.47, y: AOI.sizeYM * 0.6 },
+    };
+
+    const runBeat = (i: number) => {
+      if (i >= TOUR_BEATS.length) {
+        get().stopTour();
+        return;
+      }
+      const beat = TOUR_BEATS[i];
+      set({ tourBeat: i, tourCaption: beat.caption });
+      beat.act?.(api);
+      tourTimer = window.setTimeout(() => runBeat(i + 1), beat.hold * 1000);
+    };
+
+    set({ tourRunning: true });
+    runBeat(0);
+  },
+
+  stopTour: () => {
+    if (tourTimer !== null) {
+      window.clearTimeout(tourTimer);
+      tourTimer = null;
+    }
+    const restore = tourRestore;
+    tourRestore = null;
+    set({ tourRunning: false, tourBeat: -1, tourCaption: '' });
+    restore?.();
+  },
 
   selectedWaypointId: null,
   selectWaypoint: (id) => set({ selectedWaypointId: id }),

@@ -13,24 +13,9 @@ const HudView = lazy(() => import('./components/hud/HudView').then((m) => ({ def
 const Briefing = lazy(() => import('./components/briefing/Briefing').then((m) => ({ default: m.Briefing })));
 const About = lazy(() => import('./components/about/About').then((m) => ({ default: m.About })));
 import { Button } from './components/ui/primitives';
+import { TourOverlay } from './components/TourOverlay';
+import { Landing } from './components/Landing';
 import { useMission } from './store/useMission';
-
-function BootScreen() {
-  const stage = useMission((s) => s.bootStage);
-  return (
-    <div className="fixed inset-0 grid place-items-center bg-void z-50">
-      <div className="w-[min(420px,86vw)]">
-        <div className="font-mono text-[22px] tracking-[0.3em] text-mars-400">MARSWALK</div>
-        <div className="label mt-1">Gale Crater &middot; Mount Sharp boxwork region</div>
-        <div className="mt-6 h-[2px] bg-deck-600 overflow-hidden rounded-full">
-          <div className="h-full w-1/3 bg-mars-400 animate-[boot_1.1s_ease-in-out_infinite]" />
-        </div>
-        <div className="num text-[11px] text-ink-dim mt-2.5">{stage}</div>
-        <style>{'@keyframes boot{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}'}</style>
-      </div>
-    </div>
-  );
-}
 
 function ModeLoading() {
   return (
@@ -44,14 +29,17 @@ function PlanMode() {
   const [drawer, setDrawer] = useState<'layers' | 'plan' | null>(null);
   const measureMode = useMission((s) => s.measureMode);
   const setMeasureMode = useMission((s) => s.setMeasureMode);
+  const railOpen = useMission((s) => s.railOpen);
 
   return (
     <div className="flex-1 min-h-0 flex">
       {/* left rail — layers */}
+      {railOpen && (
       <aside className="hidden xl:flex w-[320px] shrink-0 border-r border-line flex-col overflow-y-auto p-2 gap-2">
         <LayerPanel />
         <InstrumentCharts />
       </aside>
+      )}
 
       {/* map */}
       <div className="relative flex-1 min-w-0">
@@ -104,8 +92,16 @@ function PlanMode() {
   );
 }
 
+const MODE_KEYS: Record<string, 'PLAN' | '3D' | 'HUD' | 'BRIEFING' | 'ABOUT'> = {
+  '1': 'PLAN',
+  '2': '3D',
+  '3': 'HUD',
+  '4': 'BRIEFING',
+  '5': 'ABOUT',
+};
+
 export default function App() {
-  const booted = useMission((s) => s.booted);
+  const started = useMission((s) => s.started);
   const boot = useMission((s) => s.boot);
   const mode = useMission((s) => s.mode);
 
@@ -113,12 +109,49 @@ export default function App() {
     void boot();
   }, [boot]);
 
-  if (!booted) return <BootScreen />;
+  // Keyboard shortcuts. Ignored while the user is typing in a field, and the
+  // tour swallows them so a stray key cannot fight the demo.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const st = useMission.getState();
+      const k = e.key.toLowerCase();
+
+      if (e.key === 'Escape') {
+        if (st.tourRunning) st.stopTour();
+        else if (st.measureMode) st.setMeasureMode(false);
+        else st.clearProbe();
+        return;
+      }
+      if (st.tourRunning) {
+        // any other key ends the demo rather than fighting it
+        st.stopTour();
+        return;
+      }
+      if (MODE_KEYS[e.key]) {
+        st.setMode(MODE_KEYS[e.key]);
+        e.preventDefault();
+        return;
+      }
+      if (k === 'g') st.startTour();
+      else if (k === 'l') st.toggleRail();
+      else if (k === 'm') st.setMeasureMode(!st.measureMode);
+      else if (k === 'w') st.setShowWalkBack(!st.showWalkBack);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  if (!started) return <Landing />;
 
   return (
     <div className="h-full flex flex-col bg-void">
       <TopBar />
       {mode === 'PLAN' && <PlanMode />}
+      <TourOverlay />
       <Suspense fallback={<ModeLoading />}>
         {mode === '3D' && <TerrainView />}
         {mode === 'HUD' && <HudView />}

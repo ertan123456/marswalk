@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LAYER_REGISTRY } from '../../data/config';
+import { groupedLayers } from '../../data/config';
 import type { LayerAdapter, LegendSpec } from '../../data/types';
 import { rampCssGradient } from '../../lib/raster';
 import { useMission } from '../../store/useMission';
@@ -126,11 +126,23 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
       {open && (
         <div className="px-2.5 pb-2.5 pt-1 border-t border-line/50 space-y-2">
           <LegendBody legend={adapter.legend} />
-          <p className="text-[10px] leading-relaxed text-ink-faint">
-            <span className="label !text-ink-faint">provenance</span>
-            <br />
-            {adapter.sourceNote}
-          </p>
+          <div>
+            <span className="label !text-ink-faint">how this layer was made</span>
+            <p className="text-[10px] leading-relaxed text-ink-faint mt-0.5">{adapter.sourceNote}</p>
+          </div>
+          <div className="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-line/40">
+            <span className="num text-[9px] text-ink-faint">{adapter.credit}</span>
+            {adapter.sourceUrl && (
+              <a
+                href={adapter.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="num text-[10px] text-probe-400 underline decoration-dotted hover:text-probe-500"
+              >
+                source ↗
+              </a>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -139,8 +151,7 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
 
 export function LayerPanel() {
   const setOnlyBasemap = useMission((s) => s.setOnlyBasemap);
-  const mapOnes = LAYER_REGISTRY.filter((a) => a.mapRenderable);
-  const chartOnes = LAYER_REGISTRY.filter((a) => !a.mapRenderable);
+  const groups = groupedLayers();
 
   return (
     <Panel
@@ -152,13 +163,16 @@ export function LayerPanel() {
       }
       dense
     >
-      <div className="p-2 space-y-1.5">
-        {mapOnes.map((a) => (
-          <LayerCard key={a.id} adapter={a} />
-        ))}
-        <div className="label pt-2 pb-1 px-0.5">Instrument time series</div>
-        {chartOnes.map((a) => (
-          <LayerCard key={a.id} adapter={a} />
+      <div className="p-2 space-y-2">
+        {groups.map(({ group, layers }) => (
+          <section key={group} aria-label={group}>
+            <h3 className="label pb-1 px-0.5">{group}</h3>
+            <div className="space-y-1.5">
+              {layers.map((a) => (
+                <LayerCard key={a.id} adapter={a} />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </Panel>

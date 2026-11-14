@@ -43,6 +43,11 @@ mid-EVA / ingress.
 **DATA** — every source, its provenance tag, its link, and the sources we checked and rejected with
 the reason.
 
+A **Guided demo** button auto-plays a 60-second tour of all of it — layers, the GO verdict, the
+walk-back failure, rover mode, 3D and the visor — and restores the state it started from when it
+ends. Keyboard: `1`–`5` switch modes, `G` runs the demo, `M` measure, `W` the return-to-safety
+field, `L` the layer rail, `Esc` cancels.
+
 ### The two things that make it a planner rather than a map
 
 **The walk-back check.** At every one of ~1,000 route samples the crew must be able to abandon the

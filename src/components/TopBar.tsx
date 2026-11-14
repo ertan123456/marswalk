@@ -20,6 +20,9 @@ export function TopBar() {
   const setMode = useMission((s) => s.setMode);
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
+  const tourRunning = useMission((s) => s.tourRunning);
+  const startTour = useMission((s) => s.startTour);
+  const stopTour = useMission((s) => s.stopTour);
 
   return (
     <header className="shrink-0 border-b border-line bg-deck-900/95 backdrop-blur">
@@ -57,12 +60,26 @@ export function TopBar() {
           </div>
         )}
 
+        <button
+          type="button"
+          onClick={() => (tourRunning ? stopTour() : startTour())}
+          title="Auto-plays a 60-second tour of the whole tool (G)"
+          className={
+            'mr-2 font-mono text-[10px] tracking-[0.14em] uppercase px-2.5 py-1.5 border rounded-[2px] transition-colors cursor-pointer ' +
+            (tourRunning
+              ? 'bg-mars-500/25 border-mars-400 text-mars-300'
+              : 'bg-deck-800 border-mars-500/50 text-mars-300 hover:bg-mars-500/15')
+          }
+        >
+          {tourRunning ? 'stop demo' : 'guided demo'}
+        </button>
+
         <nav className="flex items-center gap-1" aria-label="Display mode">
           {MODES.map((m) => (
             <button
               key={m.id}
               type="button"
-              title={m.hint}
+              title={m.hint + '  (' + (MODES.indexOf(m) + 1) + ')'}
               onClick={() => setMode(m.id)}
               className={
                 'font-mono text-[10px] tracking-[0.16em] px-2.5 py-1.5 border rounded-[2px] transition-colors cursor-pointer ' +
