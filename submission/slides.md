@@ -127,4 +127,4 @@ Claude (Anthropic) as a pair programmer for research, pipeline and application c
 
 > Not affiliated with, endorsed by, or sponsored by NASA. No NASA logo or insignia used as branding.
 
-**Repository:** _(link)_ · **Live:** _(Vercel link)_
+**Repository:** https://github.com/ertan123456/marswalk · **Live:** https://walk-back.vercel.app

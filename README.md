@@ -6,7 +6,8 @@ Plan one Mars surface excursion across lower Mount Sharp: layer real orbital and
 6.77 × 14.62 km strip of Gale Crater, solve a safe route across it, prove the crew can always get
 home, and carry the same plan into a first-person helmet display.
 
-**Live:** _(add the Vercel URL here after deploying — see [Deploy](#deploy))_
+**Live:** https://walk-back.vercel.app  
+**Repository:** https://github.com/ertan123456/marswalk
 
 ---
 

@@ -1,5 +1,7 @@
 # MARSWALK — 30-second demo script
 
+**Live:** https://walk-back.vercel.app · **Repository:** https://github.com/ertan123456/marswalk
+
 Voiceover with the exact on-screen action for each beat. Total 30 s at a steady reading pace
 (~85 words). Timings are cumulative.
 
