@@ -12,6 +12,7 @@ import re
 import sys
 from pathlib import Path
 
+import numpy as np
 import requests
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -231,3 +232,103 @@ def rdp(points, eps):
             stack.append((i0, best_i))
             stack.append((best_i, i1))
     return [p for p, k in zip(points, keep) if k]
+
+
+# ------------------------------------------------------------------- the DEM
+
+def load_dem(dem_dir: Path):
+    """Decode the RGB-packed heightmap back to metres, with its coverage mask.
+
+    `fetch_dem.py` packs the 16-bit elevation across R and G and carries the
+    stereo coverage flag in B, because a browser canvas drops the low byte of a
+    16-bit PNG. Every consumer has to unpack it the same way, so it is unpacked
+    in one place. Returns (elevation_m, coverage_bool, dem_meta).
+    """
+    from PIL import Image
+
+    meta = json.loads((dem_dir / "meta.json").read_text(encoding="utf-8"))
+    rgb = np.array(Image.open(dem_dir / "heightmap.png").convert("RGB"))
+    zmin = float(meta["elevation_m"]["min"])
+    zmax = float(meta["elevation_m"]["max"])
+    v16 = (rgb[:, :, 0].astype(np.uint32) << 8) | rgb[:, :, 1].astype(np.uint32)
+    z = (zmin + v16.astype(np.float32) / 65535.0 * (zmax - zmin)).astype(np.float32)
+    coverage = rgb[:, :, 2] > 127
+    return z, coverage, meta
+
+
+def dem_lonlat_fn(bounds: dict, width: int, height: int):
+    """Return a pixel -> [lon, lat] mapper for a grid on the DEM's bounds."""
+    def to_lonlat(px, py):
+        return [round(bounds["west"] + px / width * (bounds["east"] - bounds["west"]), 6),
+                round(bounds["north"] - py / height * (bounds["north"] - bounds["south"]), 6)]
+    return to_lonlat
+
+
+# ------------------------------------------- mask -> polygon ring tracing
+#
+# Shared by derive_terrain.py and derive_geochem_units.py: both turn a boolean
+# class mask into GeoJSON polygons, and two copies of a tracer would drift.
+
+def mask_to_rings(mask: np.ndarray, to_lonlat):
+    """Trace the boundary of a boolean mask as closed rings (cell edges)."""
+    h, w = mask.shape
+    starts: dict[tuple, list] = {}
+
+    def push(a, b):
+        starts.setdefault(a, []).append((a, b))
+
+    ys, xs = np.nonzero(mask)
+    for y, x in zip(ys.tolist(), xs.tolist()):
+        if y == 0 or not mask[y - 1, x]:
+            push((x + 1, y), (x, y))
+        if y == h - 1 or not mask[y + 1, x]:
+            push((x, y + 1), (x + 1, y + 1))
+        if x == 0 or not mask[y, x - 1]:
+            push((x, y), (x, y + 1))
+        if x == w - 1 or not mask[y, x + 1]:
+            push((x + 1, y + 1), (x + 1, y))
+
+    rings = []
+    guard = 0
+    limit = w * h * 8
+    for key in list(starts.keys()):
+        while starts.get(key):
+            seg = starts[key].pop()
+            ring = [seg[0]]
+            cur = seg[1]
+            while cur != seg[0] and guard < limit:
+                guard += 1
+                ring.append(cur)
+                nxt = starts.get(cur)
+                if not nxt:
+                    break
+                cur = nxt.pop()[1]
+            if len(ring) >= 4:
+                rings.append([to_lonlat(px, py) for px, py in ring] +
+                             [to_lonlat(*ring[0])])
+    return rings
+
+def drop_collinear(ring):
+    """Collapse runs of collinear vertices left by cell-edge tracing."""
+    if len(ring) < 4:
+        return ring
+    out = [ring[0]]
+    for i in range(1, len(ring) - 1):
+        ax, ay = out[-1]
+        bx, by = ring[i]
+        cx, cy = ring[i + 1]
+        if abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)) > 1e-12:
+            out.append(ring[i])
+    out.append(ring[-1])
+    return out
+
+def ring_area_cells(ring, b, w, h):
+    """Shoelace area, expressed in DEM cells."""
+    a = 0.0
+    for i in range(len(ring) - 1):
+        x0, y0 = ring[i]
+        x1, y1 = ring[i + 1]
+        a += x0 * y1 - x1 * y0
+    deg2 = abs(a) / 2.0
+    cell_deg2 = ((b["east"] - b["west"]) / w) * ((b["north"] - b["south"]) / h)
+    return deg2 / cell_deg2 if cell_deg2 else 0.0

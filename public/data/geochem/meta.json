@@ -1,0 +1,270 @@
+{
+  "provenance": "REAL",
+  "title": "MRO CRISM map-projected targeted summary parameters (MTRDR)",
+  "mission": "Mars Reconnaissance Orbiter",
+  "instrument": "CRISM",
+  "product_type": "MTRDR summary-parameter cube (*_su*_mtr3)",
+  "archive": "PDS Geosciences Node, volume mrocr_4001",
+  "credit": "NASA/JPL-Caltech/JHU-APL",
+  "reference": "Viviano-Beck et al. (2014), Revised CRISM spectral parameters and summary products, J. Geophys. Res. Planets 119, 1403-1431",
+  "scenes": [
+    {
+      "role": "primary",
+      "product_id": "FRT000058A3_07_SU165J_MTR3",
+      "source_url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_su165j_mtr3.img",
+      "map_scale_m_per_px": 18.0,
+      "cube": {
+        "samples": 788,
+        "lines": 735,
+        "bands": 60
+      },
+      "footprint": {
+        "west": 137.324158,
+        "south": -4.909366,
+        "east": 137.56345,
+        "north": -4.686168
+      },
+      "aoi_cells": 376023,
+      "note": "Full-resolution targeted observation at 18 m/px. Covers the AOI across its full width but stops short at both ends in latitude, so it supplies most of the AOI and none of the extreme north or south."
+    },
+    {
+      "role": "gap-fill",
+      "product_id": "HRL0000BABA_07_SU182J_MTR3",
+      "source_url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2008/2008_202/hrl0000baba/hrl0000baba_07_su182j_mtr3.img",
+      "map_scale_m_per_px": 36.0,
+      "cube": {
+        "samples": 425,
+        "lines": 658,
+        "bands": 60
+      },
+      "footprint": {
+        "west": 137.296692,
+        "south": -4.998476,
+        "east": 137.554812,
+        "north": -4.598845
+      },
+      "aoi_cells": 109353,
+      "note": "Half-resolution long targeted observation at 36 m/px. Its footprint contains the whole AOI, so it fills what the FRT scene misses. Used only where the FRT scene has no valid value, and flagged per cell in coverage.png because it is half the resolution."
+    }
+  ],
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "grid": {
+    "width": 474,
+    "height": 1024
+  },
+  "ground_resolution_m": {
+    "x": 14.287103165255273,
+    "y": 14.274551180905576
+  },
+  "aligned_to": "public/data/dem/meta.json - identical bounds and grid",
+  "resample": "Nearest neighbour from 18 m/px (primary) and 36 m/px (gap-fill) onto 14.29 m cells. This is an upsample, so the geochemistry is blockier than the terrain under it. Nearest rather than bilinear because interpolating would place index values between cells the instrument never measured.",
+  "coverage_mask": {
+    "file": "coverage.png",
+    "encoding": "8-bit PNG; 0 = no CRISM coverage, 1 = primary scene, 2 = gap-fill scene",
+    "percent_any": 100.0,
+    "percent_primary": 77.5,
+    "percent_gapfill": 22.5,
+    "percent_none": 0.0
+  },
+  "bands": [
+    {
+      "name": "BD530_2",
+      "key": "ferric",
+      "shows": "ferric absorption near 530 nm",
+      "mineralogy": "nanophase and crystalline iron oxide, hematite",
+      "file": "ferric.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": 0.18703997,
+      "scale_max": 0.27900636,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.000362,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": 0.164287,
+        "max": 0.279006,
+        "median": 0.222603,
+        "p90": 0.239885,
+        "p99": 0.265927,
+        "p99_9": 0.272705
+      }
+    },
+    {
+      "name": "OLINDEX3",
+      "key": "olivine",
+      "shows": "olivine broad 1 micron absorption",
+      "mineralogy": "olivine, unweathered mafic sand and bedrock",
+      "file": "olivine.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": 0.00647705,
+      "scale_max": 0.43630013,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.00169,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.198682,
+        "max": 0.4363,
+        "median": 0.038263,
+        "p90": 0.068606,
+        "p99": 0.113239,
+        "p99_9": 0.166788
+      }
+    },
+    {
+      "name": "LCPINDEX2",
+      "key": "lcp",
+      "shows": "low-calcium pyroxene",
+      "mineralogy": "pyroxene, primary volcanic rock",
+      "file": "lcp.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.02474437,
+      "scale_max": 0.04090029,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.000258,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.076816,
+        "max": 0.0409,
+        "median": -0.010554,
+        "p90": -0.005637,
+        "p99": -0.00157,
+        "p99_9": 0.006571
+      }
+    },
+    {
+      "name": "HCPINDEX2",
+      "key": "hcp",
+      "shows": "high-calcium pyroxene",
+      "mineralogy": "pyroxene, basaltic lava and ash",
+      "file": "hcp.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.02384889,
+      "scale_max": 0.04644266,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.000277,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.078683,
+        "max": 0.046443,
+        "median": -0.011593,
+        "p90": -0.003463,
+        "p99": 0.008919,
+        "p99_9": 0.017493
+      }
+    },
+    {
+      "name": "BD1900R2",
+      "key": "water",
+      "shows": "bound water near 1.9 microns",
+      "mineralogy": "hydrated phases of any kind, not diagnostic on its own",
+      "file": "water.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.01438653,
+      "scale_max": 0.12596291,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.000553,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.118211,
+        "max": 0.125963,
+        "median": -0.000332,
+        "p90": 0.004555,
+        "p99": 0.018823,
+        "p99_9": 0.04852
+      }
+    },
+    {
+      "name": "BD2210_2",
+      "key": "aloh",
+      "shows": "Al-OH and Si-OH near 2.21 microns",
+      "mineralogy": "opaline silica and Al-clay, the signature of altered volcanic ash (tuff)",
+      "file": "aloh.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.00786984,
+      "scale_max": 0.0707444,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.00031,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.141253,
+        "max": 0.070744,
+        "median": 0.001422,
+        "p90": 0.003331,
+        "p99": 0.008158,
+        "p99_9": 0.02322
+      }
+    },
+    {
+      "name": "D2200",
+      "key": "alclay",
+      "shows": "2.2 micron dropoff",
+      "mineralogy": "Al-phyllosilicate, kaolinite and montmorillonite",
+      "file": "alclay.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.01211154,
+      "scale_max": 0.10261995,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.000452,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.156324,
+        "max": 0.10262,
+        "median": 0.000972,
+        "p90": 0.003644,
+        "p99": 0.010251,
+        "p99_9": 0.028328
+      }
+    },
+    {
+      "name": "D2300",
+      "key": "femgclay",
+      "shows": "2.3 micron dropoff",
+      "mineralogy": "Fe/Mg smectite, formed where water stood or flowed",
+      "file": "femgclay.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.01931489,
+      "scale_max": 0.09505045,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.00045,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.159124,
+        "max": 0.09505,
+        "median": -0.00294,
+        "p90": 0.000799,
+        "p99": 0.009592,
+        "p99_9": 0.024578
+      }
+    },
+    {
+      "name": "SINDEX2",
+      "key": "sulfate",
+      "shows": "convexity between 2.1 and 2.4 microns",
+      "mineralogy": "polyhydrated sulfate, precipitated as water evaporated",
+      "file": "sulfate.png",
+      "encoding": "8-bit PNG. 0 = no CRISM value. 1..255 linear over scale_min..scale_max, so index = scale_min + (v - 1) / 254 * (scale_max - scale_min).",
+      "scale_min": -0.00364292,
+      "scale_max": 0.10401523,
+      "scale_note": "scale_min is the 1st percentile, not the minimum: the lowest one per cent of cells render at level 1. scale_max is the true maximum, so no detection is clipped.",
+      "quantisation_step": 0.000424,
+      "valid_cells": 485376,
+      "statistics": {
+        "min": -0.089092,
+        "max": 0.104015,
+        "median": 0.004727,
+        "p90": 0.008883,
+        "p99": 0.0194,
+        "p99_9": 0.043657
+      }
+    }
+  ],
+  "bands_note": "Band order is read from the ENVI header at run time, never hard-coded: the header's `band names` list is the only authority for which of the 60 planes is which parameter, and both scenes were checked to carry the same order.",
+  "no_data": "The sentinel is the ENVI header's `data ignore value` (65535.0). The PDS label carries no NULL keyword, so the header has to be read.",
+  "caveat": "These are spectral indices, not mineral abundances. A high index means the shape the parameter measures is present in that pixel's spectrum; it is evidence for a mineral group, not a measurement of how much is there. Thin dust cover, slope and illumination all move these numbers.",
+  "mars_radius_m": 3396190.0,
+  "retrieved": "2026-11-14"
+}

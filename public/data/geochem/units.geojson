@@ -1,0 +1,2934 @@
+{
+  "type": "FeatureCollection",
+  "name": "CRISM geochemical units (derived)",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.395436,
+              -4.917702
+            ],
+            [
+              137.395194,
+              -4.922518
+            ],
+            [
+              137.396403,
+              -4.922518
+            ],
+            [
+              137.395678,
+              -4.922037
+            ],
+            [
+              137.395678,
+              -4.921314
+            ],
+            [
+              137.396403,
+              -4.921314
+            ],
+            [
+              137.396403,
+              -4.917702
+            ],
+            [
+              137.395436,
+              -4.917702
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "femgclay",
+        "code": 1,
+        "label": "Fe/Mg smectite clay",
+        "color": "#5fb8a3",
+        "mineralogy": "Fe/Mg smectite",
+        "bands": "D2300",
+        "index": 1,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.400757,
+              -4.907347
+            ],
+            [
+              137.400032,
+              -4.909755
+            ],
+            [
+              137.400515,
+              -4.912886
+            ],
+            [
+              137.401241,
+              -4.912886
+            ],
+            [
+              137.400757,
+              -4.907347
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "femgclay",
+        "code": 1,
+        "label": "Fe/Mg smectite clay",
+        "color": "#5fb8a3",
+        "mineralogy": "Fe/Mg smectite",
+        "bands": "D2300",
+        "index": 2,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.355768,
+              -4.92011
+            ],
+            [
+              137.355526,
+              -4.921314
+            ],
+            [
+              137.356251,
+              -4.921314
+            ],
+            [
+              137.356735,
+              -4.922518
+            ],
+            [
+              137.355768,
+              -4.92011
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "femgclay",
+        "code": 1,
+        "label": "Fe/Mg smectite clay",
+        "color": "#5fb8a3",
+        "mineralogy": "Fe/Mg smectite",
+        "bands": "D2300",
+        "index": 3,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.404385,
+              -4.908069
+            ],
+            [
+              137.40366,
+              -4.910477
+            ],
+            [
+              137.404144,
+              -4.909273
+            ],
+            [
+              137.404869,
+              -4.909273
+            ],
+            [
+              137.404385,
+              -4.908069
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "femgclay",
+        "code": 1,
+        "label": "Fe/Mg smectite clay",
+        "color": "#5fb8a3",
+        "mineralogy": "Fe/Mg smectite",
+        "bands": "D2300",
+        "index": 4,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.405595,
+              -4.911681
+            ],
+            [
+              137.404869,
+              -4.913367
+            ],
+            [
+              137.405353,
+              -4.914571
+            ],
+            [
+              137.404869,
+              -4.919629
+            ],
+            [
+              137.405353,
+              -4.918424
+            ],
+            [
+              137.406079,
+              -4.918424
+            ],
+            [
+              137.406079,
+              -4.919629
+            ],
+            [
+              137.407772,
+              -4.919629
+            ],
+            [
+              137.408497,
+              -4.914571
+            ],
+            [
+              137.407772,
+              -4.914571
+            ],
+            [
+              137.407288,
+              -4.911681
+            ],
+            [
+              137.405595,
+              -4.911681
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 1,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.380197,
+              -4.904938
+            ],
+            [
+              137.380439,
+              -4.912163
+            ],
+            [
+              137.379956,
+              -4.913367
+            ],
+            [
+              137.378746,
+              -4.913367
+            ],
+            [
+              137.378021,
+              -4.915775
+            ],
+            [
+              137.379956,
+              -4.915775
+            ],
+            [
+              137.380439,
+              -4.912163
+            ],
+            [
+              137.381649,
+              -4.912163
+            ],
+            [
+              137.381165,
+              -4.909273
+            ],
+            [
+              137.380439,
+              -4.909273
+            ],
+            [
+              137.381165,
+              -4.906143
+            ],
+            [
+              137.380439,
+              -4.906143
+            ],
+            [
+              137.380197,
+              -4.904938
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 2,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.382616,
+              -4.914571
+            ],
+            [
+              137.382374,
+              -4.915775
+            ],
+            [
+              137.381649,
+              -4.915775
+            ],
+            [
+              137.381165,
+              -4.922037
+            ],
+            [
+              137.381649,
+              -4.92011
+            ],
+            [
+              137.382858,
+              -4.92011
+            ],
+            [
+              137.382616,
+              -4.914571
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 3,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.418898,
+              -4.691813
+            ],
+            [
+              137.417447,
+              -4.697351
+            ],
+            [
+              137.418173,
+              -4.697351
+            ],
+            [
+              137.418173,
+              -4.695906
+            ],
+            [
+              137.418656,
+              -4.697351
+            ],
+            [
+              137.419382,
+              -4.697351
+            ],
+            [
+              137.419866,
+              -4.694221
+            ],
+            [
+              137.418898,
+              -4.691813
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 4,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.391324,
+              -4.893861
+            ],
+            [
+              137.390356,
+              -4.901567
+            ],
+            [
+              137.391324,
+              -4.901567
+            ],
+            [
+              137.391566,
+              -4.902289
+            ],
+            [
+              137.391808,
+              -4.893861
+            ],
+            [
+              137.391324,
+              -4.893861
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 5,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.397129,
+              -4.917702
+            ],
+            [
+              137.396887,
+              -4.921314
+            ],
+            [
+              137.398097,
+              -4.921314
+            ],
+            [
+              137.398822,
+              -4.917702
+            ],
+            [
+              137.397129,
+              -4.917702
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 6,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.436072,
+              -4.683384
+            ],
+            [
+              137.436314,
+              -4.684588
+            ],
+            [
+              137.435104,
+              -4.684588
+            ],
+            [
+              137.435104,
+              -4.686274
+            ],
+            [
+              137.43583,
+              -4.686274
+            ],
+            [
+              137.435104,
+              -4.6882
+            ],
+            [
+              137.43583,
+              -4.6882
+            ],
+            [
+              137.43583,
+              -4.686996
+            ],
+            [
+              137.437039,
+              -4.686996
+            ],
+            [
+              137.437039,
+              -4.683384
+            ],
+            [
+              137.436072,
+              -4.683384
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 7,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.399548,
+              -4.91409
+            ],
+            [
+              137.399306,
+              -4.916498
+            ],
+            [
+              137.401241,
+              -4.916979
+            ],
+            [
+              137.401241,
+              -4.915294
+            ],
+            [
+              137.400515,
+              -4.915294
+            ],
+            [
+              137.400515,
+              -4.91409
+            ],
+            [
+              137.399548,
+              -4.91409
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 8,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.440909,
+              -4.906143
+            ],
+            [
+              137.441151,
+              -4.908069
+            ],
+            [
+              137.441877,
+              -4.908069
+            ],
+            [
+              137.442361,
+              -4.909273
+            ],
+            [
+              137.442361,
+              -4.908551
+            ],
+            [
+              137.443086,
+              -4.908551
+            ],
+            [
+              137.442361,
+              -4.908069
+            ],
+            [
+              137.443086,
+              -4.906143
+            ],
+            [
+              137.441877,
+              -4.906143
+            ],
+            [
+              137.441877,
+              -4.906865
+            ],
+            [
+              137.440909,
+              -4.906143
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 9,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.400515,
+              -4.858701
+            ],
+            [
+              137.400032,
+              -4.862072
+            ],
+            [
+              137.400757,
+              -4.862313
+            ],
+            [
+              137.400274,
+              -4.863277
+            ],
+            [
+              137.401241,
+              -4.863277
+            ],
+            [
+              137.400515,
+              -4.858701
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 10,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.39592,
+              -4.907347
+            ],
+            [
+              137.396403,
+              -4.909755
+            ],
+            [
+              137.397613,
+              -4.909755
+            ],
+            [
+              137.397613,
+              -4.907347
+            ],
+            [
+              137.39592,
+              -4.907347
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 11,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.430025,
+              -4.914571
+            ],
+            [
+              137.429783,
+              -4.915775
+            ],
+            [
+              137.429057,
+              -4.915775
+            ],
+            [
+              137.429057,
+              -4.917702
+            ],
+            [
+              137.429783,
+              -4.917702
+            ],
+            [
+              137.429783,
+              -4.915775
+            ],
+            [
+              137.430267,
+              -4.917702
+            ],
+            [
+              137.430992,
+              -4.917702
+            ],
+            [
+              137.430992,
+              -4.915775
+            ],
+            [
+              137.430267,
+              -4.915775
+            ],
+            [
+              137.430025,
+              -4.914571
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 12,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.457841,
+              -4.6882
+            ],
+            [
+              137.457599,
+              -4.69109
+            ],
+            [
+              137.458325,
+              -4.69109
+            ],
+            [
+              137.458809,
+              -4.6882
+            ],
+            [
+              137.457841,
+              -4.6882
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 13,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.37415,
+              -4.689886
+            ],
+            [
+              137.373909,
+              -4.693017
+            ],
+            [
+              137.374392,
+              -4.694702
+            ],
+            [
+              137.375118,
+              -4.694702
+            ],
+            [
+              137.37415,
+              -4.689886
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 14,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.380197,
+              -4.685792
+            ],
+            [
+              137.380439,
+              -4.689404
+            ],
+            [
+              137.380439,
+              -4.688682
+            ],
+            [
+              137.381165,
+              -4.688682
+            ],
+            [
+              137.381165,
+              -4.686274
+            ],
+            [
+              137.380197,
+              -4.685792
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 15,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.417205,
+              -4.686274
+            ],
+            [
+              137.416963,
+              -4.6882
+            ],
+            [
+              137.418656,
+              -4.688682
+            ],
+            [
+              137.418656,
+              -4.686274
+            ],
+            [
+              137.418173,
+              -4.687478
+            ],
+            [
+              137.417447,
+              -4.687478
+            ],
+            [
+              137.417205,
+              -4.686274
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 16,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.436072,
+              -4.694221
+            ],
+            [
+              137.436314,
+              -4.697351
+            ],
+            [
+              137.437039,
+              -4.697351
+            ],
+            [
+              137.437523,
+              -4.695425
+            ],
+            [
+              137.436314,
+              -4.695425
+            ],
+            [
+              137.436072,
+              -4.694221
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 17,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.400515,
+              -4.863758
+            ],
+            [
+              137.400274,
+              -4.866648
+            ],
+            [
+              137.400999,
+              -4.866648
+            ],
+            [
+              137.401241,
+              -4.863758
+            ],
+            [
+              137.400515,
+              -4.863758
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 18,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.429299,
+              -4.692294
+            ],
+            [
+              137.429057,
+              -4.694221
+            ],
+            [
+              137.429783,
+              -4.694221
+            ],
+            [
+              137.430267,
+              -4.695425
+            ],
+            [
+              137.429299,
+              -4.692294
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 19,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.401483,
+              -4.885914
+            ],
+            [
+              137.401241,
+              -4.888081
+            ],
+            [
+              137.401967,
+              -4.888081
+            ],
+            [
+              137.402209,
+              -4.885914
+            ],
+            [
+              137.401483,
+              -4.885914
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 20,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.414544,
+              -4.900363
+            ],
+            [
+              137.414544,
+              -4.902771
+            ],
+            [
+              137.41527,
+              -4.902771
+            ],
+            [
+              137.41527,
+              -4.900845
+            ],
+            [
+              137.414544,
+              -4.900363
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 21,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.433653,
+              -4.696629
+            ],
+            [
+              137.433411,
+              -4.699037
+            ],
+            [
+              137.434621,
+              -4.699037
+            ],
+            [
+              137.433895,
+              -4.698555
+            ],
+            [
+              137.433653,
+              -4.696629
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 22,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.414061,
+              -4.921314
+            ],
+            [
+              137.413819,
+              -4.922518
+            ],
+            [
+              137.415028,
+              -4.922518
+            ],
+            [
+              137.415028,
+              -4.921314
+            ],
+            [
+              137.414061,
+              -4.921314
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "silica-aloh",
+        "code": 2,
+        "label": "Opaline silica / Al-OH",
+        "color": "#8fb8e8",
+        "mineralogy": "opaline silica, Al-clay",
+        "bands": "BD2210_2, D2200",
+        "index": 23,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.364959,
+              -4.905661
+            ],
+            [
+              137.365201,
+              -4.907347
+            ],
+            [
+              137.364717,
+              -4.908551
+            ],
+            [
+              137.363991,
+              -4.908551
+            ],
+            [
+              137.363991,
+              -4.911681
+            ],
+            [
+              137.364717,
+              -4.911681
+            ],
+            [
+              137.365201,
+              -4.910477
+            ],
+            [
+              137.364717,
+              -4.908551
+            ],
+            [
+              137.365201,
+              -4.909755
+            ],
+            [
+              137.365927,
+              -4.909755
+            ],
+            [
+              137.365927,
+              -4.907347
+            ],
+            [
+              137.366652,
+              -4.907347
+            ],
+            [
+              137.364959,
+              -4.905661
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 1,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.465097,
+              -4.916979
+            ],
+            [
+              137.464372,
+              -4.921314
+            ],
+            [
+              137.465581,
+              -4.921314
+            ],
+            [
+              137.466065,
+              -4.922518
+            ],
+            [
+              137.466065,
+              -4.919629
+            ],
+            [
+              137.465097,
+              -4.916979
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 2,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.376569,
+              -4.914571
+            ],
+            [
+              137.376811,
+              -4.919629
+            ],
+            [
+              137.376811,
+              -4.918424
+            ],
+            [
+              137.377537,
+              -4.918424
+            ],
+            [
+              137.377537,
+              -4.915775
+            ],
+            [
+              137.376811,
+              -4.915775
+            ],
+            [
+              137.376569,
+              -4.914571
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 3,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.391324,
+              -4.82619
+            ],
+            [
+              137.390598,
+              -4.827635
+            ],
+            [
+              137.390598,
+              -4.82908
+            ],
+            [
+              137.391324,
+              -4.828598
+            ],
+            [
+              137.391082,
+              -4.830766
+            ],
+            [
+              137.391566,
+              -4.82908
+            ],
+            [
+              137.392533,
+              -4.829562
+            ],
+            [
+              137.392533,
+              -4.828358
+            ],
+            [
+              137.391808,
+              -4.82908
+            ],
+            [
+              137.391808,
+              -4.827394
+            ],
+            [
+              137.392533,
+              -4.827876
+            ],
+            [
+              137.392291,
+              -4.82619
+            ],
+            [
+              137.391324,
+              -4.82619
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 4,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.39471,
+              -4.91409
+            ],
+            [
+              137.395194,
+              -4.916498
+            ],
+            [
+              137.394468,
+              -4.916498
+            ],
+            [
+              137.393985,
+              -4.918906
+            ],
+            [
+              137.395194,
+              -4.918906
+            ],
+            [
+              137.395678,
+              -4.916498
+            ],
+            [
+              137.39471,
+              -4.91409
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 5,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.388663,
+              -4.818966
+            ],
+            [
+              137.388421,
+              -4.819688
+            ],
+            [
+              137.389389,
+              -4.820651
+            ],
+            [
+              137.389389,
+              -4.819688
+            ],
+            [
+              137.390598,
+              -4.82017
+            ],
+            [
+              137.390115,
+              -4.822096
+            ],
+            [
+              137.390598,
+              -4.821374
+            ],
+            [
+              137.391566,
+              -4.821615
+            ],
+            [
+              137.390598,
+              -4.819206
+            ],
+            [
+              137.388663,
+              -4.818966
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 6,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.355768,
+              -4.909273
+            ],
+            [
+              137.355526,
+              -4.910959
+            ],
+            [
+              137.356251,
+              -4.910959
+            ],
+            [
+              137.356251,
+              -4.912163
+            ],
+            [
+              137.357461,
+              -4.912163
+            ],
+            [
+              137.357461,
+              -4.910959
+            ],
+            [
+              137.356735,
+              -4.910959
+            ],
+            [
+              137.356735,
+              -4.909755
+            ],
+            [
+              137.355768,
+              -4.909273
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 7,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.405111,
+              -4.904698
+            ],
+            [
+              137.406079,
+              -4.906865
+            ],
+            [
+              137.407288,
+              -4.906143
+            ],
+            [
+              137.407288,
+              -4.904698
+            ],
+            [
+              137.405111,
+              -4.904698
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 8,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.392775,
+              -4.822096
+            ],
+            [
+              137.392533,
+              -4.826672
+            ],
+            [
+              137.393985,
+              -4.826431
+            ],
+            [
+              137.393017,
+              -4.824986
+            ],
+            [
+              137.393743,
+              -4.822819
+            ],
+            [
+              137.392775,
+              -4.822096
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 9,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.379472,
+              -4.909273
+            ],
+            [
+              137.378746,
+              -4.913367
+            ],
+            [
+              137.37923,
+              -4.911681
+            ],
+            [
+              137.380439,
+              -4.912163
+            ],
+            [
+              137.379472,
+              -4.909273
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 10,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.374392,
+              -4.786937
+            ],
+            [
+              137.37415,
+              -4.787659
+            ],
+            [
+              137.372941,
+              -4.787659
+            ],
+            [
+              137.373667,
+              -4.788141
+            ],
+            [
+              137.372215,
+              -4.788141
+            ],
+            [
+              137.372215,
+              -4.789345
+            ],
+            [
+              137.37415,
+              -4.788622
+            ],
+            [
+              137.374392,
+              -4.786937
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 11,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.394227,
+              -4.905661
+            ],
+            [
+              137.393985,
+              -4.908551
+            ],
+            [
+              137.394468,
+              -4.909755
+            ],
+            [
+              137.395194,
+              -4.909755
+            ],
+            [
+              137.394227,
+              -4.905661
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 12,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.441393,
+              -4.906143
+            ],
+            [
+              137.440668,
+              -4.908069
+            ],
+            [
+              137.441151,
+              -4.909273
+            ],
+            [
+              137.441877,
+              -4.909273
+            ],
+            [
+              137.441877,
+              -4.908069
+            ],
+            [
+              137.441151,
+              -4.908069
+            ],
+            [
+              137.441151,
+              -4.906865
+            ],
+            [
+              137.441877,
+              -4.906865
+            ],
+            [
+              137.441393,
+              -4.906143
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 13,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.427606,
+              -4.912886
+            ],
+            [
+              137.426638,
+              -4.914571
+            ],
+            [
+              137.427364,
+              -4.914571
+            ],
+            [
+              137.427848,
+              -4.916498
+            ],
+            [
+              137.427606,
+              -4.912886
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 14,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.37536,
+              -4.903494
+            ],
+            [
+              137.375602,
+              -4.904938
+            ],
+            [
+              137.377537,
+              -4.904457
+            ],
+            [
+              137.376811,
+              -4.903494
+            ],
+            [
+              137.37536,
+              -4.903494
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 15,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.380681,
+              -4.922037
+            ],
+            [
+              137.380439,
+              -4.923
+            ],
+            [
+              137.382374,
+              -4.923
+            ],
+            [
+              137.382374,
+              -4.922037
+            ],
+            [
+              137.380681,
+              -4.922037
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 16,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.408739,
+              -4.910477
+            ],
+            [
+              137.408497,
+              -4.912163
+            ],
+            [
+              137.409707,
+              -4.912163
+            ],
+            [
+              137.409707,
+              -4.910959
+            ],
+            [
+              137.408739,
+              -4.910477
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 17,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.404385,
+              -4.910477
+            ],
+            [
+              137.404144,
+              -4.911681
+            ],
+            [
+              137.404869,
+              -4.911681
+            ],
+            [
+              137.405353,
+              -4.912886
+            ],
+            [
+              137.404385,
+              -4.910477
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 18,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.403902,
+              -4.904938
+            ],
+            [
+              137.40366,
+              -4.906143
+            ],
+            [
+              137.404144,
+              -4.907347
+            ],
+            [
+              137.404869,
+              -4.907347
+            ],
+            [
+              137.403902,
+              -4.904938
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 19,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.383826,
+              -4.704576
+            ],
+            [
+              137.383584,
+              -4.70578
+            ],
+            [
+              137.384793,
+              -4.70578
+            ],
+            [
+              137.384793,
+              -4.704576
+            ],
+            [
+              137.383826,
+              -4.704576
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 20,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.401483,
+              -4.919629
+            ],
+            [
+              137.401725,
+              -4.921314
+            ],
+            [
+              137.40245,
+              -4.921314
+            ],
+            [
+              137.40245,
+              -4.919629
+            ],
+            [
+              137.401483,
+              -4.919629
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "sulfate",
+        "code": 3,
+        "label": "Polyhydrated sulfate",
+        "color": "#f2d06b",
+        "mineralogy": "polyhydrated sulfate",
+        "bands": "SINDEX2",
+        "index": 21,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.424703,
+              -4.803071
+            ],
+            [
+              137.423736,
+              -4.803794
+            ],
+            [
+              137.424703,
+              -4.805239
+            ],
+            [
+              137.424703,
+              -4.809574
+            ],
+            [
+              137.425187,
+              -4.809092
+            ],
+            [
+              137.424703,
+              -4.811982
+            ],
+            [
+              137.425187,
+              -4.812704
+            ],
+            [
+              137.424945,
+              -4.8115
+            ],
+            [
+              137.425913,
+              -4.811982
+            ],
+            [
+              137.425913,
+              -4.810778
+            ],
+            [
+              137.42688,
+              -4.811259
+            ],
+            [
+              137.427122,
+              -4.812704
+            ],
+            [
+              137.427122,
+              -4.811019
+            ],
+            [
+              137.425671,
+              -4.809092
+            ],
+            [
+              137.425913,
+              -4.806443
+            ],
+            [
+              137.424945,
+              -4.805721
+            ],
+            [
+              137.424703,
+              -4.803071
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "mafic",
+        "code": 4,
+        "label": "Mafic (pyroxene / olivine)",
+        "color": "#b07de0",
+        "mineralogy": "pyroxene, olivine",
+        "bands": "LCPINDEX2, HCPINDEX2, OLINDEX3",
+        "index": 1,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.409949,
+              -4.908551
+            ],
+            [
+              137.408981,
+              -4.910959
+            ],
+            [
+              137.409707,
+              -4.910959
+            ],
+            [
+              137.410191,
+              -4.913367
+            ],
+            [
+              137.410916,
+              -4.913367
+            ],
+            [
+              137.410916,
+              -4.909755
+            ],
+            [
+              137.410191,
+              -4.909755
+            ],
+            [
+              137.409949,
+              -4.908551
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "mafic",
+        "code": 4,
+        "label": "Mafic (pyroxene / olivine)",
+        "color": "#b07de0",
+        "mineralogy": "pyroxene, olivine",
+        "bands": "LCPINDEX2, HCPINDEX2, OLINDEX3",
+        "index": 2,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.389873,
+              -4.906865
+            ],
+            [
+              137.389631,
+              -4.910959
+            ],
+            [
+              137.39084,
+              -4.910959
+            ],
+            [
+              137.39084,
+              -4.906865
+            ],
+            [
+              137.389873,
+              -4.906865
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "mafic",
+        "code": 4,
+        "label": "Mafic (pyroxene / olivine)",
+        "color": "#b07de0",
+        "mineralogy": "pyroxene, olivine",
+        "bands": "LCPINDEX2, HCPINDEX2, OLINDEX3",
+        "index": 3,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.372215,
+              -4.912886
+            ],
+            [
+              137.373183,
+              -4.916979
+            ],
+            [
+              137.373183,
+              -4.913367
+            ],
+            [
+              137.373909,
+              -4.912886
+            ],
+            [
+              137.372215,
+              -4.912886
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "mafic",
+        "code": 4,
+        "label": "Mafic (pyroxene / olivine)",
+        "color": "#b07de0",
+        "mineralogy": "pyroxene, olivine",
+        "bands": "LCPINDEX2, HCPINDEX2, OLINDEX3",
+        "index": 4,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.395436,
+              -4.906865
+            ],
+            [
+              137.395678,
+              -4.909755
+            ],
+            [
+              137.396403,
+              -4.909755
+            ],
+            [
+              137.396403,
+              -4.908069
+            ],
+            [
+              137.395678,
+              -4.908069
+            ],
+            [
+              137.396403,
+              -4.906865
+            ],
+            [
+              137.395436,
+              -4.906865
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "mafic",
+        "code": 4,
+        "label": "Mafic (pyroxene / olivine)",
+        "color": "#b07de0",
+        "mineralogy": "pyroxene, olivine",
+        "bands": "LCPINDEX2, HCPINDEX2, OLINDEX3",
+        "index": 5,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.3831,
+              -4.680253
+            ],
+            [
+              137.382858,
+              -4.681457
+            ],
+            [
+              137.383584,
+              -4.681457
+            ],
+            [
+              137.384068,
+              -4.683865
+            ],
+            [
+              137.384068,
+              -4.681457
+            ],
+            [
+              137.3831,
+              -4.680253
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "mafic",
+        "code": 4,
+        "label": "Mafic (pyroxene / olivine)",
+        "color": "#b07de0",
+        "mineralogy": "pyroxene, olivine",
+        "bands": "LCPINDEX2, HCPINDEX2, OLINDEX3",
+        "index": 6,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.433411,
+              -4.780675
+            ],
+            [
+              137.432685,
+              -4.780916
+            ],
+            [
+              137.432927,
+              -4.785732
+            ],
+            [
+              137.433411,
+              -4.786937
+            ],
+            [
+              137.434137,
+              -4.786937
+            ],
+            [
+              137.433411,
+              -4.780675
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 1,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.371006,
+              -4.904457
+            ],
+            [
+              137.370764,
+              -4.905661
+            ],
+            [
+              137.369555,
+              -4.906143
+            ],
+            [
+              137.369555,
+              -4.908551
+            ],
+            [
+              137.370764,
+              -4.908551
+            ],
+            [
+              137.37028,
+              -4.906143
+            ],
+            [
+              137.37149,
+              -4.905661
+            ],
+            [
+              137.371006,
+              -4.904457
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 2,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.393501,
+              -4.908069
+            ],
+            [
+              137.394468,
+              -4.912163
+            ],
+            [
+              137.395194,
+              -4.909755
+            ],
+            [
+              137.394468,
+              -4.909755
+            ],
+            [
+              137.394468,
+              -4.908551
+            ],
+            [
+              137.393501,
+              -4.908069
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 3,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.403902,
+              -4.908551
+            ],
+            [
+              137.402934,
+              -4.909273
+            ],
+            [
+              137.40245,
+              -4.912886
+            ],
+            [
+              137.402934,
+              -4.911681
+            ],
+            [
+              137.40366,
+              -4.911681
+            ],
+            [
+              137.403902,
+              -4.908551
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 4,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.404385,
+              -4.900845
+            ],
+            [
+              137.40366,
+              -4.904698
+            ],
+            [
+              137.404385,
+              -4.904698
+            ],
+            [
+              137.404627,
+              -4.903494
+            ],
+            [
+              137.404385,
+              -4.900845
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 5,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.371732,
+              -4.912886
+            ],
+            [
+              137.37149,
+              -4.915775
+            ],
+            [
+              137.371974,
+              -4.91409
+            ],
+            [
+              137.372699,
+              -4.91409
+            ],
+            [
+              137.371732,
+              -4.912886
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 6,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.396645,
+              -4.92011
+            ],
+            [
+              137.396887,
+              -4.923
+            ],
+            [
+              137.397613,
+              -4.923
+            ],
+            [
+              137.397613,
+              -4.921314
+            ],
+            [
+              137.396887,
+              -4.921314
+            ],
+            [
+              137.396645,
+              -4.92011
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 7,
+        "provenance": "DERIVED"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              137.438974,
+              -4.909273
+            ],
+            [
+              137.438249,
+              -4.911681
+            ],
+            [
+              137.438732,
+              -4.910477
+            ],
+            [
+              137.439458,
+              -4.910477
+            ],
+            [
+              137.438974,
+              -4.909273
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "unit": "hydrated",
+        "code": 5,
+        "label": "Hydrated, mineral unresolved",
+        "color": "#9db4c0",
+        "mineralogy": "unidentified hydrated phase",
+        "bands": "BD1900R2",
+        "index": 8,
+        "provenance": "DERIVED"
+      }
+    }
+  ]
+}

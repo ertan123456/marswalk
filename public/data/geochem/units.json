@@ -1,0 +1,578 @@
+{
+  "provenance": "DERIVED",
+  "derived_from": {
+    "product_type": "MTRDR summary-parameter cube (*_su*_mtr3)",
+    "scenes": [
+      {
+        "product_id": "FRT000058A3_07_SU165J_MTR3",
+        "source_url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_su165j_mtr3.img",
+        "map_scale_m_per_px": 18.0
+      },
+      {
+        "product_id": "HRL0000BABA_07_SU182J_MTR3",
+        "source_url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2008/2008_202/hrl0000baba/hrl0000baba_07_su182j_mtr3.img",
+        "map_scale_m_per_px": 36.0
+      }
+    ],
+    "provenance": "REAL",
+    "credit": "NASA/JPL-Caltech/JHU-APL",
+    "reference": "Viviano-Beck et al. (2014), Revised CRISM spectral parameters and summary products, J. Geophys. Res. Planets 119, 1403-1431"
+  },
+  "method": "Each CRISM summary parameter is thresholded at the background median plus 4 robust standard deviations, with the robust sd from the median absolute deviation, and never below 0.005 band depth. Over a dust-mantled AOI the bulk of every parameter is a noise-centred core, so this is a one-sided outlier test against the surrounding ground rather than a hand-picked cut. Background and sd are computed SEPARATELY FOR EACH SCENE and every cell is judged against its own scene, so a detection means 'this cell stands out from the ground around it in the same observation'. Where several units qualify for a cell, the one furthest above its own threshold in units of its own noise wins; the unspecific hydration unit is used only when nothing diagnostic qualifies.",
+  "why_per_scene": "Pooling the two scenes into one distribution was tried first and had to be abandoned. It classified 41.6% of the 36 m/px area against 0.97% of the 18 m/px area, a 43-fold split that no geology produces: the unit map was largely recording which scene covered which cell. The cause was the spread rather than the offset. The two medians sit within about two robust sd of each other, but the 2008 observation is 1.8 to 2.6 times noisier than the 2007 one, so a pooled sd gave a cut worth four sd in the quiet scene and about one and a half in the noisy one. CRISM summary parameters are not calibrated across observations closely enough to survive pooling. scene_consistency below is the permanent check that this stays fixed.",
+  "caveat": "These are relative enrichments of spectral indices within this AOI, not mineral abundances and not a geological map. A high index means the absorption shape the parameter measures is present in that pixel's spectrum: evidence for a mineral group, not a measurement of how much is there. Dust cover, slope and illumination all move these numbers, and a unit boundary here is the edge of a detection at 18 m/px, not a geological contact. Most of the AOI falls in no unit, which is the expected result over dust-mantled ground.",
+  "excluded_bands": [
+    {
+      "band": "BD530_2",
+      "reason": "No cell exceeds the detection threshold in either scene: the distribution is a tight core with no high tail, so this parameter carries no mappable structure in this AOI. It ships as a continuous index layer and is not made into a unit."
+    }
+  ],
+  "scene_consistency": {
+    "per_scene": {
+      "18 m/px primary": {
+        "coverage_code": 1,
+        "cells": 376023,
+        "classified_cells": 5155,
+        "classified_percent": 1.37
+      },
+      "36 m/px gap-fill": {
+        "coverage_code": 2,
+        "cells": 109353,
+        "classified_cells": 5837,
+        "classified_percent": 5.34
+      }
+    },
+    "spread": 3.9,
+    "warn_above": 2.0,
+    "fatal_above": 10.0,
+    "note": "The classified share of each scene's own area. If these diverged sharply the units would be tracking the seam between observations rather than the ground, so the build fails above the fatal limit. The residual gap is the coarser scene's heavier tail: detections in the 36 m/px part of the AOI are weaker evidence than those in the 18 m/px part."
+  },
+  "validation": {
+    "stratigraphic_ordering": {
+      "question": "On Mount Sharp the clay-bearing unit lies below the sulfate-bearing unit. Do the derived units reproduce that ordering by elevation?",
+      "median_elevation_m": {
+        "femgclay": -2804.5,
+        "silica-aloh": -3014.1,
+        "sulfate": -3366.4,
+        "mafic": -3346.1,
+        "hydrated": -3210.5
+      },
+      "clay_below_sulfate": false,
+      "verdict": "NOT reproduced: the Fe/Mg clay detections sit at a higher median elevation than the sulfate detections, the reverse of the published column. The separation is also small against the AOI's 2 km of relief. This layer should therefore be read as 'where is the ground spectrally unusual and worth a closer look', not as 'this is the clay unit'. Most of this AOI is dust-mantled, the surviving detections are small scattered exposures, and the published ordering was established over a far larger area with per-exposure spectral analysis rather than a threshold on summary parameters over 15 km."
+    },
+    "slope_dependence": {
+      "question": "CRISM band depths inflate on steep, poorly illuminated slopes. Are the detections mostly an artifact of terrain rather than composition?",
+      "by_slope_band": [
+        {
+          "slope_deg": "0-5",
+          "cells": 54381,
+          "classified_percent": 1.82
+        },
+        {
+          "slope_deg": "5-10",
+          "cells": 119659,
+          "classified_percent": 2.14
+        },
+        {
+          "slope_deg": "10-15",
+          "cells": 70761,
+          "classified_percent": 2.22
+        },
+        {
+          "slope_deg": "15-20",
+          "cells": 42341,
+          "classified_percent": 2.19
+        },
+        {
+          "slope_deg": "20-25",
+          "cells": 27515,
+          "classified_percent": 2.33
+        },
+        {
+          "slope_deg": "25-30",
+          "cells": 19389,
+          "classified_percent": 2.52
+        },
+        {
+          "slope_deg": "30-90",
+          "cells": 28828,
+          "classified_percent": 3.0
+        }
+      ],
+      "median_slope_deg_classified": 11.24,
+      "median_slope_deg_all": 10.42,
+      "steep_over_flat_ratio": 1.65,
+      "verdict": "Mild. The classified share rises across the full slope range by well under an order of magnitude, and the median slope of classified cells is within about a degree of the AOI median, so slope-driven inflation is present but is not what the units are made of."
+    },
+    "directionality": {
+      "question": "CRISM is a pushbroom instrument, so residual column-to-column error appears as vertical streaks. Are the detections preferentially vertical?",
+      "units_anisotropy": 1.79,
+      "terrain_control_anisotropy": 1.23,
+      "excess_over_control": 1.46,
+      "control_note": "The control is the terrain hazard layer: the same grid and the same ring tracer, derived from the DEM with no spectrometer involved, so it carries whatever anisotropy the grid itself imposes and nothing else.",
+      "verdict": "Detections carry noticeably more vertical structure than the terrain control on the same grid, which is the signature of residual pushbroom striping. A per-column destripe was implemented and tested at three smoothing widths and moved the anisotropy by less than 0.01x, so the structure is not a constant per-column offset and no correction is applied: shipping one that does nothing would be worse than reporting the measurement. Part of what this layer marks is therefore instrument artifact that we have measured but not attributed. It is a further reason to treat a unit as a prompt to go and look rather than as a finding."
+    }
+  },
+  "what_this_layer_is_good_for": "Finding ground that is spectrally unusual against its surroundings and therefore worth walking to and examining in person. It is not a mineral map and it does not reproduce the published stratigraphy of Mount Sharp, which is stated and measured under validation above. Treat a unit as a reason to look, not as an answer.",
+  "sigma_k": 4.0,
+  "credibility_floor": 0.005,
+  "thresholds": {
+    "BD530_2": {
+      "band": "BD530_2",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": 0.222885,
+          "robust_sd": 0.013957,
+          "statistical_threshold": 0.278713,
+          "threshold": 0.278713,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 0,
+          "percent_over": 0.0
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": 0.220713,
+          "robust_sd": 0.025767,
+          "statistical_threshold": 0.32378,
+          "threshold": 0.32378,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 0,
+          "percent_over": 0.0
+        }
+      }
+    },
+    "OLINDEX3": {
+      "band": "OLINDEX3",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": 0.035245,
+          "robust_sd": 0.012544,
+          "statistical_threshold": 0.085422,
+          "threshold": 0.085422,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 173,
+          "percent_over": 0.046
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": 0.060628,
+          "robust_sd": 0.030107,
+          "statistical_threshold": 0.181054,
+          "threshold": 0.181054,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 374,
+          "percent_over": 0.342
+        }
+      }
+    },
+    "LCPINDEX2": {
+      "band": "LCPINDEX2",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": -0.010013,
+          "robust_sd": 0.004215,
+          "statistical_threshold": 0.006846,
+          "threshold": 0.006846,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 4,
+          "percent_over": 0.001
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": -0.012598,
+          "robust_sd": 0.005748,
+          "statistical_threshold": 0.010393,
+          "threshold": 0.010393,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 286,
+          "percent_over": 0.262
+        }
+      }
+    },
+    "HCPINDEX2": {
+      "band": "HCPINDEX2",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": -0.012226,
+          "robust_sd": 0.004103,
+          "statistical_threshold": 0.004186,
+          "threshold": 0.005,
+          "bound_by": "credibility floor",
+          "cells": 376023,
+          "cells_over": 270,
+          "percent_over": 0.072
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": -0.006691,
+          "robust_sd": 0.008206,
+          "statistical_threshold": 0.026132,
+          "threshold": 0.026132,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 111,
+          "percent_over": 0.102
+        }
+      }
+    },
+    "BD1900R2": {
+      "band": "BD1900R2",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": -0.000573,
+          "robust_sd": 0.002458,
+          "statistical_threshold": 0.009258,
+          "threshold": 0.009258,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 1468,
+          "percent_over": 0.39
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": 0.00219,
+          "robust_sd": 0.007373,
+          "statistical_threshold": 0.031682,
+          "threshold": 0.031682,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 1261,
+          "percent_over": 1.153
+        }
+      }
+    },
+    "BD2210_2": {
+      "band": "BD2210_2",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": 0.001725,
+          "robust_sd": 0.001377,
+          "statistical_threshold": 0.007231,
+          "threshold": 0.007231,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 1392,
+          "percent_over": 0.37
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": -0.000132,
+          "robust_sd": 0.003212,
+          "statistical_threshold": 0.012716,
+          "threshold": 0.012716,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 1765,
+          "percent_over": 1.614
+        }
+      }
+    },
+    "D2200": {
+      "band": "D2200",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": 0.000988,
+          "robust_sd": 0.002009,
+          "statistical_threshold": 0.009024,
+          "threshold": 0.009024,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 1327,
+          "percent_over": 0.353
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": -0.000367,
+          "robust_sd": 0.004688,
+          "statistical_threshold": 0.018384,
+          "threshold": 0.018384,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 1193,
+          "percent_over": 1.091
+        }
+      }
+    },
+    "D2300": {
+      "band": "D2300",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": -0.003106,
+          "robust_sd": 0.002003,
+          "statistical_threshold": 0.004905,
+          "threshold": 0.005,
+          "bound_by": "credibility floor",
+          "cells": 376023,
+          "cells_over": 412,
+          "percent_over": 0.11
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": -0.002205,
+          "robust_sd": 0.00534,
+          "statistical_threshold": 0.019157,
+          "threshold": 0.019157,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 971,
+          "percent_over": 0.888
+        }
+      }
+    },
+    "SINDEX2": {
+      "band": "SINDEX2",
+      "per_scene": {
+        "18 m/px primary": {
+          "coverage_code": 1,
+          "background_median": 0.00441,
+          "robust_sd": 0.001885,
+          "statistical_threshold": 0.011951,
+          "threshold": 0.011951,
+          "bound_by": "statistics",
+          "cells": 376023,
+          "cells_over": 1385,
+          "percent_over": 0.368
+        },
+        "36 m/px gap-fill": {
+          "coverage_code": 2,
+          "background_median": 0.006106,
+          "robust_sd": 0.005027,
+          "statistical_threshold": 0.026214,
+          "threshold": 0.026214,
+          "bound_by": "statistics",
+          "cells": 109353,
+          "cells_over": 1989,
+          "percent_over": 1.819
+        }
+      }
+    }
+  },
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "grid": {
+    "width": 474,
+    "height": 1024
+  },
+  "ground_resolution_m": {
+    "x": 14.287103165255273,
+    "y": 14.274551180905576
+  },
+  "aligned_to": "public/data/dem/meta.json - identical bounds and grid, asserted at build",
+  "encoding": "8-bit PNG; pixel value = unit code, 0 = no distinct signature or no coverage",
+  "classified_percent_of_aoi": 2.26,
+  "classified_percent_of_covered": 2.26,
+  "background": {
+    "code": 0,
+    "key": "background",
+    "label": "No distinct signature",
+    "color": "#3a3330",
+    "detail": "No CRISM summary parameter stands out from the AOI background here. Most of this AOI is dust-mantled, so this is the expected answer over most of the map and does not mean the ground is uninteresting."
+  },
+  "units": [
+    {
+      "code": 1,
+      "key": "femgclay",
+      "label": "Fe/Mg smectite clay",
+      "color": "#5fb8a3",
+      "mineralogy": "Fe/Mg smectite",
+      "water_story": "Smectite needs water that stayed in contact with rock for a long time, so this marks former standing or slow-moving water: lake floor and channel-fill deposits.",
+      "bands": [
+        "D2300"
+      ],
+      "thresholds_per_scene": {
+        "D2300": {
+          "18 m/px primary": 0.005,
+          "36 m/px gap-fill": 0.019157
+        }
+      },
+      "cells": 949,
+      "percent_of_aoi": 0.196,
+      "area_km2": 0.1935,
+      "strongest_index_value": 0.09505,
+      "median_index_value": 0.021659,
+      "elevation_m": {
+        "min": -4398.9,
+        "median": -2804.5,
+        "max": -2430.7
+      },
+      "cells_at_18m": 280,
+      "cells_at_36m": 669,
+      "within_science_regions_percent": {
+        "Clay-bearing unit (Glen Torridon)": 0.7,
+        "Greenheugh Pediment": 0.6
+      }
+    },
+    {
+      "code": 2,
+      "key": "silica-aloh",
+      "label": "Opaline silica / Al-OH",
+      "color": "#8fb8e8",
+      "mineralogy": "opaline silica, Al-clay",
+      "water_story": "The 2.2 micron Al-OH and Si-OH absorptions are what altered volcanic ash leaves behind. This is the tuff signature, and it also records acidic or short-lived water rather than a long-standing lake.",
+      "bands": [
+        "BD2210_2",
+        "D2200"
+      ],
+      "thresholds_per_scene": {
+        "BD2210_2": {
+          "18 m/px primary": 0.007231,
+          "36 m/px gap-fill": 0.012716
+        },
+        "D2200": {
+          "18 m/px primary": 0.009024,
+          "36 m/px gap-fill": 0.018384
+        }
+      },
+      "cells": 3702,
+      "percent_of_aoi": 0.763,
+      "area_km2": 0.755,
+      "strongest_index_value": 0.10262,
+      "median_index_value": 0.015894,
+      "elevation_m": {
+        "min": -4377.7,
+        "median": -3014.1,
+        "max": -2536.9
+      },
+      "cells_at_18m": 1658,
+      "cells_at_36m": 2044,
+      "within_science_regions_percent": {
+        "Sulfate-bearing unit": 0.2,
+        "Gediz Vallis Ridge": 0.2,
+        "Boxwork region": 0.1
+      }
+    },
+    {
+      "code": 3,
+      "key": "sulfate",
+      "label": "Polyhydrated sulfate",
+      "color": "#f2d06b",
+      "mineralogy": "polyhydrated sulfate",
+      "water_story": "Sulfates drop out of solution as water evaporates, so this is the drying end of the record and the other half of Mount Sharp's clay-to-sulfate climate transition.",
+      "bands": [
+        "SINDEX2"
+      ],
+      "thresholds_per_scene": {
+        "SINDEX2": {
+          "18 m/px primary": 0.011951,
+          "36 m/px gap-fill": 0.026214
+        }
+      },
+      "cells": 3248,
+      "percent_of_aoi": 0.669,
+      "area_km2": 0.6624,
+      "strongest_index_value": 0.104015,
+      "median_index_value": 0.027722,
+      "elevation_m": {
+        "min": -4370.4,
+        "median": -3366.4,
+        "max": -2547.1
+      },
+      "cells_at_18m": 1374,
+      "cells_at_36m": 1874,
+      "within_science_regions_percent": {
+        "Boxwork region": 3.5,
+        "Gediz Vallis Channel": 1.5,
+        "Gediz Vallis Ridge": 0.9,
+        "Sulfate-bearing unit": 0.2
+      }
+    },
+    {
+      "code": 4,
+      "key": "mafic",
+      "label": "Mafic (pyroxene / olivine)",
+      "color": "#b07de0",
+      "mineralogy": "pyroxene, olivine",
+      "water_story": "Primary volcanic minerals that water has not altered. Where they survive, either little water reached the rock or the surface is young.",
+      "bands": [
+        "LCPINDEX2",
+        "HCPINDEX2",
+        "OLINDEX3"
+      ],
+      "thresholds_per_scene": {
+        "LCPINDEX2": {
+          "18 m/px primary": 0.006846,
+          "36 m/px gap-fill": 0.010393
+        },
+        "HCPINDEX2": {
+          "18 m/px primary": 0.005,
+          "36 m/px gap-fill": 0.026132
+        },
+        "OLINDEX3": {
+          "18 m/px primary": 0.085422,
+          "36 m/px gap-fill": 0.181054
+        }
+      },
+      "cells": 929,
+      "percent_of_aoi": 0.191,
+      "area_km2": 0.1895,
+      "strongest_index_value": 0.4363,
+      "median_index_value": 0.069089,
+      "elevation_m": {
+        "min": -4334.6,
+        "median": -3346.1,
+        "max": -2647.8
+      },
+      "cells_at_18m": 434,
+      "cells_at_36m": 495,
+      "within_science_regions_percent": {
+        "Boxwork region": 1.0
+      }
+    },
+    {
+      "code": 5,
+      "key": "hydrated",
+      "label": "Hydrated, mineral unresolved",
+      "color": "#9db4c0",
+      "mineralogy": "unidentified hydrated phase",
+      "water_story": "Bound water with no diagnostic 2.2 or 2.3 micron absorption to name the host mineral. Worth visiting precisely because orbit cannot settle it.",
+      "bands": [
+        "BD1900R2"
+      ],
+      "thresholds_per_scene": {
+        "BD1900R2": {
+          "18 m/px primary": 0.009258,
+          "36 m/px gap-fill": 0.031682
+        }
+      },
+      "cells": 2164,
+      "percent_of_aoi": 0.446,
+      "area_km2": 0.4413,
+      "strongest_index_value": 0.125963,
+      "median_index_value": 0.016004,
+      "elevation_m": {
+        "min": -4388.1,
+        "median": -3210.5,
+        "max": -2530.7
+      },
+      "cells_at_18m": 1409,
+      "cells_at_36m": 755,
+      "within_science_regions_percent": {
+        "Gediz Vallis Channel": 0.7,
+        "Sulfate-bearing unit": 0.3,
+        "Gediz Vallis Ridge": 0.3,
+        "Boxwork region": 0.3
+      }
+    }
+  ],
+  "science_region_overlap_note": "within_science_regions_percent is the share of each unit's cells that fall inside a science region traced from Curiosity's own traverse. It is a spatial coincidence between two independently derived layers, not a claim that the rover confirmed the orbital detection.",
+  "credit": "Derived by MARSWALK from NASA/JPL-Caltech/JHU-APL MRO CRISM data",
+  "generated": "2026-11-14"
+}

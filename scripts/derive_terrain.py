@@ -18,7 +18,17 @@ import sys
 import numpy as np
 from PIL import Image
 
-from common import PUBLIC_DATA, log, rdp, write_json
+from common import (
+    PUBLIC_DATA,
+    dem_lonlat_fn,
+    drop_collinear,
+    load_dem,
+    log,
+    mask_to_rings,
+    rdp,
+    ring_area_cells,
+    write_json,
+)
 
 OUT_DIR = PUBLIC_DATA / "derived"
 DEM_DIR = PUBLIC_DATA / "dem"
@@ -96,76 +106,9 @@ def detrended_roughness(z: np.ndarray) -> np.ndarray:
     return win.std(axis=0).astype(np.float32)
 
 
-def mask_to_rings(mask: np.ndarray, to_lonlat):
-    """Trace the boundary of a boolean mask as closed rings (cell edges)."""
-    h, w = mask.shape
-    starts: dict[tuple, list] = {}
-
-    def push(a, b):
-        starts.setdefault(a, []).append((a, b))
-
-    ys, xs = np.nonzero(mask)
-    for y, x in zip(ys.tolist(), xs.tolist()):
-        if y == 0 or not mask[y - 1, x]:
-            push((x + 1, y), (x, y))
-        if y == h - 1 or not mask[y + 1, x]:
-            push((x, y + 1), (x + 1, y + 1))
-        if x == 0 or not mask[y, x - 1]:
-            push((x, y), (x, y + 1))
-        if x == w - 1 or not mask[y, x + 1]:
-            push((x + 1, y + 1), (x + 1, y))
-
-    rings = []
-    guard = 0
-    limit = w * h * 8
-    for key in list(starts.keys()):
-        while starts.get(key):
-            seg = starts[key].pop()
-            ring = [seg[0]]
-            cur = seg[1]
-            while cur != seg[0] and guard < limit:
-                guard += 1
-                ring.append(cur)
-                nxt = starts.get(cur)
-                if not nxt:
-                    break
-                cur = nxt.pop()[1]
-            if len(ring) >= 4:
-                rings.append([to_lonlat(px, py) for px, py in ring] +
-                             [to_lonlat(*ring[0])])
-    return rings
-
-
 MIN_POLY_CELLS = 48     # drop speckle smaller than this many DEM cells
 MAX_POLYS = 40          # keep the GeoJSON reviewable
 SIMPLIFY_CELLS = 2.5    # Douglas-Peucker tolerance, in DEM cells
-
-
-def drop_collinear(ring):
-    """Collapse runs of collinear vertices left by cell-edge tracing."""
-    if len(ring) < 4:
-        return ring
-    out = [ring[0]]
-    for i in range(1, len(ring) - 1):
-        ax, ay = out[-1]
-        bx, by = ring[i]
-        cx, cy = ring[i + 1]
-        if abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)) > 1e-12:
-            out.append(ring[i])
-    out.append(ring[-1])
-    return out
-
-
-def ring_area_cells(ring, b, w, h):
-    """Shoelace area, expressed in DEM cells."""
-    a = 0.0
-    for i in range(len(ring) - 1):
-        x0, y0 = ring[i]
-        x1, y1 = ring[i + 1]
-        a += x0 * y1 - x1 * y0
-    deg2 = abs(a) / 2.0
-    cell_deg2 = ((b["east"] - b["west"]) / w) * ((b["north"] - b["south"]) / h)
-    return deg2 / cell_deg2 if cell_deg2 else 0.0
 
 
 def main() -> int:
@@ -173,19 +116,15 @@ def main() -> int:
     if not meta_path.exists():
         log("FATAL: run fetch_dem.py first")
         return 1
-    dem_meta = json.loads(meta_path.read_text(encoding="utf-8"))
-
-    hm = np.array(Image.open(DEM_DIR / "heightmap.png")).astype(np.float32)
+    # heightmap.png is RGB-packed (R/G = 16-bit elevation, B = stereo coverage),
+    # so it goes through the one shared decoder instead of being read as grey.
+    z, coverage, dem_meta = load_dem(DEM_DIR)
     zmin = dem_meta["elevation_m"]["min"]
     zmax = dem_meta["elevation_m"]["max"]
-    z = zmin + hm / 65535.0 * (zmax - zmin)
     h, w = z.shape
     res = dem_meta["ground_resolution_m"]
     dx, dy = float(res["x"]), float(res["y"])
     log(f"DEM {w} x {h} at {dx:.2f} x {dy:.2f} m/px, elevation {zmin:.1f}..{zmax:.1f} m")
-
-    cov_path = DEM_DIR / "coverage.png"
-    coverage = (np.array(Image.open(cov_path)) > 127) if cov_path.exists() else np.ones_like(z, bool)
     log(f"  stereo coverage {100.0 * coverage.mean():.1f}%")
 
     slope = horn_slope(z, dx, dy)
@@ -229,9 +168,7 @@ def main() -> int:
     # --- hazard polygons -----------------------------------------------------
     b = dem_meta["bounds"]
 
-    def to_lonlat(px, py):
-        return [round(b["west"] + px / w * (b["east"] - b["west"]), 6),
-                round(b["north"] - py / h * (b["north"] - b["south"]), 6)]
+    to_lonlat = dem_lonlat_fn(b, w, h)
 
     features = []
     for c in CLASS_META:

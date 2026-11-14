@@ -96,6 +96,111 @@
     "reason": "This is the only geologic map in the Trek catalogue that covers the AOI, and it is global at 1:20,000,000. One millimetre on that map is 20 km; the whole 6.77 x 14.62 km AOI is smaller than a single map unit. Drawing it as a layer would imply geological detail the product cannot support. It is cited as regional context instead. Searched USGS Astrogeology for a higher-resolution map of the MSL site on 2026-11-14 and found none published as GIS data.",
     "credit": "USGS / NASA"
   },
+  "geochem": {
+    "provenance": "REAL",
+    "title": "MRO CRISM map-projected targeted summary parameters (MTRDR)",
+    "mission": "Mars Reconnaissance Orbiter",
+    "instrument": "CRISM",
+    "product_type": "MTRDR summary-parameter cube (*_su*_mtr3)",
+    "archive": "PDS Geosciences Node, volume mrocr_4001",
+    "discovery": "https://oderest.rsl.wustl.edu/live2/?target=mars&query=product&results=fmpc&output=JSON&ihid=MRO&iid=CRISM&pt=MTRDR",
+    "discovery_note": "A spatial ODE search needs ihid, iid and pt together; any one alone is ignored. Ten MTRDR observations intersect the AOI. ODE indexes each by its *_if*_mtr3 I/F cube, so the summary cube is found through the product's file listing, not by guessing a filename.",
+    "credit": "NASA/JPL-Caltech/JHU-APL",
+    "reference": "Viviano-Beck et al. (2014), Revised CRISM spectral parameters and summary products, J. Geophys. Res. Planets 119, 1403-1431",
+    "scenes": [
+      {
+        "role": "primary",
+        "product_id": "FRT000058A3_07_SU165J_MTR3",
+        "observation": "FRT000058A3",
+        "img": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_su165j_mtr3.img",
+        "hdr": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_su165j_mtr3.hdr",
+        "lbl": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_su165j_mtr3.lbl",
+        "start_time": "2007-04-22T12:12:12.684",
+        "map_scale_m": 18.0,
+        "note": "Full-resolution targeted observation at 18 m/px. Covers the AOI across its full width but stops short at both ends in latitude, so it supplies most of the AOI and none of the extreme north or south."
+      },
+      {
+        "role": "gap-fill",
+        "product_id": "HRL0000BABA_07_SU182J_MTR3",
+        "observation": "HRL0000BABA",
+        "img": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2008/2008_202/hrl0000baba/hrl0000baba_07_su182j_mtr3.img",
+        "hdr": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2008/2008_202/hrl0000baba/hrl0000baba_07_su182j_mtr3.hdr",
+        "lbl": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2008/2008_202/hrl0000baba/hrl0000baba_07_su182j_mtr3.lbl",
+        "map_scale_m": 36.0,
+        "note": "Half-resolution long targeted observation at 36 m/px. Its footprint contains the whole AOI, so it fills what the FRT scene misses. Used only where the FRT scene has no valid value, and flagged per cell in coverage.png because it is half the resolution."
+      }
+    ],
+    "bands": [
+      {
+        "name": "BD530_2",
+        "key": "ferric",
+        "shows": "ferric absorption near 530 nm",
+        "mineralogy": "nanophase and crystalline iron oxide, hematite"
+      },
+      {
+        "name": "OLINDEX3",
+        "key": "olivine",
+        "shows": "olivine broad 1 micron absorption",
+        "mineralogy": "olivine, unweathered mafic sand and bedrock"
+      },
+      {
+        "name": "LCPINDEX2",
+        "key": "lcp",
+        "shows": "low-calcium pyroxene",
+        "mineralogy": "pyroxene, primary volcanic rock"
+      },
+      {
+        "name": "HCPINDEX2",
+        "key": "hcp",
+        "shows": "high-calcium pyroxene",
+        "mineralogy": "pyroxene, basaltic lava and ash"
+      },
+      {
+        "name": "BD1900R2",
+        "key": "water",
+        "shows": "bound water near 1.9 microns",
+        "mineralogy": "hydrated phases of any kind, not diagnostic on its own"
+      },
+      {
+        "name": "BD2210_2",
+        "key": "aloh",
+        "shows": "Al-OH and Si-OH near 2.21 microns",
+        "mineralogy": "opaline silica and Al-clay, the signature of altered volcanic ash (tuff)"
+      },
+      {
+        "name": "D2200",
+        "key": "alclay",
+        "shows": "2.2 micron dropoff",
+        "mineralogy": "Al-phyllosilicate, kaolinite and montmorillonite"
+      },
+      {
+        "name": "D2300",
+        "key": "femgclay",
+        "shows": "2.3 micron dropoff",
+        "mineralogy": "Fe/Mg smectite, formed where water stood or flowed"
+      },
+      {
+        "name": "SINDEX2",
+        "key": "sulfate",
+        "shows": "convexity between 2.1 and 2.4 microns",
+        "mineralogy": "polyhydrated sulfate, precipitated as water evaporated"
+      }
+    ],
+    "bands_note": "Band order is read from the ENVI header at run time, never hard-coded: the header's `band names` list is the only authority for which of the 60 planes is which parameter, and both scenes were checked to carry the same order.",
+    "no_data": "The sentinel is the ENVI header's `data ignore value` (65535.0). The PDS label carries no NULL keyword, so the header has to be read.",
+    "caveat": "These are spectral indices, not mineral abundances. A high index means the shape the parameter measures is present in that pixel's spectrum; it is evidence for a mineral group, not a measurement of how much is there. Thin dust cover, slope and illumination all move these numbers.",
+    "retrieved": "2026-11-14",
+    "unit_derivation": {
+      "script": "scripts/derive_geochem_units.py",
+      "provenance": "DERIVED",
+      "sigma_k": 4.0,
+      "credibility_floor_band_depth": 0.005,
+      "per_scene_thresholds": true,
+      "method": "A cell joins a unit where a summary parameter exceeds that scene's own AOI background median by sigma_k robust standard deviations, and never below the credibility floor. Thresholds are computed per scene at build time, not stored here, because they depend on the scene statistics; the values actually used are written into public/data/geochem/units.json every build, along with three checks (cross-scene consistency, stratigraphic ordering, slope dependence).",
+      "audit": "These two numbers are the whole of the hand-chosen input. Change sigma_k to move every threshold together; the build reports what each became and fails if the two scenes start classifying at rates more than 10x apart.",
+      "known_limitation": "The derived units do NOT reproduce the published clay-below-sulfate ordering on Mount Sharp. That is measured and stated in units.json rather than hidden: the layer is for finding ground worth visiting, not for naming minerals."
+    }
+  },
   "science_regions": {
     "provenance": "DERIVED (from REAL traverse)",
     "status": "next data task",
@@ -142,6 +247,22 @@
     "perseverance_raw_images": {
       "url": "https://mars.nasa.gov/mars2020/multimedia/raw-images/",
       "reason": "Mars 2020 operates in Jezero Crater, not Gale. Listed on the About page as a related resource only."
+    },
+    "crism_global_mineral_map": {
+      "url": "https://oderest.rsl.wustl.edu/live2/?target=mars&query=product&results=fmpc&output=JSON&ihid=MRO&iid=CRISM&pt=MRDR",
+      "reason": "The CRISM multispectral global mosaic is published at 256 pixels per degree, about 180 m/px. Over this 6.77 x 14.62 km AOI that is roughly 38 x 81 pixels, so a single pixel spans several science stations and no unit boundary inside the AOI would be real. Rejected for the same reason as the global geologic map: too coarse for the question the app asks. The targeted MTRDR cubes at 18 m/px were used instead."
+    },
+    "crism_mtrdr_browse_images": {
+      "url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/browse/2007/2007_112/frt000058a3/",
+      "reason": "Every MTRDR observation ships ready-made BR* browse rasters, one per mineral theme, which would have been far less work to use. They are 8-bit renders with a per-scene contrast stretch already applied, so the pixel values are display levels, not index values: two scenes stretched differently cannot be compared or thresholded. The Trek DEM was rejected on exactly this ground, and being consistent matters more than the saved effort. The 32-bit float summary cube was used instead."
+    },
+    "crism_if_cube": {
+      "url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_if165j_mtr3.img",
+      "reason": "The 1.1 GB I/F cube holds the full calibrated spectra and would allow our own spectral parameters. Computing them would mean reproducing the continuum removal and the atmospheric and photometric corrections already applied in the published summary cube, with no way to validate the result. Using the archive's own summary parameters keeps the numbers traceable to a published method."
+    },
+    "usgs_gale_geologic_map": {
+      "url": "https://astrogeology-usgs.hub.arcgis.com/pages/interactive-maps-mars",
+      "reason": "Searched on 2026-11-14 for a published Gale Crater or Mount Sharp geologic map released as GIS data at AOI scale. The USGS catalogue has the 1:20,000,000 global map (see `geology`) and nothing finer for this site. Published MSL-site unit maps exist in the literature as figures without georeferencing control points, which is the same problem as the proposed-path figure in `science_regions`. So the geochemical units here are derived from CRISM indices rather than digitised from a published map, and are labelled DERIVED."
     }
   }
 }
