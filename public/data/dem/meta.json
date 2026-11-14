@@ -32,7 +32,10 @@
     "max": -2271.041748046875
   },
   "encoding": "16-bit greyscale PNG; elevation = min + value/65535 * (max - min)",
+  "coverage_mask": "coverage.png - 255 where the stereo DTM has real data, 0 where it does not",
+  "stereo_coverage_percent": 74.8,
   "nodata_filled_cells": 122502,
+  "nodata_note": "Cells outside the HiRISE stereo swath are filled by neighbour diffusion so the terrain mesh stays continuous. They are flagged in coverage.png and barred by the route planner.",
   "mars_radius_m": 3396190.0,
   "retrieved": "2026-11-13"
 }

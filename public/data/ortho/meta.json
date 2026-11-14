@@ -1,0 +1,27 @@
+{
+  "provenance": "REAL",
+  "product_name": "curiosity_hirise_mosaic",
+  "title": "MRO HiRISE, Curiosity Roving Site Mosaic",
+  "mission": "Mars Reconnaissance Orbiter",
+  "instrument": "HiRISE RED",
+  "source_url": "https://trek.nasa.gov/tiles/Mars/EQ/curiosity_hirise_mosaic/1.0.0/WMTSCapabilities.xml",
+  "tile_template": "https://trek.nasa.gov/tiles/Mars/EQ/curiosity_hirise_mosaic/1.0.0//default/default028mm/{z}/{row}/{col}.png",
+  "credit": "NASA/JPL-Caltech/University of Arizona",
+  "zoom": 13,
+  "native_m_per_px": 5.088,
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "size_px": {
+    "width": 1335,
+    "height": 2873
+  },
+  "tiles_fetched": 78,
+  "tiles_missing": 0,
+  "coverage_percent": 99.9,
+  "processing": "tiles stitched, cropped to AOI, 1-99 percentile contrast stretch",
+  "retrieved": "2026-11-14"
+}

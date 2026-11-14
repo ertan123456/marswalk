@@ -1,0 +1,28 @@
+{
+  "provenance": "REAL",
+  "product_name": "MSL rover traverse and waypoints",
+  "title": "Curiosity actual driven path",
+  "mission": "Mars Science Laboratory (Curiosity)",
+  "instrument": "Rover localisation (visual odometry + orbital tie-points)",
+  "source_urls": [
+    "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json",
+    "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_traverse.json"
+  ],
+  "credit": "NASA/JPL-Caltech",
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "waypoints_in_aoi": 1039,
+  "sol_range": [
+    1167,
+    5073
+  ],
+  "path_segments": 1032,
+  "path_vertices": 3411,
+  "simplification": "Douglas-Peucker at ~1 m; coordinates rounded to 6 dp (~0.1 m)",
+  "note": "Clipped to the AOI. This is the path Curiosity actually drove, not a plan - it is shown so a proposed EVA route can be compared against ground truth.",
+  "retrieved": "2026-11-14"
+}

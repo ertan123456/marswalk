@@ -132,10 +132,17 @@ def main() -> int:
         log("FATAL: more than half the AOI has no DTM coverage; pick another product")
         return 1
 
-    # --- fill small gaps so the planner never walks into a NaN ---------------
+    # --- fill gaps for rendering, but keep the mask so nothing is invented ----
+    #
+    # The HiRISE stereo swath is a tilted parallelogram, so the corners of an
+    # axis-aligned AOI fall outside it. We fill those cells to keep the 3D mesh
+    # and the hillshade continuous, and ship a coverage mask alongside so the
+    # planner can bar them: you cannot route an EVA across terrain you have no
+    # stereo coverage for.
     if not valid.all():
         filled = fill_nans(out)
-        log(f"  filled {int((~valid).sum())} no-data cells by nearest-neighbour diffusion")
+        log(f"  filled {int((~valid).sum())} no-data cells for rendering "
+            f"(flagged in coverage.png, barred by the planner)")
     else:
         filled = out
 
@@ -150,6 +157,13 @@ def main() -> int:
     Image.fromarray(png, mode="I;16").save(OUT_DIR / "heightmap.png", optimize=True)
     size_kb = (OUT_DIR / "heightmap.png").stat().st_size / 1024
     log(f"  wrote public/data/dem/heightmap.png ({size_kb:.0f} KB, 16-bit)")
+
+    # --- coverage mask: 255 where the DTM really has data, 0 where it does not
+    cov = (valid * 255).astype(np.uint8)
+    Image.fromarray(cov, mode="L").save(OUT_DIR / "coverage.png", optimize=True)
+    cov_kb = (OUT_DIR / "coverage.png").stat().st_size / 1024
+    log(f"  wrote public/data/dem/coverage.png ({cov_kb:.0f} KB) - "
+        f"{pct:.1f}% real stereo coverage")
 
     write_json(OUT_DIR / "meta.json", {
         "provenance": "REAL",
@@ -168,7 +182,12 @@ def main() -> int:
         "ground_resolution_m": {"x": width_m / out_w, "y": height_m / out_h},
         "elevation_m": {"min": zmin, "max": zmax},
         "encoding": "16-bit greyscale PNG; elevation = min + value/65535 * (max - min)",
+        "coverage_mask": "coverage.png - 255 where the stereo DTM has real data, 0 where it does not",
+        "stereo_coverage_percent": round(pct, 1),
         "nodata_filled_cells": int((~valid).sum()),
+        "nodata_note": ("Cells outside the HiRISE stereo swath are filled by neighbour "
+                        "diffusion so the terrain mesh stays continuous. They are flagged "
+                        "in coverage.png and barred by the route planner."),
         "mars_radius_m": MARS_RADIUS_M,
         "retrieved": "2026-11-13",
     })

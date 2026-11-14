@@ -199,3 +199,35 @@ def write_json(path: Path, obj) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2)
     log(f"  wrote {path.relative_to(ROOT)} ({os.path.getsize(path)/1024:.1f} KB)")
+
+
+def rdp(points, eps):
+    """Douglas-Peucker line simplification. Iterative, so long rings are safe."""
+    if len(points) < 3:
+        return list(points)
+    keep = [False] * len(points)
+    keep[0] = keep[-1] = True
+    stack = [(0, len(points) - 1)]
+    while stack:
+        i0, i1 = stack.pop()
+        if i1 <= i0 + 1:
+            continue
+        x0, y0 = points[i0]
+        x1, y1 = points[i1]
+        dx, dy = x1 - x0, y1 - y0
+        denom = dx * dx + dy * dy
+        best_i, best_d = -1, 0.0
+        for i in range(i0 + 1, i1):
+            x, y = points[i]
+            if denom == 0:
+                d = ((x - x0) ** 2 + (y - y0) ** 2) ** 0.5
+            else:
+                t = max(0.0, min(1.0, ((x - x0) * dx + (y - y0) * dy) / denom))
+                d = ((x - (x0 + t * dx)) ** 2 + (y - (y0 + t * dy)) ** 2) ** 0.5
+            if d > best_d:
+                best_i, best_d = i, d
+        if best_d > eps:
+            keep[best_i] = True
+            stack.append((i0, best_i))
+            stack.append((best_i, i1))
+    return [p for p, k in zip(points, keep) if k]

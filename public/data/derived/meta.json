@@ -1,0 +1,97 @@
+{
+  "provenance": "DERIVED",
+  "derived_from": {
+    "product_name": "HiRISE stereo DTM DTEEC_009149_1750_009294_1750_U01",
+    "source_url": "https://www.uahirise.org/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/DTEEC_009149_1750_009294_1750_U01.IMG",
+    "provenance": "REAL"
+  },
+  "method": {
+    "slope": "Horn 3x3 gradient on the DEM at 14.29 x 14.27 m baseline",
+    "roughness": "standard deviation of elevation in a 3x3 window (rock-abundance proxy)",
+    "no_data": "cells outside the HiRISE stereo swath are classed no-data and barred"
+  },
+  "thresholds_deg": {
+    "caution": 15.0,
+    "impassable": 25.0
+  },
+  "thresholds_roughness_m": {
+    "caution": 1.0,
+    "impassable": 2.2
+  },
+  "classes": [
+    {
+      "code": 0,
+      "key": "nominal",
+      "label": "Nominal traverse",
+      "color": "#3ddc97",
+      "passable": true,
+      "cost_factor": 1.0,
+      "detail": "Slope under 15 degrees and low local relief."
+    },
+    {
+      "code": 1,
+      "key": "caution",
+      "label": "Caution: slope 15-25 deg or rugged",
+      "color": "#f2b53a",
+      "passable": true,
+      "cost_factor": 2.6,
+      "detail": "Above the 15 degree slope flight rule, or detrended local relief over 1.0 m. Traversable at a cost penalty."
+    },
+    {
+      "code": 2,
+      "key": "slope-impassable",
+      "label": "Slope > 25 deg",
+      "color": "#ef4444",
+      "passable": false,
+      "cost_factor": null,
+      "detail": "Above the suited-crew limit. Barred by the planner."
+    },
+    {
+      "code": 3,
+      "key": "rough",
+      "label": "Broken ground",
+      "color": "#a855f7",
+      "passable": false,
+      "cost_factor": null,
+      "detail": "Detrended local relief over 2.2 m. A ruggedness index, not a rock count: at ~14 m/px the DEM cannot resolve individual boulders."
+    },
+    {
+      "code": 4,
+      "key": "no-data",
+      "label": "No stereo coverage",
+      "color": "#616b7c",
+      "passable": false,
+      "cost_factor": null,
+      "detail": "Outside the HiRISE stereo swath. No terrain knowledge, so the planner will not route here."
+    }
+  ],
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "grid": {
+    "width": 474,
+    "height": 1024
+  },
+  "ground_resolution_m": {
+    "x": 14.287103165255273,
+    "y": 14.274551180905576
+  },
+  "slope_png_encoding": "16-bit greyscale; degrees = value/65535 * 90",
+  "statistics": {
+    "slope_median_deg": 10.42,
+    "slope_p95_deg": 33.63,
+    "slope_max_deg": 68.3,
+    "class_cell_counts": {
+      "nominal": 182198,
+      "caution": 101423,
+      "slope-impassable": 48222,
+      "rough": 31031,
+      "no-data": 122502
+    }
+  },
+  "credit": "Derived by MARSWALK from NASA/JPL-Caltech/University of Arizona HiRISE data",
+  "generated": "2026-11-14"
+}
