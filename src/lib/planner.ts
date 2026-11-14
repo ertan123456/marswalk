@@ -37,8 +37,14 @@ export interface SuitModel {
   steepCostFactor: number;
   /** A* cost multiplier for crossing rugged / broken ground */
   roughCostFactor: number;
-  /** pressurised rover shadows the traverse and counts as a safe haven */
-  roverSupport: boolean;
+  /** how the crew covers ground between stations */
+  mobility: 'foot' | 'rover';
+  /** rover driving speed on level ground, m/s */
+  roverSpeedMs: number;
+  /** the rover is barred from slopes at or above this - stricter than the crew */
+  roverMaxSlopeDeg: number;
+  /** consumables multiplier while riding: the rover carries the tools */
+  roverBurnFactor: number;
   /** local hour the crew steps outside */
   evaStartHour: number;
 }
@@ -54,7 +60,10 @@ export const DEFAULT_SUIT: SuitModel = {
   slopePenaltyPerDeg: 0.08,
   steepCostFactor: 2.6,
   roughCostFactor: 3.4,
-  roverSupport: true,
+  mobility: 'foot',
+  roverSpeedMs: 2.2,
+  roverMaxSlopeDeg: 15,
+  roverBurnFactor: 0.55,
   evaStartHour: 7.25,
 };
 
@@ -67,6 +76,15 @@ export function walkSpeedMs(suit: SuitModel, grade: number): number {
   const norm = Math.exp(-3.5 * 0.05);
   const v = (suit.flatSpeedMs * Math.exp(-3.5 * Math.abs(grade + 0.05))) / norm;
   return Math.max(0.12, v);
+}
+
+/**
+ * Rover driving speed against grade. A wheeled vehicle loses speed on a slope
+ * much faster than a walker does, and it is barred outright above its slope
+ * limit, so this only has to be sane inside that band.
+ */
+export function roverSpeedMs(suit: SuitModel, grade: number): number {
+  return Math.max(0.4, suit.roverSpeedMs * (1 - Math.min(0.75, Math.abs(grade) * 2.2)));
 }
 
 /** Consumables burn rate, as a multiple of the nominal on-station rate. */
@@ -84,15 +102,25 @@ export interface CostField {
   passable: Uint8Array;
 }
 
-let costCache: { key: string; field: CostField } | null = null;
+const costCache = new Map<string, CostField>();
 
-function costKey(suit: SuitModel): string {
-  return [suit.maxSlopeDeg, suit.slopePenaltyPerDeg, suit.steepCostFactor, suit.roughCostFactor].join('|');
+function costKey(suit: SuitModel, mode: 'foot' | 'rover'): string {
+  return [mode, suit.maxSlopeDeg, suit.roverMaxSlopeDeg, suit.slopePenaltyPerDeg,
+          suit.steepCostFactor, suit.roughCostFactor].join('|');
 }
 
-export function buildCostField(suit: SuitModel): CostField {
-  const key = costKey(suit);
-  if (costCache && costCache.key === key) return costCache.field;
+/**
+ * Traversability for one mobility mode.
+ *
+ * The rover is NOT simply a faster crew member: it is barred from steeper
+ * ground than the crew is (15 degrees against 25) and from broken ground that
+ * a walker can pick through. That asymmetry is the whole point of the mode -
+ * it is what creates drop-off points.
+ */
+export function buildCostField(suit: SuitModel, mode: 'foot' | 'rover' = 'foot'): CostField {
+  const key = costKey(suit, mode);
+  const hit = costCache.get(key);
+  if (hit) return hit;
 
   const t = getTerrain();
   const n = t.width * t.height;
@@ -100,16 +128,20 @@ export function buildCostField(suit: SuitModel): CostField {
   const passable = new Uint8Array(n);
 
   const cautionDeg = t.derivedMeta.thresholds_deg.caution;
+  const roughCaution = t.derivedMeta.thresholds_roughness_m.caution;
+  const slopeLimit = mode === 'rover' ? suit.roverMaxSlopeDeg : suit.maxSlopeDeg;
 
   for (let i = 0; i < n; i++) {
     const cls = t.hazard[i];
     // No stereo coverage is a hard bar: we will not route a crew across ground
     // the DTM does not actually cover.
-    const barred =
+    let barred =
       cls === HAZARD.NO_DATA ||
       cls === HAZARD.ROUGH ||
       cls === HAZARD.SLOPE_IMPASSABLE ||
-      t.slopeDeg[i] >= suit.maxSlopeDeg;
+      t.slopeDeg[i] >= slopeLimit;
+    // A walker can pick a line through ground a wheeled vehicle cannot.
+    if (mode === 'rover' && t.roughness[i] >= roughCaution) barred = true;
     if (barred) {
       factor[i] = Infinity;
       passable[i] = 0;
@@ -127,7 +159,7 @@ export function buildCostField(suit: SuitModel): CostField {
   }
 
   const field: CostField = { width: t.width, height: t.height, factor, passable };
-  costCache = { key, field };
+  costCache.set(key, field);
   return field;
 }
 
@@ -236,6 +268,67 @@ export function nearestPassable(col: number, row: number, field: CostField): { c
   return { col, row };
 }
 
+/** Everything the rover can reach from a starting cell, over its own field. */
+export function reachableFrom(startIdx: number, field: CostField): Uint8Array {
+  const g = field.width;
+  const gh = field.height;
+  const seen = new Uint8Array(g * gh);
+  if (!field.passable[startIdx]) return seen;
+  const stack = [startIdx];
+  seen[startIdx] = 1;
+  while (stack.length) {
+    const i = stack.pop() as number;
+    const c = i % g;
+    const r = (i / g) | 0;
+    for (const [dx, dy] of NEIGHBOURS) {
+      const nc = c + dx;
+      const nr = r + dy;
+      if (nc < 0 || nr < 0 || nc >= g || nr >= gh) continue;
+      const j = nr * g + nc;
+      if (seen[j] || !field.passable[j]) continue;
+      seen[j] = 1;
+      stack.push(j);
+    }
+  }
+  return seen;
+}
+
+/**
+ * The cell nearest `target` that the rover can actually get to - the drop-off.
+ * Searched over the FOOT field, so the walk from it is one the crew can make.
+ */
+export function nearestReachable(
+  targetIdx: number,
+  reachable: Uint8Array,
+  footField: CostField,
+): number | null {
+  if (reachable[targetIdx]) return targetIdx;
+  const g = footField.width;
+  const gh = footField.height;
+  const seen = new Uint8Array(g * gh);
+  let frontier = [targetIdx];
+  seen[targetIdx] = 1;
+  for (let depth = 0; depth < 400 && frontier.length; depth++) {
+    const next: number[] = [];
+    for (const i of frontier) {
+      const c = i % g;
+      const r = (i / g) | 0;
+      for (const [dx, dy] of NEIGHBOURS) {
+        const nc = c + dx;
+        const nr = r + dy;
+        if (nc < 0 || nr < 0 || nc >= g || nr >= gh) continue;
+        const j = nr * g + nc;
+        if (seen[j] || !footField.passable[j]) continue;
+        seen[j] = 1;
+        if (reachable[j]) return j;
+        next.push(j);
+      }
+    }
+    frontier = next;
+  }
+  return null;
+}
+
 /** A* between two grid cells. Returns cell indices, start to goal. */
 export function astar(startIdx: number, goalIdx: number, field: CostField): number[] | null {
   const g = field.width;
@@ -314,7 +407,7 @@ let returnCache: { key: string; field: ReturnField } | null = null;
  */
 export function buildReturnField(suit: SuitModel, havens: { label: string; point: LocalPoint }[]): ReturnField {
   const key = [
-    costKey(suit),
+    costKey(suit, 'foot'),
     suit.flatSpeedMs,
     suit.walkBurnBase,
     suit.walkBurnPerGrade,
@@ -384,6 +477,8 @@ export function buildReturnField(suit: SuitModel, havens: { label: string; point
 /* ------------------------------------------------------------- route plan */
 
 export interface RouteSample {
+  /** how this step was covered */
+  mode: 'foot' | 'rover';
   point: LocalPoint;
   elevation: number;
   slopeDeg: number;
@@ -417,6 +512,9 @@ export interface Station {
   walkBackMarginH: number;
   returnTimeH: number;
   bearingFromPrev: number;
+  /** rover mode: where the crew dismounted, and how far they then walked */
+  dropOff?: LocalPoint;
+  walkFromDropOffM?: number;
 }
 
 export interface RoutePlan {
@@ -432,6 +530,11 @@ export interface RoutePlan {
   spe: { overlaps: boolean; hoursUntil: number };
   /** latest EVA start hour that clears the SPE window */
   suggestedShelterHour: number;
+  mobility: 'foot' | 'rover';
+  /** rover mode: points where the rover could go no further */
+  dropOffs: { point: LocalPoint; stationCode: string; walkM: number }[];
+  roverDistanceM: number;
+  footDistanceM: number;
   feasible: boolean;
   violations: string[];
   notes: string[];
@@ -444,18 +547,46 @@ export interface PlanRequest {
   /** return to start at the end */
   closeLoop: boolean;
   suit: SuitModel;
-  /** extra safe haven when rover support is enabled */
-  roverStaging: LocalPoint | null;
 }
 
 export function planRoute(req: PlanRequest): RoutePlan {
   const t = getTerrain();
   const g = t.width;
-  const field = buildCostField(req.suit);
+  const isRover = req.suit.mobility === 'rover';
+  const footField = buildCostField(req.suit, 'foot');
+  const roverField = isRover ? buildCostField(req.suit, 'rover') : footField;
+  const field = footField;
+
+  // Where can the rover actually get to from the habitat?
+  const habGrid = localToGrid(req.start);
+  const habSnapRover = nearestPassable(habGrid.col, habGrid.row, roverField);
+  const roverReach = isRover
+    ? reachableFrom(habSnapRover.row * g + habSnapRover.col, roverField)
+    : null;
+
+  // Work out the drop-off for each station before routing, so the walk-back
+  // field can treat every drop-off as a safe haven: reaching the rover ends
+  // the emergency, because the rover drives you home.
+  const dropOffs: { point: LocalPoint; stationCode: string; walkM: number }[] = [];
+  const dropOffFor = new Map<string, LocalPoint>();
+  if (isRover && roverReach) {
+    for (const w of req.waypoints) {
+      const wi = localToGrid(w.point);
+      const wSnap = nearestPassable(wi.col, wi.row, footField);
+      const idx = wSnap.row * g + wSnap.col;
+      const d = nearestReachable(idx, roverReach, footField);
+      if (d === null) continue;
+      const dp = gridToLocal(d % g, (d / g) | 0);
+      dropOffFor.set(w.id, dp);
+      if (d !== idx) {
+        dropOffs.push({ point: dp, stationCode: w.code, walkM: distanceM(dp, w.point) });
+      }
+    }
+  }
 
   const havens: { label: string; point: LocalPoint }[] = [{ label: 'Habitat', point: req.start }];
-  if (req.suit.roverSupport && req.roverStaging) {
-    havens.push({ label: 'Pressurised rover', point: req.roverStaging });
+  for (const d of dropOffs) {
+    havens.push({ label: 'Rover at ' + d.stationCode, point: d.point });
   }
   const ret = buildReturnField(req.suit, havens);
 
@@ -496,9 +627,12 @@ export function planRoute(req: PlanRequest): RoutePlan {
   let timeH = 0;
   let consumablesH = 0;
   let cumDist = 0;
+  let roverDistanceM = 0;
+  let footDistanceM = 0;
 
-  const pushSample = (p: LocalPoint, idx: number) => {
+  const pushSample = (p: LocalPoint, idx: number, mode: 'foot' | 'rover' = 'foot') => {
     const sample: RouteSample = {
+      mode,
       point: p,
       elevation: t.elevation[idx],
       slopeDeg: t.slopeDeg[idx],
@@ -544,19 +678,25 @@ export function planRoute(req: PlanRequest): RoutePlan {
 
   let prevPoint = req.start;
 
-  for (const target of legTargets) {
-    const si = localToGrid(prevPoint);
-    const ti = localToGrid(target.point);
-    const sSnap = nearestPassable(si.col, si.row, field);
-    const tSnap = nearestPassable(ti.col, ti.row, field);
-    const path = astar(sSnap.row * g + sSnap.col, tSnap.row * g + tSnap.col, field);
+  /**
+   * Walk or drive from one point to another, appending samples. Returns false
+   * when no admissible corridor exists for that mode.
+   */
+  const travel = (fromP: LocalPoint, toP: LocalPoint, mode: 'foot' | 'rover'): boolean => {
+    const f = mode === 'rover' ? roverField : footField;
+    const a0 = localToGrid(fromP);
+    const b0 = localToGrid(toP);
+    const aS = nearestPassable(a0.col, a0.row, f);
+    const bS = nearestPassable(b0.col, b0.row, f);
+    const aIdx = aS.row * g + aS.col;
+    const bIdx = bS.row * g + bS.col;
+    // Already there: a degenerate hop is a success with nothing to travel, not
+    // a routing failure. (Getting this wrong made every station whose drop-off
+    // fell in its own cell report "no admissible route".)
+    if (aIdx === bIdx) return true;
+    const path = astar(aIdx, bIdx, f);
+    if (!path || path.length < 2) return false;
 
-    if (!path || path.length < 2) {
-      unreachable.push(target.code + ' ' + target.label);
-      continue;
-    }
-
-    const legStartDist = cumDist;
     for (let k = 1; k < path.length; k++) {
       const a = path[k - 1];
       const b = path[k];
@@ -567,14 +707,58 @@ export function planRoute(req: PlanRequest): RoutePlan {
       const step = stepLength(bc - ac, br - ar);
       const rise = t.elevation[b] - t.elevation[a];
       const grade = rise / step;
-      const speed = walkSpeedMs(req.suit, grade);
-      const penalty = 0.5 * (field.factor[a] + field.factor[b]);
-      const dt = (step / speed / 3600) * Math.min(3, 0.6 + 0.4 * penalty);
+      const penalty = 0.5 * (f.factor[a] + f.factor[b]);
+
+      let dt: number;
+      let burn: number;
+      if (mode === 'rover') {
+        dt = step / roverSpeedMs(req.suit, grade) / 3600;
+        dt *= Math.min(2.2, 0.7 + 0.3 * penalty);
+        burn = req.suit.roverBurnFactor;
+        roverDistanceM += step;
+      } else {
+        dt = step / walkSpeedMs(req.suit, grade) / 3600;
+        dt *= Math.min(3, 0.6 + 0.4 * penalty);
+        burn = walkBurnRate(req.suit, grade);
+        footDistanceM += step;
+      }
 
       cumDist += step;
       timeH += dt;
-      consumablesH += dt * walkBurnRate(req.suit, grade);
-      pushSample(gridToLocal(bc, br), b);
+      consumablesH += dt * burn;
+      pushSample(gridToLocal(bc, br), b, mode);
+    }
+    return true;
+  };
+
+  for (const target of legTargets) {
+    const legStartDist = cumDist;
+    const drop = isRover ? dropOffFor.get(target.id) : undefined;
+    // On the closing leg the rover simply drives the crew home.
+    const driveTo = isRover ? (drop ?? target.point) : null;
+
+    let ok = true;
+    let walkFromDrop = 0;
+
+    if (isRover && driveTo) {
+      ok = travel(prevPoint, driveTo, 'rover');
+      const dropCell = drop ? localToGrid(drop) : null;
+      const targetCell = localToGrid(target.point);
+      const dismount =
+        !!dropCell && (dropCell.col !== targetCell.col || dropCell.row !== targetCell.row);
+      if (ok && drop && dismount) {
+        // The rover can get no closer; the crew dismounts and walks in.
+        const before = cumDist;
+        ok = travel(drop, target.point, 'foot');
+        walkFromDrop = cumDist - before;
+      }
+    } else {
+      ok = travel(prevPoint, target.point, 'foot');
+    }
+
+    if (!ok || samples.length < 2) {
+      unreachable.push(target.code + ' ' + target.label);
+      continue;
     }
 
     const arrivalIdx = samples.length - 1;
@@ -604,9 +788,17 @@ export function planRoute(req: PlanRequest): RoutePlan {
       walkBackMarginH: marginAtStation,
       returnTimeH: last.returnTimeH,
       bearingFromPrev: bearingDeg(prevPoint, last.point),
+      dropOff: walkFromDrop > 0 ? drop : undefined,
+      walkFromDropOffM: walkFromDrop > 0 ? walkFromDrop : undefined,
     });
 
-    prevPoint = last.point;
+    // Walk back out to the rover before the next drive.
+    if (isRover && drop && walkFromDrop > 0) {
+      travel(target.point, drop, 'foot');
+      prevPoint = drop;
+    } else {
+      prevPoint = last.point;
+    }
   }
 
   const violations: string[] = [];
@@ -656,10 +848,21 @@ export function planRoute(req: PlanRequest): RoutePlan {
     );
   }
 
-  if (req.suit.roverSupport && req.roverStaging) {
-    notes.push('Pressurised rover staged forward counts as a safe haven; walk-back is measured to the nearer of the two.');
+  if (isRover) {
+    notes.push(
+      'Rover-assisted: the crew rides between stations and dismounts where the rover cannot ' +
+        'continue. Walk-back is measured to the nearest drop-off, because reaching the rover ends ' +
+        'the emergency — it drives them home.',
+    );
+    notes.push(
+      'The rover is barred above ' + req.suit.roverMaxSlopeDeg + '° and from any broken ground, ' +
+        'against ' + req.suit.maxSlopeDeg + '° for the crew on foot. That gap is what creates the drop-offs.',
+    );
+    if (dropOffs.length === 0) {
+      notes.push('Every station is rover-accessible on this plan: no dismount required.');
+    }
   } else {
-    notes.push('No rover support: every walk-back is measured all the way to the habitat airlock.');
+    notes.push('On foot: every walk-back is measured all the way to the habitat airlock.');
   }
   notes.push(
     'Routing bars slopes at or above ' +
@@ -682,6 +885,10 @@ export function planRoute(req: PlanRequest): RoutePlan {
     doseMgy,
     spe,
     suggestedShelterHour,
+    mobility: req.suit.mobility,
+    dropOffs,
+    roverDistanceM,
+    footDistanceM,
     feasible: violations.length === 0,
     violations,
     notes,

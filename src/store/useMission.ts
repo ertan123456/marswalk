@@ -84,12 +84,6 @@ const initialLayers = (): Record<string, LayerState> => {
   return out;
 };
 
-/** Rover stages forward at BX-03, per the mission plan. */
-function roverStaging(): LocalPoint | null {
-  const bx3 = getSciencePoints().find((p) => p.code === 'BX-03');
-  return bx3 ? bx3.position : null;
-}
-
 export const useMission = create<MissionState>((set, get) => ({
   booted: false,
   bootStage: 'Standing by',
@@ -215,7 +209,6 @@ export const useMission = create<MissionState>((set, get) => ({
       waypoints,
       closeLoop: true,
       suit,
-      roverStaging: roverStaging(),
     });
     set({ plan, planning: false, traverseProgress: 0 });
   },

@@ -104,15 +104,20 @@ export function SuitSettings() {
         <div className="pt-1 space-y-2 border-t border-line/60">
           <label className="flex items-start justify-between gap-3 pt-2 cursor-pointer">
             <span>
-              <span className="text-[11px] text-ink block leading-tight">Pressurised rover support</span>
+              <span className="text-[11px] text-ink block leading-tight">
+                {suit.mobility === 'rover' ? 'Rover-assisted' : 'On foot (buddy pair)'}
+              </span>
               <span className="text-[10px] text-ink-faint leading-snug block mt-0.5">
-                {MISSION.roverSupport.name} staged forward at BX-03 as a second safe haven.
+                {suit.mobility === 'rover'
+                  ? `${MISSION.roverSupport.name} carries the crew and the tools. It is barred above ` +
+                    `${suit.roverMaxSlopeDeg}° and from broken ground, so the crew dismounts where it cannot follow.`
+                  : 'The crew walks the whole traverse. Every walk-back is measured to the habitat airlock.'}
               </span>
             </span>
             <Switch
-              checked={suit.roverSupport}
-              onChange={(v) => setSuit({ roverSupport: v })}
-              label="Rover support"
+              checked={suit.mobility === 'rover'}
+              onChange={(v) => setSuit({ mobility: v ? 'rover' : 'foot' })}
+              label="Rover-assisted mobility"
             />
           </label>
           <label className="flex items-start justify-between gap-3 cursor-pointer">

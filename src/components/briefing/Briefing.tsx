@@ -243,14 +243,14 @@ export function Briefing() {
               <div
                 className={
                   'border rounded-[2px] p-2.5 ' +
-                  (suit.roverSupport ? 'border-probe-500/50 bg-probe-500/8' : 'border-line/40 bg-deck-900/40 opacity-60')
+                  (suit.mobility === 'rover' ? 'border-probe-500/50 bg-probe-500/8' : 'border-line/40 bg-deck-900/40 opacity-60')
                 }
               >
                 <div className="flex items-baseline gap-2">
                   <span className="num text-[13px] text-probe-400">{MISSION.roverSupport.name}</span>
                   <span className="text-[12px] text-ink">{MISSION.roverSupport.kind}</span>
-                  <Badge tone={suit.roverSupport ? 'nominal' : 'default'}>
-                    {suit.roverSupport ? 'committed' : 'not assigned'}
+                  <Badge tone={suit.mobility === 'rover' ? 'nominal' : 'default'}>
+                    {suit.mobility === 'rover' ? 'committed' : 'not assigned'}
                   </Badge>
                 </div>
                 <p className="text-[11px] text-ink-dim leading-relaxed mt-1.5">{MISSION.roverSupport.detail}</p>

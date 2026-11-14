@@ -56,7 +56,15 @@ function Totals() {
 
   return (
     <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-      <Readout label="traverse" value={formatDistance(plan.totalDistanceM)} />
+      <Readout
+        label={plan.mobility === 'rover' ? 'traverse (driven + walked)' : 'traverse'}
+        value={formatDistance(plan.totalDistanceM)}
+        hint={
+          plan.mobility === 'rover'
+            ? `${formatDistance(plan.roverDistanceM)} driven, ${formatDistance(plan.footDistanceM)} on foot`
+            : undefined
+        }
+      />
       <Readout label="EVA duration" value={formatDuration(plan.totalTimeH)} unit="h" />
       <Readout
         label="consumables left"
@@ -166,6 +174,13 @@ function StationList() {
                   k="leg"
                   v={formatDistance(station.legDistanceM) + ' · ' + compassLabel(station.bearingFromPrev) + ' ' + Math.round(station.bearingFromPrev) + '°'}
                 />
+                {station.walkFromDropOffM !== undefined && (
+                  <KeyVal
+                    k="rover drop-off"
+                    v={'dismount, walk ' + formatDistance(station.walkFromDropOffM)}
+                    tone="caution"
+                  />
+                )}
                 <KeyVal k="on station" v={Math.round(station.taskMinutes) + ' min'} />
                 <KeyVal
                   k="consumables at depart"
@@ -315,6 +330,24 @@ export function PlanPanel() {
         <div className="mt-3">
           <Totals />
         </div>
+        {plan && (
+          <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+            <Badge tone={plan.mobility === 'rover' ? 'accent' : 'default'}>
+              {plan.mobility === 'rover' ? 'rover-assisted' : 'on foot'}
+            </Badge>
+            {plan.mobility === 'rover' && (
+              <>
+                <Badge>{formatDistance(plan.roverDistanceM)} driven</Badge>
+                <Badge>{formatDistance(plan.footDistanceM)} walked</Badge>
+                <Badge tone={plan.dropOffs.length ? 'caution' : 'nominal'}>
+                  {plan.dropOffs.length
+                    ? `${plan.dropOffs.length} drop-off${plan.dropOffs.length === 1 ? '' : 's'}`
+                    : 'no dismount needed'}
+                </Badge>
+              </>
+            )}
+          </div>
+        )}
         {plan && plan.violations.length > 0 && (
           <div className="mt-3 space-y-1.5">
             {plan.violations.map((v, i) => (

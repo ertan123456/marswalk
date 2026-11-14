@@ -1,7 +1,7 @@
 /**
  * 2D layered planning map.
  *
- * Leaflet with CRS.Simple: the AOI is a 4 km x 4 km planar frame in metres
+ * Leaflet with CRS.Simple: the AOI is a planar frame in metres
  * (lat = northing, lng = easting), which is how Mars raster products at this
  * scale are delivered. No Earth datum, no web-Mercator distortion, and the
  * pixel grid maps 1:1 to the DEM the planner runs on.
@@ -15,7 +15,7 @@ import { LAYER_IDS, mapLayers } from '../../data/config';
 import { buildReturnField } from '../../lib/planner';
 import { renderGridToDataURL } from '../../lib/raster';
 import { useMission } from '../../store/useMission';
-import { getHabitat, MISSION, getSciencePoints } from '../../data/real/science';
+import { getHabitat, MISSION } from '../../data/real/science';
 
 const AOI_BOUNDS = L.latLngBounds([0, 0], [AOI.sizeYM, AOI.sizeXM]);
 
@@ -186,18 +186,17 @@ export function MapView() {
     }
     if (!showWalkBack) return;
 
+    // In rover mode, reaching the rover ends the emergency - it drives the crew
+    // home - so every drop-off counts as a safe haven alongside the habitat.
     const havens: { label: string; point: { x: number; y: number } }[] = [
       { label: 'Habitat', point: getHabitat() },
     ];
-    if (suit.roverSupport) {
-      const bx3 = getSciencePoints().find((p) => p.code === 'BX-03');
-      if (bx3) havens.push({ label: 'Rover', point: bx3.position });
+    for (const d of plan?.dropOffs ?? []) {
+      havens.push({ label: 'Rover at ' + d.stationCode, point: d.point });
     }
+
     const field = buildReturnField(suit, havens);
     const usable = suit.evaBudgetH * (1 - suit.reserveFraction);
-
-    // Half-hour isochrone bands, plus hard red where an abort from that cell
-    // could not reach a haven inside the usable budget at all.
     const BAND_H = 0.5;
     const ramp = [
       [90, 214, 232],
@@ -228,14 +227,13 @@ export function MapView() {
       out[o] = col[0];
       out[o + 1] = col[1];
       out[o + 2] = col[2];
-      // alternate band opacity so the isochrone steps read as contours
       out[o + 3] = band % 2 === 0 ? 34 : 64;
     });
 
     const ov = L.imageOverlay(url, AOI_BOUNDS, { pane: 'envelope', opacity: 0.9, interactive: false });
     ov.addTo(map);
     envelopeRef.current = ov;
-  }, [booted, showWalkBack, suit]);
+  }, [booted, showWalkBack, suit, plan]);
 
   /* ---------------------------------------------------------------- the route */
   useEffect(() => {
@@ -245,39 +243,40 @@ export function MapView() {
     group.clearLayers();
     if (!plan || plan.samples.length < 2) return;
 
-    // Split into runs of ok / violating samples so the red section is exact.
+    // Break the line wherever the walk-back verdict OR the mobility mode
+    // changes, so it is obvious at a glance which stretches are driven and
+    // which are walked.
     let run: L.LatLngExpression[] = [toLatLng(plan.samples[0].point)];
     let runOk = plan.samples[0].walkBackOk;
+    let runMode = plan.samples[0].mode;
+
     const flush = () => {
       if (run.length < 2) return;
+      const color = runOk ? (runMode === 'rover' ? '#5ad6e8' : '#ff8f4d') : '#ef4444';
       L.polyline(run, {
         pane: 'route',
-        color: runOk ? '#5ad6e8' : '#ef4444',
-        weight: 3,
+        color,
+        weight: runMode === 'rover' ? 4 : 2.6,
         opacity: 0.95,
+        dashArray: runMode === 'foot' && plan.mobility === 'rover' ? '5 4' : undefined,
       }).addTo(group);
-      L.polyline(run, {
-        pane: 'route',
-        color: runOk ? '#5ad6e8' : '#ef4444',
-        weight: 9,
-        opacity: 0.14,
-      }).addTo(group);
+      L.polyline(run, { pane: 'route', color, weight: 9, opacity: 0.14 }).addTo(group);
     };
 
     for (let i = 1; i < plan.samples.length; i++) {
       const s = plan.samples[i];
-      if (s.walkBackOk !== runOk) {
+      if (s.walkBackOk !== runOk || s.mode !== runMode) {
         run.push(toLatLng(s.point));
         flush();
         run = [toLatLng(s.point)];
         runOk = s.walkBackOk;
+        runMode = s.mode;
       } else {
         run.push(toLatLng(s.point));
       }
     }
     flush();
 
-    // Crew position marker, driven by the traverse scrubber.
     const idx = Math.min(plan.samples.length - 1, Math.round(traverseProgress * (plan.samples.length - 1)));
     const cur = plan.samples[idx];
     L.circleMarker(toLatLng(cur.point), {
@@ -285,7 +284,7 @@ export function MapView() {
       radius: 5,
       color: '#ffffff',
       weight: 2,
-      fillColor: '#ff8f4d',
+      fillColor: cur.mode === 'rover' ? '#5ad6e8' : '#ff8f4d',
       fillOpacity: 1,
     }).addTo(group);
   }, [plan, traverseProgress]);
@@ -300,8 +299,8 @@ export function MapView() {
     const visible = layers[LAYER_IDS.science]?.visible;
     const order = useMission.getState().waypointOrder;
 
-    const hab = plan?.stations[0]?.point;
-    if (hab) {
+    const hab = plan?.stations[0]?.point ?? getHabitat();
+    {
       const icon = L.divIcon({
         className: '',
         html:
@@ -316,22 +315,29 @@ export function MapView() {
         .addTo(group);
     }
 
-    if (suit.roverSupport) {
-      const bx3 = plan?.stations.find((s) => s.code === 'BX-03');
-      if (bx3) {
-        const icon = L.divIcon({
-          className: '',
-          html:
-            '<div style="transform:translate(-50%,-50%);width:11px;height:11px;border:2px solid #5ad6e8;border-radius:2px;background:#0b0d11"></div>',
-          iconSize: [0, 0],
-        });
-        L.marker(toLatLng(bx3.point), { icon, pane: 'markers' })
-          .bindTooltip(MISSION.roverSupport.name + ' — forward safe haven', {
-            className: 'mw-tip',
-            direction: 'top',
-          })
-          .addTo(group);
-      }
+    // Rover drop-offs: where the vehicle could go no further and the crew walked.
+    for (const d of plan?.dropOffs ?? []) {
+      const icon = L.divIcon({
+        className: '',
+        html:
+          '<div style="transform:translate(-50%,-50%);display:flex;align-items:center;gap:5px">' +
+          '<div style="width:11px;height:11px;border:2px solid #5ad6e8;border-radius:2px;background:#0b0d11"></div>' +
+          '<div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.1em;color:#5ad6e8;white-space:nowrap;text-shadow:0 0 6px #000">DROP</div>' +
+          '</div>',
+        iconSize: [0, 0],
+      });
+      L.marker(toLatLng(d.point), { icon, pane: 'markers' })
+        .bindTooltip(
+          '<div style="font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.08em;color:#5ad6e8">ROVER DROP-OFF &middot; ' +
+            d.stationCode +
+            '</div><div style="font-size:11px;color:#9aa3b2;margin-top:3px;max-width:220px;line-height:1.45">' +
+            MISSION.roverSupport.name +
+            ' can go no further. The crew walks the last ' +
+            Math.round(d.walkM) +
+            ' m, and the rover waits here as the safe haven.</div>',
+          { className: 'mw-tip', direction: 'top', opacity: 1 },
+        )
+        .addTo(group);
     }
 
     if (!sci || sci.type !== 'points' || !visible) return;
@@ -366,11 +372,11 @@ export function MapView() {
           color +
           '">' +
           p.code +
-          ' · ' +
+          ' &middot; ' +
           p.title.toUpperCase() +
           '</div><div style="font-size:11px;color:#9aa3b2;margin-top:3px">' +
           p.targetMineral +
-          ' · ' +
+          ' &middot; ' +
           p.taskMinutes +
           ' min on station</div>',
         { className: 'mw-tip', direction: 'top', opacity: 1 },
@@ -382,7 +388,7 @@ export function MapView() {
       });
       m.addTo(group);
     }
-  }, [plan, layerData, layers, selectedWaypointId, suit.roverSupport]);
+  }, [plan, layerData, layers, selectedWaypointId]);
 
   /* ---------------------------------------------------------- measure overlay */
   useEffect(() => {
