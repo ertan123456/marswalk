@@ -6,7 +6,8 @@ Plan one Mars surface excursion across lower Mount Sharp: layer real orbital and
 6.77 × 14.62 km strip of Gale Crater, solve a safe route across it, prove the crew can always get
 home, and carry the same plan into a first-person helmet display.
 
-**Live:** https://walk-back.vercel.app  
+**Live:** https://ertan123456.github.io/marswalk/  
+**Mirror:** https://walk-back.vercel.app — note that the `vercel.app` domain is blocked on some networks (see [Deploy](#deploy))  
 **Repository:** https://github.com/ertan123456/marswalk
 
 ---
@@ -176,14 +177,28 @@ Node 20+. The build is fully static: no backend, no API keys, nothing to deploy 
 
 ## Deploy
 
-Framework preset **Vite**, build `npm run build`, output `dist`. `vercel.json` rewrites everything
-to `/` for client-side routing.
+The app deploys to **two** hosts on every push to `main`, and is static either way — no backend, no
+API keys, nothing server-side.
+
+**GitHub Pages** (primary) — `.github/workflows/pages.yml` builds and publishes automatically. The
+workflow sets `PAGES_BASE=/marswalk/` because Pages serves from a project subpath; every static
+asset loads through `import.meta.env.BASE_URL`, so nothing else changes.
+
+**Vercel** (mirror) — framework preset **Vite**, build `npm run build`, output `dist`.
+`vercel.json` rewrites everything to `/`. Vercel sets no `PAGES_BASE`, so it serves from the root.
 
 ```bash
 npx vercel --prod
 ```
 
-Any static host works identically — it is just the `dist` folder.
+**Why two.** The `vercel.app` domain could not be reached from the network this was built on: DNS
+resolved to real Vercel addresses and TCP 443 connected, but the TLS handshake returned
+`WRONG_VERSION_NUMBER`. An unrelated `vercel.app` project on the same account failed identically
+while `github.com` and `trek.nasa.gov` negotiated TLS 1.3 cleanly, so the interference is with the
+whole domain rather than this deployment. Pages is the link to hand to anyone; the Vercel one is
+kept as a mirror.
+
+Any static host works — it is just the `dist` folder.
 
 ---
 
