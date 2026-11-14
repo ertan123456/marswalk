@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
 import { compassLabel } from '../../lib/geo';
 import { formatDistance, formatDuration, formatMinutes, formatMLST } from '../../lib/format';
 import { getSciencePoints } from '../../data/real/science';
 import { SPE_EVENT } from '../../data/models/environment';
+import { loadPov, povFor, frameUrl, viewLabel } from '../../data/real/pov';
+import type { PovStation } from '../../data/real/pov';
 import { useMission } from '../../store/useMission';
 import { Alert, Badge, KeyVal, Panel, Readout } from '../ui/primitives';
 import { ElevationProfileChart, WalkBackChart } from './RouteCharts';
@@ -188,6 +191,91 @@ function StationList() {
   );
 }
 
+function PovGallery({ code }: { code: string }) {
+  const [station, setStation] = useState<PovStation | null | undefined>(undefined);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    setActive(0);
+    void loadPov().then(() => {
+      if (alive) setStation(povFor(code) ?? null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [code]);
+
+  if (station === undefined) {
+    return (
+      <div className="mt-1.5 aspect-[4/3] border border-line/60 rounded-[2px] grid place-items-center bg-deck-900/60">
+        <span className="num text-[10px] text-ink-faint">loading rover frames…</span>
+      </div>
+    );
+  }
+  if (!station || station.frames.length === 0) {
+    return (
+      <div className="mt-1.5 aspect-[4/3] border border-dashed border-line rounded-[2px] grid place-items-center bg-deck-900/40">
+        <span className="num text-[10px] text-ink-faint">no rover frame near this sol</span>
+      </div>
+    );
+  }
+
+  const f = station.frames[Math.min(active, station.frames.length - 1)];
+  return (
+    <div className="mt-1.5">
+      <div className="relative border border-line/60 rounded-[2px] overflow-hidden bg-black">
+        <img
+          src={frameUrl(f)}
+          alt={f.caption || f.title}
+          loading="lazy"
+          className="block w-full aspect-square object-cover"
+        />
+        <div className="absolute top-1 right-1">
+          <Badge tone={f.view === 'horizon' ? 'nominal' : 'default'}>
+            {f.view === 'horizon' ? 'view out' : 'workspace'}
+          </Badge>
+        </div>
+      </div>
+
+      {station.frames.length > 1 && (
+        <div className="flex gap-1 mt-1">
+          {station.frames.map((fr, i) => (
+            <button
+              key={fr.image_id}
+              type="button"
+              onClick={() => setActive(i)}
+              className={
+                'flex-1 h-10 border rounded-[2px] overflow-hidden cursor-pointer transition-colors ' +
+                (i === active ? 'border-mars-400' : 'border-line/60 hover:border-line')
+              }
+              title={viewLabel(fr)}
+            >
+              <img src={frameUrl(fr)} alt="" loading="lazy" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="num text-[10px] text-probe-400 mt-1.5">{viewLabel(f)}</div>
+      <p className="text-[10px] text-ink-faint leading-relaxed mt-0.5">
+        {f.caption || f.title}
+      </p>
+      <div className="flex items-center justify-between gap-2 mt-1">
+        <span className="num text-[9px] text-ink-faint">{f.credit}</span>
+        <a
+          href={f.source_page}
+          target="_blank"
+          rel="noreferrer"
+          className="num text-[9px] text-ink-dim underline decoration-dotted hover:text-ink"
+        >
+          raw frame ↗
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function SelectedTarget() {
   const selected = useMission((s) => s.selectedWaypointId);
   const p = getSciencePoints().find((x) => x.id === selected);
@@ -196,15 +284,19 @@ function SelectedTarget() {
     <Panel title={'Target brief · ' + p.code}>
       <h3 className="text-sm text-ink leading-tight">{p.title}</h3>
       <div className="num text-[10px] text-mars-300 mt-0.5">{p.targetMineral}</div>
+      {p.sol !== undefined && (
+        <div className="num text-[10px] text-ink-faint mt-0.5">
+          Pinned to Curiosity's surveyed position on sol {p.sol}
+          {p.surveyedElevM !== undefined && ` · ${Math.round(p.surveyedElevM)} m`}
+        </div>
+      )}
       <p className="text-[11px] leading-relaxed text-ink-dim mt-2">{p.whyItMatters}</p>
       <div className="mt-2.5 border border-line/60 rounded-[2px] bg-deck-800/40 p-2">
-        <div className="label">ground-level view</div>
-        <div className="mt-1.5 aspect-[16/9] border border-dashed border-line rounded-[2px] grid place-items-center bg-[repeating-linear-gradient(45deg,#11141a_0_6px,#0e1116_6px_12px)]">
-          <div className="text-center px-3">
-            <div className="num text-[10px] text-ink-faint">{p.groundViewSlot.pending}</div>
-          </div>
+        <div className="flex items-center justify-between">
+          <span className="label">ground-level view</span>
+          <Badge tone="nominal">REAL</Badge>
         </div>
-        <p className="text-[10px] text-ink-faint leading-relaxed mt-1.5">{p.groundViewSlot.caption}</p>
+        <PovGallery code={p.code} />
       </div>
     </Panel>
   );

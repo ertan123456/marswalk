@@ -1,0 +1,469 @@
+{
+  "provenance": "REAL",
+  "product_name": "MSL raw images",
+  "mission": "Mars Science Laboratory (Curiosity)",
+  "api": "https://mars.nasa.gov/rss/api/ (feed=raw_images, category=msl)",
+  "browse_page": "https://mars.nasa.gov/msl/multimedia/raw-images/",
+  "selection": "Navcam and Mastcam frames near the sol each station is pinned to. A pool is downloaded per station and scored for how much of a view out to the horizon each one is - arm-workspace frames have the turret in shot and no sky - and the best few are kept. Hazcam and MAHLI are excluded outright.",
+  "processing": "resized to 860 px on the long edge, JPEG q78",
+  "credit": "NASA/JPL-Caltech (Navcam); NASA/JPL-Caltech/MSSS (Mastcam)",
+  "retrieved": "2026-11-14",
+  "stations": [
+    {
+      "code": "GT-01",
+      "title": "Glen Torridon \u2014 clay-bearing unit",
+      "pinned_sol": 2300,
+      "frames": [
+        {
+          "file": "data/pov/GT-01/1.jpg",
+          "sol": 2299,
+          "instrument": "NAV_LEFT_A",
+          "title": "Mars Curiosity Sol 2299: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam A). This image was acquired on Jan. 24, 2019 (Sol 2299) at the local mean solar time of 16:29:02.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2019-01-24T11:37:39.38847",
+          "image_id": "NLA_601599805EDR_F0731944NCAM00258M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLA_601599805EDR_F0731944NCAM00258M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/02299/opgs/edr/ncam/NLA_601599805EDR_F0731944NCAM00258M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 76.6,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 211142
+        },
+        {
+          "file": "data/pov/GT-01/2.jpg",
+          "sol": 2299,
+          "instrument": "NAV_LEFT_A",
+          "title": "Mars Curiosity Sol 2299: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam A). This image was acquired on Jan. 24, 2019 (Sol 2299) at the local mean solar time of 16:28:37.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2019-01-24T11:37:14.55298",
+          "image_id": "NLA_601599780EDR_F0731944NCAM00258M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLA_601599780EDR_F0731944NCAM00258M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/02299/opgs/edr/ncam/NLA_601599780EDR_F0731944NCAM00258M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 66.7,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 212117
+        },
+        {
+          "file": "data/pov/GT-01/3.jpg",
+          "sol": 2299,
+          "instrument": "NAV_LEFT_A",
+          "title": "Mars Curiosity Sol 2299: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam A). This image was acquired on Jan. 24, 2019 (Sol 2299) at the local mean solar time of 11:49:14.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2019-01-24T06:50:10.31644",
+          "image_id": "NLA_601582556EDR_F0731692NCAM00207M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLA_601582556EDR_F0731692NCAM00207M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/02299/opgs/edr/ncam/NLA_601582556EDR_F0731692NCAM00207M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 57.9,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 146983
+        }
+      ]
+    },
+    {
+      "code": "GP-02",
+      "title": "Greenheugh Pediment",
+      "pinned_sol": 2700,
+      "frames": [
+        {
+          "file": "data/pov/GP-02/1.jpg",
+          "sol": 2698,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 2698: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Mar. 9, 2020 (Sol 2698) at the local mean solar time of 13:20:57.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2020-03-09T07:39:47.41207",
+          "image_id": "NLB_637009194EDR_F0790474NCAM00255M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_637009194EDR_F0790474NCAM00255M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/02698/opgs/edr/ncam/NLB_637009194EDR_F0790474NCAM00255M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 86.0,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 171442
+        },
+        {
+          "file": "data/pov/GP-02/2.jpg",
+          "sol": 2698,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 2698: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Mar. 9, 2020 (Sol 2698) at the local mean solar time of 13:29:04.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2020-03-09T07:48:06.87659",
+          "image_id": "NLB_637009694EDR_F0790474NCAM00256M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_637009694EDR_F0790474NCAM00256M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/02698/opgs/edr/ncam/NLB_637009694EDR_F0790474NCAM00256M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 78.4,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 166735
+        },
+        {
+          "file": "data/pov/GP-02/3.jpg",
+          "sol": 2698,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 2698: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Mar. 9, 2020 (Sol 2698) at the local mean solar time of 13:07:23.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2020-03-09T07:25:50.09814",
+          "image_id": "NLB_637008357EDR_F0790432NCAM00385M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_637008357EDR_F0790432NCAM00385M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/02698/opgs/edr/ncam/NLB_637008357EDR_F0790432NCAM00385M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 65.2,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 207767
+        }
+      ]
+    },
+    {
+      "code": "SU-03",
+      "title": "Sulfate-bearing unit",
+      "pinned_sol": 3504,
+      "frames": [
+        {
+          "file": "data/pov/SU-03/1.jpg",
+          "sol": 3504,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 3504: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Jun. 15, 2022 (Sol 3504) at the local mean solar time of 11:46:47.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2022-06-15T09:50:28.60966",
+          "image_id": "NLB_708555559EDR_F0952934NCAM00560M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_708555559EDR_F0952934NCAM00560M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03504/opgs/edr/ncam/NLB_708555559EDR_F0952934NCAM00560M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 189.3,
+          "view": "horizon",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 119178
+        },
+        {
+          "file": "data/pov/SU-03/2.jpg",
+          "sol": 3504,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 3504: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Jun. 15, 2022 (Sol 3504) at the local mean solar time of 11:47:24.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2022-06-15T09:51:06.70493",
+          "image_id": "NLB_708555598EDR_F0952934NCAM00560M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_708555598EDR_F0952934NCAM00560M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03504/opgs/edr/ncam/NLB_708555598EDR_F0952934NCAM00560M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 189.2,
+          "view": "horizon",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 119350
+        },
+        {
+          "file": "data/pov/SU-03/3.jpg",
+          "sol": 3504,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 3504: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Jun. 15, 2022 (Sol 3504) at the local mean solar time of 11:49:52.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2022-06-15T09:53:38.70685",
+          "image_id": "NLB_708555750EDR_F0952934NCAM00560M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_708555750EDR_F0952934NCAM00560M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03504/opgs/edr/ncam/NLB_708555750EDR_F0952934NCAM00560M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 189.2,
+          "view": "horizon",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 119385
+        }
+      ]
+    },
+    {
+      "code": "GV-04",
+      "title": "Gediz Vallis Ridge",
+      "pinned_sol": 3899,
+      "frames": [
+        {
+          "file": "data/pov/GV-04/1.jpg",
+          "sol": 3897,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 3897: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Jul. 24, 2023 (Sol 3897) at the local mean solar time of 14:12:30.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2023-07-24T07:38:02.1066",
+          "image_id": "NLB_743452895EDR_F1022032NCAM00266M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_743452895EDR_F1022032NCAM00266M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03897/opgs/edr/ncam/NLB_743452895EDR_F1022032NCAM00266M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 105.4,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 216351
+        },
+        {
+          "file": "data/pov/GV-04/2.jpg",
+          "sol": 3897,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 3897: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Jul. 24, 2023 (Sol 3897) at the local mean solar time of 13:55:45.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2023-07-24T07:20:50.005",
+          "image_id": "NLB_743451863EDR_F1021996NCAM00385M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_743451863EDR_F1021996NCAM00385M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03897/opgs/edr/ncam/NLB_743451863EDR_F1021996NCAM00385M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 83.1,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 203064
+        },
+        {
+          "file": "data/pov/GV-04/3.jpg",
+          "sol": 3897,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 3897: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Jul. 24, 2023 (Sol 3897) at the local mean solar time of 13:56:08.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2023-07-24T07:21:14.05035",
+          "image_id": "NLB_743451887EDR_F1021996NCAM00385M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_743451887EDR_F1021996NCAM00385M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/03897/opgs/edr/ncam/NLB_743451887EDR_F1021996NCAM00385M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 81.6,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 202709
+        }
+      ]
+    },
+    {
+      "code": "GV-05",
+      "title": "Gediz Vallis Channel",
+      "pinned_sol": 4301,
+      "frames": [
+        {
+          "file": "data/pov/GV-05/1.jpg",
+          "sol": 4298,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 4298: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Sep. 8, 2024 (Sol 4298) at the local mean solar time of 12:38:57.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2024-09-08T06:36:28.37476",
+          "image_id": "NLB_779045664EDR_F1082162NCAM00353M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_779045664EDR_F1082162NCAM00353M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04298/opgs/edr/ncam/NLB_779045664EDR_F1082162NCAM00353M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 129.4,
+          "view": "horizon",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 135486
+        },
+        {
+          "file": "data/pov/GV-05/2.jpg",
+          "sol": 4298,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 4298: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Sep. 8, 2024 (Sol 4298) at the local mean solar time of 12:38:27.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2024-09-08T06:35:57.45241",
+          "image_id": "NLB_779045633EDR_F1082162NCAM00353M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_779045633EDR_F1082162NCAM00353M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04298/opgs/edr/ncam/NLB_779045633EDR_F1082162NCAM00353M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 99.3,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 116079
+        },
+        {
+          "file": "data/pov/GV-05/3.jpg",
+          "sol": 4298,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 4298: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on Sep. 8, 2024 (Sol 4298) at the local mean solar time of 12:28:48.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2024-09-08T06:26:02.65827",
+          "image_id": "NLB_779045039EDR_F1082126NCAM00385M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_779045039EDR_F1082126NCAM00385M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04298/opgs/edr/ncam/NLB_779045039EDR_F1082126NCAM00385M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 98.3,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 184148
+        }
+      ]
+    },
+    {
+      "code": "BX-06",
+      "title": "Boxwork region",
+      "pinned_sol": 4893,
+      "frames": [
+        {
+          "file": "data/pov/BX-06/1.jpg",
+          "sol": 4891,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 4891: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on May. 10, 2026 (Sol 4891) at the local mean solar time of 12:14:48.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2026-05-10T13:26:59.22192",
+          "image_id": "NLB_831687391EDR_F1220270NCAM00485M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_831687391EDR_F1220270NCAM00485M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04891/opgs/edr/ncam/NLB_831687391EDR_F1220270NCAM00485M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 109.8,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 198068
+        },
+        {
+          "file": "data/pov/BX-06/2.jpg",
+          "sol": 4891,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 4891: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on May. 10, 2026 (Sol 4891) at the local mean solar time of 12:15:16.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2026-05-10T13:27:27.96907",
+          "image_id": "NLB_831687419EDR_F1220270NCAM00485M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_831687419EDR_F1220270NCAM00485M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04891/opgs/edr/ncam/NLB_831687419EDR_F1220270NCAM00485M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 109.5,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 193830
+        },
+        {
+          "file": "data/pov/BX-06/3.jpg",
+          "sol": 4891,
+          "instrument": "NAV_LEFT_B",
+          "title": "Mars Curiosity Sol 4891: Left Navigation Camera (Navcam)",
+          "caption": "NASA's Mars Curiosity rover acquired this image using its onboard Left Navigation Camera (Navcam B). This image was acquired on May. 10, 2026 (Sol 4891) at the local mean solar time of 12:38:55.",
+          "credit": "NASA/JPL-Caltech",
+          "date_taken_utc": "2026-05-10T13:51:45.68426",
+          "image_id": "NLB_831688877EDR_F1220360NCAM00253M_",
+          "source_page": "https://mars.nasa.gov/msl/multimedia/raw-images/NLB_831688877EDR_F1220360NCAM00253M_",
+          "original_image": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04891/opgs/edr/ncam/NLB_831688877EDR_F1220360NCAM00253M_-br2.jpg",
+          "source_px": [
+            1024,
+            1024
+          ],
+          "horizon_score": 108.5,
+          "view": "workspace",
+          "stored_px": [
+            860,
+            860
+          ],
+          "bytes": 196600
+        }
+      ]
+    }
+  ]
+}
