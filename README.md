@@ -294,7 +294,9 @@ A console for two displays and a visor has to stay legible to the person reading
   carry their class name in the click readout. GO / NO-GO is a word before it is a colour.
 - **Keyboard throughout.** `1`–`5` switch modes, `G` runs the guided demo, `M` measure, `W` the
   return-to-safety field, `L` the layer rail, `Esc` cancels. Every control is reachable by `Tab` and
-  draws a visible focus ring (`:focus-visible`, so it does not fire on mouse clicks).
+  draws a visible focus ring (`:focus-visible`, so it does not fire on mouse clicks). Below 1280 px
+  the two rails collapse into a labelled drawer whose toggles report `aria-expanded`, and `Esc`
+  closes it before it does anything else.
 - **Screen readers.** Landmark roles on the rails and the map, `aria-label` on icon-only controls,
   `aria-pressed` on the station and layer toggles so state is announced, and `.sr-only` labels on
   the inputs that are visually labelled by context. The NASA reference figure carries full

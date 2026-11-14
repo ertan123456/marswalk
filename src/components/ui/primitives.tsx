@@ -193,6 +193,10 @@ export function Button({
   tone = 'default',
   className = '',
   title,
+  ariaLabel,
+  ariaExpanded,
+  ariaControls,
+  ariaPressed,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -200,6 +204,13 @@ export function Button({
   tone?: 'default' | 'accent' | 'danger';
   className?: string;
   title?: string;
+  /** For icon-only or abbreviated labels that do not read on their own. */
+  ariaLabel?: string;
+  /** Set on a button that opens a panel, so its state is announced. */
+  ariaExpanded?: boolean;
+  ariaControls?: string;
+  /** For a toggle, where `active` alone is only a visual cue. */
+  ariaPressed?: boolean;
 }) {
   const base =
     'font-mono text-[10px] tracking-[0.12em] uppercase px-2.5 py-1.5 border rounded-[2px] transition-colors cursor-pointer whitespace-nowrap';
@@ -211,7 +222,16 @@ export function Button({
         ? 'bg-danger/10 border-danger/50 text-danger hover:bg-danger/20'
         : 'bg-deck-800 border-line text-ink-dim hover:bg-deck-700 hover:text-ink';
   return (
-    <button type="button" title={title} onClick={onClick} className={base + ' ' + style + ' ' + className}>
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
+      aria-pressed={ariaPressed}
+      className={base + ' ' + style + ' ' + className}
+    >
       {children}
     </button>
   );

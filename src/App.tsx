@@ -31,6 +31,20 @@ function PlanMode() {
   const setMeasureMode = useMission((s) => s.setMeasureMode);
   const railOpen = useMission((s) => s.railOpen);
 
+  // Below xl the rails collapse into a drawer, so Escape has to close that
+  // first. Capture phase on window, so the global shortcut handler (which
+  // would otherwise clear the probe on the same keypress) never sees it.
+  useEffect(() => {
+    if (!drawer) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setDrawer(null);
+      e.stopPropagation();
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [drawer]);
+
   return (
     <div className="flex-1 min-h-0 flex">
       {/* left rail — layers */}
@@ -51,10 +65,22 @@ function PlanMode() {
             measure
           </Button>
           <div className="xl:hidden flex flex-col gap-1.5">
-            <Button active={drawer === 'layers'} onClick={() => setDrawer(drawer === 'layers' ? null : 'layers')}>
+            <Button
+              active={drawer === 'layers'}
+              ariaExpanded={drawer === 'layers'}
+              ariaControls="plan-drawer"
+              title="Show the data layers and instruments"
+              onClick={() => setDrawer(drawer === 'layers' ? null : 'layers')}
+            >
               layers
             </Button>
-            <Button active={drawer === 'plan'} onClick={() => setDrawer(drawer === 'plan' ? null : 'plan')}>
+            <Button
+              active={drawer === 'plan'}
+              ariaExpanded={drawer === 'plan'}
+              ariaControls="plan-drawer"
+              title="Show the EVA plan and Mission AI"
+              onClick={() => setDrawer(drawer === 'plan' ? null : 'plan')}
+            >
               plan
             </Button>
           </div>
@@ -68,9 +94,15 @@ function PlanMode() {
 
         {/* tablet drawers */}
         {drawer && (
-          <div className="xl:hidden absolute inset-y-0 right-0 z-[600] w-[min(380px,92vw)] border-l border-line bg-void/97 backdrop-blur overflow-y-auto p-2 space-y-2">
+          <aside
+            id="plan-drawer"
+            aria-label={drawer === 'layers' ? 'Data layers and instruments' : 'EVA plan'}
+            className="xl:hidden absolute inset-y-0 right-0 z-[600] w-[min(380px,92vw)] border-l border-line bg-void/97 backdrop-blur overflow-y-auto p-2 space-y-2"
+          >
             <div className="flex justify-end">
-              <Button onClick={() => setDrawer(null)}>close</Button>
+              <Button onClick={() => setDrawer(null)} title="Close this panel (Esc)">
+                close
+              </Button>
             </div>
             {drawer === 'layers' ? (
               <>
@@ -80,7 +112,7 @@ function PlanMode() {
             ) : (
               <PlanPanel />
             )}
-          </div>
+          </aside>
         )}
       </main>
 
