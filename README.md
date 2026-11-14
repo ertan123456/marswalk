@@ -26,7 +26,7 @@ layers, the 3D view, the visor — exists to support that answer.
 
 ## What it does
 
-**PLAN** — the habitat display. Nine toggleable layers with opacity, legend, source and provenance
+**PLAN** — the habitat display. Ten toggleable layers with opacity, legend, source and provenance
 tag. Click anywhere and get *every* layer's value at that point, each tagged REAL / DERIVED /
 MODELED. Measure tool cuts an elevation profile between two points.
 
@@ -69,8 +69,12 @@ reaching it ends the emergency.
 
 | three stations, default plan | distance | duration | consumables left | verdict |
 |---|---|---|---|---|
-| On foot | 7.92 km | 4:51 | 30% | GO |
-| Rover-assisted | 10.20 km | 3:54 | 62% | GO |
+| On foot | 7.92 km | 4:51 | 26% | GO |
+| Rover-assisted | 10.20 km | 3:54 | 59% | GO |
+
+Both figures are 3–4 points lower than they would be without the thermal model: suit heating is
+charged to the same consumables budget as everything else, and on a 07:15 egress the cold costs
+20 min on foot and 17 in the rover. See [Temperature](#temperature-as-a-variable).
 
 The rover route is *longer* — the 15° limit forces real detours around Mount Sharp's flank — and
 still an hour quicker and twice as cheap in consumables.
@@ -130,6 +134,79 @@ is a DERIVED result and labelled as one.
 
 ---
 
+## Geochemistry, and what it is honestly worth
+
+The mentor review asked for geochemical regions with effects of their own. They ship, from real
+CRISM data, and the most important thing about them is written into the product rather than left
+for a reviewer to discover.
+
+Nine published **CRISM MTRDR summary parameters** — spectral indices computed by the instrument
+team — are resampled onto the AOI grid from two targeted observations: an 18 m/px scene covering
+77.5% of the AOI and a 36 m/px scene filling the rest. `coverage.png` records which scene supplied
+each cell, because 36 m/px is not the same claim as 18. The cubes are 139 MB and 67 MB; one HTTP
+range request fetches one whole band, so the pipeline pulls ~28 MB of the 206.
+
+A cell joins a **unit** where an index exceeds its own scene's background median by four robust
+standard deviations. That threshold is computed **per scene**, which is the single most important
+decision in the derivation. Pooling both scenes into one distribution was tried first and produced
+a map that classified 41.6% of the coarse area against 0.97% of the fine one — a 43× split that no
+geology produces. The cause was spread rather than offset: the 2008 scene is 1.8–2.6× noisier, so a
+pooled σ gave a cut worth 4σ in one scene and ~1.5σ in the other. Per-scene thresholds bring the
+split to 3.9×, and the build now **fails** above 10× so it cannot come back quietly.
+
+2.26% of the AOI carries a unit. The rest is dust-mantled and is left unshaded.
+
+Three checks run on every build and are written into `units.json`. **One of them does not pass:**
+
+| Check | Result |
+|---|---|
+| Stratigraphic ordering | **Not reproduced.** On Mount Sharp clay lies below sulfate; our clay detections sit above our sulfate ones. |
+| Slope artifact | Mild. 1.82% classified at 0–5°, 3.00% above 30° — a 1.65× gradient. |
+| Directionality | Excessive. 1.46× the vertical structure of the terrain hazard layer on the same grid, the signature of residual pushbroom striping. A per-column destripe was written and tested at three widths; it moved the anisotropy by under 0.01×, so no correction is shipped. |
+
+So the layer is labelled for what it is: **ground that is spectrally unusual against its
+surroundings and worth walking to — not a mineral map.** A spectral index measures the shape of a
+spectrum, not how much of a mineral is present.
+
+Also rejected, with reasons in `sources.json`: the ready-made `BR*` browse rasters (8-bit
+*per-scene stretched* renders whose values cannot be compared between scenes — the same ground the
+Trek DEM was rejected on), the 180 m/px global CRISM mosaic (≈38 × 81 px over this AOI), and the
+1.1 GB I/F cube (deriving our own parameters would mean reproducing the archive's atmospheric and
+photometric corrections with no way to validate the result).
+
+## Investigations: what to study, and where
+
+Choosing a scientific investigation re-times the EVA. Each names the units that can answer it, and
+the code then asks the shipped CRISM raster where the nearest qualifying ground to each station
+actually is — so the distances move when the data moves.
+
+| | verdict | duration | consumables left |
+|---|---|---|---|
+| Default three-station traverse | GO | 4:51 | 26% |
+| …with **clay mineralogy** selected | **NO-GO** | 5:56 | 13% |
+
+A drill campaign on clay is 95 min a station against the 35 the station defaults to. The reserve
+breaks, and the planner says so.
+
+**No station stands on a mapped unit.** The stations are where Curiosity was surveyed; the units
+are where CRISM shows a spectral outlier. Five of the six have qualifying ground within 150 m, so
+the model reports the nearest unit and its distance rather than pretending otherwise — which is
+more useful anyway, because that distance is how far off-station the crew walks to do the work.
+Tuff alteration is supported only at GV-04, 143 m out, and GV-04 is not on the default traverse, so
+the panel marks which stations are on the route and says plainly when none are.
+
+## Temperature as a variable
+
+The weather model produced hourly air and ground temperature from the start and nothing read it.
+Suit heating is now modelled as linear in how far the air sits below a threshold, charged to the
+consumables budget, plus a one-off cold-soak at egress. Both constants are sliders in the suit
+model rather than buried numbers, because this is a model of a suit nobody has built.
+
+It makes the EVA start hour a real lever: about 20% extra burn at dawn, nothing at midday, climbing
+again after dark.
+
+---
+
 ## The area of interest
 
 | | |
@@ -165,6 +242,8 @@ checked and did **not** use.
 | Station ground views | **REAL** | 18 Navcam/Mastcam frames near each station's sol | [MSL raw images](https://mars.nasa.gov/msl/multimedia/raw-images/) |
 | Slope | **DERIVED** | Horn 3×3 on the real DTM at its true 14.29 × 14.27 m baseline | — |
 | Mobility hazards | **DERIVED** | Slope + detrended relief against EVA flight rules | — |
+| Geochemical indices | **REAL** | CRISM MTRDR summary parameters, 32-bit float, 18 m/px (36 m/px gap-fill) | [PDS Geosciences](https://pds-geosciences.wustl.edu/missions/mro/crism.htm) |
+| Geochemical units | **DERIVED** | Per-scene 4σ outlier test on those indices | — |
 | Science regions | **DERIVED** | Corridors from the rover's own traverse, by sol window | [Proposed Path figure](https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/) |
 | Radiation | **MODELED** | Surface dose rate from published Curiosity RAD results | [Hassler et al. 2014](https://doi.org/10.1126/science.1244797) |
 | Surface weather | **MODELED** | Daily cycle from published REMS values | [REMS](https://mars.nasa.gov/msl/spacecraft/instruments/rems/) |
@@ -180,7 +259,8 @@ MODELED is presented as a raw measurement anywhere in the app.
   relief. Fine as a picture, unusable for slope or hazard derivation. Replaced by the PDS float DTM.
 - **USGS SIM 3292 global geologic map** — the only geologic map covering this AOI, and it is global
   at 1:20,000,000. One millimetre on that map is 20 km; the entire AOI is smaller than a single unit.
-  Drawing it would imply detail the product cannot support, so there is no geology layer.
+  Drawing it would imply detail the product cannot support, so it is cited as regional context
+  only. The geochemistry layer that *does* ship comes from targeted CRISM instead — see below.
 - **MOLA 463 m global DEM** — real and reachable, but gives ~15 × 32 pixels over this AOI.
 - **NASA Worldview** — Earth data. Used only as design inspiration for the layer-panel interaction,
   credited on the DATA page. No Earth data is on the Mars map.
@@ -191,7 +271,7 @@ MODELED is presented as a raw measurement anywhere in the app.
 ## The pipeline
 
 Everything runs offline and writes static assets to `public/data`, so the app makes **no network
-call to NASA at demo time**. Total shipped data: 6.6 MB.
+call to NASA at demo time**. Total shipped data: 8.2 MB.
 
 ```bash
 cd scripts
@@ -200,6 +280,8 @@ python fetch_ortho.py      # REAL    Trek WMTS tiles -> basemap.webp
 python fetch_traverse.py   # REAL    MMGIS GeoJSON -> waypoints + path
 python derive_terrain.py   # DERIVED slope, ruggedness, hazard classes
 python derive_regions.py   # DERIVED science-region corridors
+python fetch_geochem.py    # REAL    CRISM MTRDR summary parameters -> 9 index rasters
+python derive_geochem_units.py  # DERIVED geochemical units + polygons
 python fetch_pov.py        # REAL    Curiosity frames per station
 ```
 
