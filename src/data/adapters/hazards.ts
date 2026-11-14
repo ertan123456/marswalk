@@ -11,8 +11,10 @@
  */
 
 import { BOUNDS_M } from '../../lib/geo';
-import { getTerrain } from '../real/terrain';
+import { HAZARD, getTerrain } from '../real/terrain';
 import type { CategoryDef, LayerAdapter, LayerData } from '../types';
+
+const NOMINAL_CODE = HAZARD.NOMINAL;
 
 export function hazardCategories(): CategoryDef[] {
   const t = getTerrain();
@@ -21,6 +23,10 @@ export function hazardCategories(): CategoryDef[] {
     label: c.label,
     color: c.color,
     note: c.detail,
+    // Nominal ground is 58.4% of the AOI. Shading it green covered most of the
+    // map with "fine here" and hid the HiRISE imagery underneath; the hazard
+    // layer now draws only what the crew has to route around.
+    unpainted: c.code === NOMINAL_CODE,
   }));
 }
 
@@ -39,7 +45,9 @@ export const hazardAdapter: LayerAdapter = {
     'ruggedness index, not a rock count. 58.4% of the AOI is passable to suited crew.',
   credit: 'Derived by MARSWALK from NASA/JPL-Caltech/University of Arizona HiRISE data',
   defaultVisible: true,
-  defaultOpacity: 0.3,
+  // Higher than before because far less is painted now: only the exceptions
+  // carry ink, so they can afford to be read clearly.
+  defaultOpacity: 0.55,
   mapRenderable: true,
   legend: {
     type: 'categorical',

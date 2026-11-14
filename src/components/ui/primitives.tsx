@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 
 export function Panel({
   title,
@@ -272,6 +272,76 @@ export function KeyVal({ k, v, tone }: { k: string; v: ReactNode; tone?: 'danger
     <div className="flex items-baseline justify-between gap-3 py-[3px] border-b border-line/40 last:border-0">
       <span className="text-[11px] text-ink-faint shrink-0">{k}</span>
       <span className={'num text-[11px] text-right ' + t}>{v}</span>
+    </div>
+  );
+}
+
+/**
+ * A segmented control for swapping what a rail shows.
+ *
+ * The console used to mount every panel at once, which is most of why it read
+ * as cluttered: the layer list and the instrument charts competed for the same
+ * rail whether or not anyone was looking at either. One at a time, switched
+ * here.
+ *
+ * Proper tab semantics, arrow keys included, because this is the primary way
+ * to reach half the content in the rail.
+ */
+export function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  ariaLabel,
+  idPrefix,
+}: {
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+  ariaLabel: string;
+  /** Used to tie each tab to its panel; the panel sets id `${idPrefix}-panel`. */
+  idPrefix: string;
+}) {
+  function onKeyDown(e: KeyboardEvent) {
+    const i = options.findIndex((o) => o.value === value);
+    if (i < 0) return;
+    let next = i;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % options.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + options.length) % options.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = options.length - 1;
+    else return;
+    e.preventDefault();
+    onChange(options[next].value);
+  }
+
+  return (
+    <div
+      role="tablist"
+      aria-label={ariaLabel}
+      onKeyDown={onKeyDown}
+      className="flex items-center gap-0.5 p-0.5 bg-deck-900 border border-line rounded-[3px]"
+    >
+      {options.map((o) => {
+        const active = o.value === value;
+        return (
+          <button
+            key={o.value}
+            type="button"
+            role="tab"
+            id={`${idPrefix}-tab-${o.value}`}
+            aria-selected={active}
+            aria-controls={`${idPrefix}-panel`}
+            tabIndex={active ? 0 : -1}
+            onClick={() => onChange(o.value)}
+            className={
+              'flex-1 font-mono text-[10px] tracking-[0.12em] uppercase px-2 py-1 rounded-[2px] cursor-pointer whitespace-nowrap ' +
+              (active ? 'bg-deck-700 text-ink' : 'text-ink-faint hover:text-ink-dim')
+            }
+          >
+            {o.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

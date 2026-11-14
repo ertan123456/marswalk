@@ -67,8 +67,10 @@ export const regionsAdapter: LayerAdapter = {
     'are approximate, from the mission record, and are listed in the shipped metadata.',
   sourceUrl: 'https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/',
   credit: 'Derived by MARSWALK from NASA/JPL-Caltech rover localisation data',
-  defaultVisible: true,
-  defaultOpacity: 0.75,
+  // Off by default: large translucent polygons over a hazard field is three
+  // colour systems at once. Turned on when planning the science, not to look at.
+  defaultVisible: false,
+  defaultOpacity: 0.7,
   mapRenderable: true,
   legend: {
     type: 'categorical',

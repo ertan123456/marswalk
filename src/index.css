@@ -5,38 +5,67 @@
   --font-mono: "JetBrains Mono", "SF Mono", "Cascadia Mono", ui-monospace, "Courier New", monospace;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Mission-control surfaces */
-  --color-void: #07080a;
-  --color-deck-900: #0b0d11;
-  --color-deck-800: #11141a;
-  --color-deck-700: #171b23;
-  --color-deck-600: #1f242e;
-  --color-deck-500: #2b313d;
-  --color-line: #2a303b;
+  /*
+   * Surfaces.
+   *
+   * Two things were wrong before. The ground was a near-black blue-grey
+   * (#07080a) carrying a high-chroma orange accent, so the coldest and the
+   * hottest thing on screen sat next to each other and the whole console read
+   * as harsh. And `--color-line` (#2a303b) was LIGHTER than the panels it
+   * outlined (#11141a), so every one of the ~15 panels on the PLAN screen drew
+   * a glowing rectangle. That, more than the panel count, is what made it look
+   * cluttered.
+   *
+   * Now: one warm graphite ramp, so the Mars accent belongs to it instead of
+   * fighting it; the ground is lifted off black; and the hairline sits just
+   * above the panel it divides, so structure is felt rather than drawn. The
+   * map stays the brightest thing on the screen, which is the point of the
+   * app.
+   *
+   * The deck-* names are kept so no component had to change, but each step now
+   * has one job: ground, chrome, panel, hover, active, control.
+   */
+  --color-void: #191715;      /* app ground */
+  --color-deck-900: #1d1a18;  /* top bar, mode chrome */
+  --color-deck-800: #221f1c;  /* panel, button rest */
+  --color-deck-700: #2b2724;  /* hover */
+  --color-deck-600: #332e2a;  /* active, input well */
+  --color-deck-500: #3d3833;  /* scrollbar thumb, range track */
 
-  /* Text */
-  --color-ink: #e8eaee;
-  --color-ink-dim: #9aa3b2;
-  --color-ink-faint: #616b7c;
+  /* Hairlines sit just above the panel, so borders recede. */
+  --color-line: #2e2925;
+  --color-line-soft: #272320;
 
-  /* Mars accent */
-  --color-mars-300: #ffb27a;
-  --color-mars-400: #ff8f4d;
+  /* Text — warm whites, so they sit in the same family as the surfaces. */
+  --color-ink: #f0ece8;
+  --color-ink-dim: #a8a29b;
+  --color-ink-faint: #8a837b;
+
+  /* Mars accent — the one accent, used sparingly. */
+  --color-mars-300: #ffbf8d;
+  --color-mars-400: #ff9c5c;
   --color-mars-500: #e2652a;
   --color-mars-600: #b84a19;
 
-  /* Instrument cyan — data/geometry */
-  --color-probe-400: #5ad6e8;
+  /* Instrument cyan — data and geometry. Complementary to the warm ground. */
+  --color-probe-400: #6fdcec;
   --color-probe-500: #2bb6cc;
 
   /* Safety */
-  --color-caution: #f2b53a;
-  --color-danger: #ef4444;
-  --color-nominal: #3ddc97;
+  --color-caution: #f5bd47;
+  --color-danger: #f65a5a;
+  --color-nominal: #46e3a0;
 }
 
 :root {
   color-scheme: dark;
+
+  /*
+   * The built-in CSS easings are too weak to read as intentional. These are
+   * the curves every transition in the app uses.
+   */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 html, body, #root {
@@ -101,9 +130,27 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
+/*
+ * Press feedback on everything pressable. Instant, small, and on transform
+ * only so it never costs a layout. Without it the console feels like it is not
+ * listening; with it every control answers the pointer.
+ *
+ * Deliberately NOT applied to mode switching as a view transition: the modes
+ * are bound to keys 1-5 and a presenter hits them constantly, so animating the
+ * switch itself would make the app feel slower every single time.
+ */
+button,
+[role="button"] {
+  transition: transform 160ms var(--ease-out), background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+button:active:not(:disabled),
+[role="button"]:active {
+  transform: scale(0.97);
+}
+
 /* Leaflet dark theme overrides */
 .leaflet-container {
-  background: #05060a;
+  background: #121010;
   font-family: var(--font-sans);
   outline: none;
 }
@@ -115,7 +162,7 @@ input[type="range"]::-moz-range-thumb {
 }
 .leaflet-control-zoom a:hover { background: var(--color-deck-600) !important; }
 .leaflet-control-attribution {
-  background: rgba(7, 8, 10, 0.75) !important;
+  background: rgba(25, 23, 21, 0.78) !important;
   color: var(--color-ink-faint) !important;
   font-family: var(--font-mono);
   font-size: 9px !important;
@@ -147,7 +194,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* Leaflet tooltips, styled as mission-control callouts */
 .leaflet-tooltip.mw-tip {
-  background: rgba(17, 20, 26, 0.96);
+  background: rgba(34, 31, 28, 0.96);
   border: 1px solid var(--color-line);
   border-radius: 2px;
   color: var(--color-ink);

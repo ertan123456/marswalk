@@ -25,7 +25,10 @@ export const demAdapter: LayerAdapter = {
     'Read by HTTP range from the PDS archive rather than downloading the full 390 MB file.',
   sourceUrl: 'https://www.uahirise.org/dtm/',
   credit: 'NASA/JPL-Caltech/University of Arizona',
-  defaultVisible: true,
+  // Off by default. It is the prettiest layer and the least operational: the
+  // basemap already shows the ground and 3D shows the relief. Stacked under
+  // the hazard classes it only added a second full-field colour wash.
+  defaultVisible: false,
   defaultOpacity: 0.38,
   mapRenderable: true,
   legend: {

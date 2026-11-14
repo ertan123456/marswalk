@@ -6,7 +6,7 @@ import { SPE_EVENT } from '../../data/models/environment';
 import { loadPov, povFor, frameUrl, viewLabel } from '../../data/real/pov';
 import type { PovStation } from '../../data/real/pov';
 import { useMission } from '../../store/useMission';
-import { Alert, Badge, KeyVal, Panel, Readout } from '../ui/primitives';
+import { Alert, Badge, KeyVal, Panel, Readout, Segmented } from '../ui/primitives';
 import { ElevationProfileChart, WalkBackChart } from './RouteCharts';
 import { SuitSettings } from './SuitSettings';
 import { MissionAssistant } from '../ai/MissionAssistant';
@@ -323,6 +323,7 @@ function SelectedTarget() {
 }
 
 export function PlanPanel() {
+  const [tab, setTab] = useState<'stations' | 'charts' | 'ai'>('stations');
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
   const setSuit = useMission((s) => s.setSuit);
@@ -388,33 +389,67 @@ export function PlanPanel() {
         )}
       </Panel>
 
-      <MissionAssistant />
+      {/*
+        Everything below the verdict used to be mounted at once — assistant,
+        two charts, the station list, the suit model and the target brief, six
+        or seven stacked panels in a 380px rail. The verdict is the product and
+        stays pinned; the rest is one tab at a time.
+      */}
+      <Segmented
+        idPrefix="plan-rail"
+        ariaLabel="Plan rail contents"
+        value={tab}
+        onChange={setTab}
+        options={[
+          { value: 'stations', label: 'stations' },
+          { value: 'charts', label: 'charts' },
+          { value: 'ai', label: 'ai' },
+        ]}
+      />
 
-      {plan && plan.samples.length > 1 && (
-        <Panel title="Elevation profile">
-          <ElevationProfileChart plan={plan} />
-        </Panel>
-      )}
+      <div
+        id="plan-rail-panel"
+        role="tabpanel"
+        aria-labelledby={`plan-rail-tab-${tab}`}
+        className="space-y-2"
+      >
+        {tab === 'stations' && (
+          <>
+            <Panel title="Science stations" dense>
+              <div className="p-2">
+                <StationList />
+              </div>
+            </Panel>
+            <SelectedTarget />
+            <SuitSettings />
+          </>
+        )}
 
-      {plan && plan.samples.length > 1 && (
-        <Panel title="Walk-back check">
-          <WalkBackChart plan={plan} />
-          <p className="text-[10px] text-ink-faint leading-relaxed mt-1.5">
-            The crew must be able to abandon the EVA at any instant and reach a safe haven with the{' '}
-            {Math.round(suit.reserveFraction * 100)}% reserve untouched. Where the red line rises above the green one,
-            that is no longer true.
-          </p>
-        </Panel>
-      )}
+        {tab === 'charts' &&
+          (plan && plan.samples.length > 1 ? (
+            <>
+              <Panel title="Elevation profile">
+                <ElevationProfileChart plan={plan} />
+              </Panel>
+              <Panel title="Walk-back check">
+                <WalkBackChart plan={plan} />
+                <p className="text-[10px] text-ink-faint leading-relaxed mt-1.5">
+                  The crew must be able to abandon the EVA at any instant and reach a safe haven with the{' '}
+                  {Math.round(suit.reserveFraction * 100)}% reserve untouched. Where the red line rises above the
+                  green one, that is no longer true.
+                </p>
+              </Panel>
+            </>
+          ) : (
+            <Panel title="Charts">
+              <p className="text-[11px] text-ink-faint leading-relaxed">
+                Charts appear once a route is solved. Add at least one station.
+              </p>
+            </Panel>
+          ))}
 
-      <Panel title="Science stations" dense>
-        <div className="p-2">
-          <StationList />
-        </div>
-      </Panel>
-
-      <SelectedTarget />
-      <SuitSettings />
+        {tab === 'ai' && <MissionAssistant />}
+      </div>
     </div>
   );
 }

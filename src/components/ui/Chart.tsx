@@ -284,7 +284,7 @@ export function Plot({
               cy={(h.s.axis === 'right' ? syR : syL)(h.y)}
               r="2.4"
               fill={h.s.color}
-              stroke="#0b0d11"
+              stroke="#1d1a18"
               strokeWidth="0.8"
             />
           ))}

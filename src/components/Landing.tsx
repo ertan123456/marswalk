@@ -35,7 +35,7 @@ export function Landing() {
       />
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(100deg, #07080a 22%, rgba(7,8,10,0.86) 46%, rgba(7,8,10,0.35) 78%)' }}
+        style={{ background: 'linear-gradient(100deg, #191715 22%, rgba(25,23,21,0.86) 46%, rgba(25,23,21,0.35) 78%)' }}
         aria-hidden="true"
       />
 

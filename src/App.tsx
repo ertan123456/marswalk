@@ -12,7 +12,7 @@ const TerrainView = lazy(() => import('./components/three/TerrainView').then((m)
 const HudView = lazy(() => import('./components/hud/HudView').then((m) => ({ default: m.HudView })));
 const Briefing = lazy(() => import('./components/briefing/Briefing').then((m) => ({ default: m.Briefing })));
 const About = lazy(() => import('./components/about/About').then((m) => ({ default: m.About })));
-import { Button } from './components/ui/primitives';
+import { Button, Segmented } from './components/ui/primitives';
 import { TourOverlay } from './components/TourOverlay';
 import { Landing } from './components/Landing';
 import { useMission } from './store/useMission';
@@ -27,6 +27,7 @@ function ModeLoading() {
 
 function PlanMode() {
   const [drawer, setDrawer] = useState<'layers' | 'plan' | null>(null);
+  const [rail, setRail] = useState<'layers' | 'instruments'>('layers');
   const measureMode = useMission((s) => s.measureMode);
   const setMeasureMode = useMission((s) => s.setMeasureMode);
   const railOpen = useMission((s) => s.railOpen);
@@ -47,11 +48,27 @@ function PlanMode() {
 
   return (
     <div className="flex-1 min-h-0 flex">
-      {/* left rail — layers */}
+      {/* left rail — layers or instruments, one at a time */}
       {railOpen && (
       <aside aria-label="Data layers and instruments" className="hidden xl:flex w-[320px] shrink-0 border-r border-line flex-col overflow-y-auto p-2 gap-2">
-        <LayerPanel />
-        <InstrumentCharts />
+        <Segmented
+          idPrefix="left-rail"
+          ariaLabel="Left rail contents"
+          value={rail}
+          onChange={setRail}
+          options={[
+            { value: 'layers', label: 'layers' },
+            { value: 'instruments', label: 'instruments' },
+          ]}
+        />
+        <div
+          id="left-rail-panel"
+          role="tabpanel"
+          aria-labelledby={`left-rail-tab-${rail}`}
+          className="flex flex-col gap-2"
+        >
+          {rail === 'layers' ? <LayerPanel /> : <InstrumentCharts />}
+        </div>
       </aside>
       )}
 
@@ -106,8 +123,17 @@ function PlanMode() {
             </div>
             {drawer === 'layers' ? (
               <>
-                <LayerPanel />
-                <InstrumentCharts />
+                <Segmented
+                  idPrefix="drawer-rail"
+                  ariaLabel="Drawer contents"
+                  value={rail}
+                  onChange={setRail}
+                  options={[
+                    { value: 'layers', label: 'layers' },
+                    { value: 'instruments', label: 'instruments' },
+                  ]}
+                />
+                {rail === 'layers' ? <LayerPanel /> : <InstrumentCharts />}
               </>
             ) : (
               <PlanPanel />

@@ -33,7 +33,11 @@ export function layerImageURL(layerId: string, data: LayerData, legend: LegendSp
     });
   } else if (data.type === 'categorical-grid') {
     const { codes, width, height, categories } = data;
-    const palette = new Map(categories.map((c) => [c.code, parseHex(c.color)]));
+    // An unpainted class is simply absent from the palette, which the writer
+    // below already renders as fully transparent.
+    const palette = new Map(
+      categories.filter((c) => !c.unpainted).map((c) => [c.code, parseHex(c.color)]),
+    );
     url = renderGridToDataURL(width, height, (i, out, o) => {
       const c = palette.get(codes[i]);
       out[o] = c ? c.r : 0;

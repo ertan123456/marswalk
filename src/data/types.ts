@@ -48,6 +48,16 @@ export interface CategoryDef {
   label: string;
   color: string;
   note?: string;
+  /**
+   * Draw nothing for this class and leave the basemap showing through.
+   *
+   * For the ordinary, expected state. Shading "nothing is wrong here" paints
+   * the majority of the map for no information gain and buries the ground the
+   * imagery actually shows; only the exceptions need ink. The class is still
+   * in the data and the planner still reads it, so the legend lists it as
+   * unshaded rather than hiding it.
+   */
+  unpainted?: boolean;
 }
 
 /** A classified / categorical map (e.g. mineral units). */

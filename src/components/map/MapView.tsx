@@ -313,7 +313,7 @@ export function MapView() {
         className: '',
         html:
           '<div style="transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px">' +
-          '<div style="width:14px;height:14px;border:2px solid #3ddc97;background:#0b0d11;transform:rotate(45deg)"></div>' +
+          '<div style="width:14px;height:14px;border:2px solid #3ddc97;background:#1d1a18;transform:rotate(45deg)"></div>' +
           '<div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.12em;color:#3ddc97;white-space:nowrap;text-shadow:0 0 6px #000">HAB</div>' +
           '</div>',
         iconSize: [0, 0],
@@ -329,7 +329,7 @@ export function MapView() {
         className: '',
         html:
           '<div style="transform:translate(-50%,-50%);display:flex;align-items:center;gap:5px">' +
-          '<div style="width:11px;height:11px;border:2px solid #5ad6e8;border-radius:2px;background:#0b0d11"></div>' +
+          '<div style="width:11px;height:11px;border:2px solid #5ad6e8;border-radius:2px;background:#1d1a18"></div>' +
           '<div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.1em;color:#5ad6e8;white-space:nowrap;text-shadow:0 0 6px #000">DROP</div>' +
           '</div>',
         iconSize: [0, 0],
@@ -366,7 +366,7 @@ export function MapView() {
           color +
           ';background:' +
           (inPlan >= 0 ? color : 'transparent') +
-          ';box-shadow:0 0 0 2px #07080a"></div>' +
+          ';box-shadow:0 0 0 2px #191715"></div>' +
           '<div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.1em;color:' +
           color +
           ';white-space:nowrap;text-shadow:0 0 6px #000">' +
@@ -410,7 +410,7 @@ export function MapView() {
         radius: 3.5,
         color: '#5ad6e8',
         weight: 2,
-        fillColor: '#07080a',
+        fillColor: '#191715',
         fillOpacity: 1,
       }).addTo(group);
     }

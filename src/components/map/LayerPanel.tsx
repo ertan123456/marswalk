@@ -27,9 +27,24 @@ function LegendBody({ legend }: { legend: LegendSpec }) {
       <div className="space-y-1">
         {legend.items.map((c) => (
           <div key={c.code} className="flex items-start gap-2">
-            <span className="mt-[3px] h-2.5 w-2.5 shrink-0 rounded-[1px] border border-black/40" style={{ background: c.color }} />
+            {/*
+              An unpainted class gets a hollow, dashed swatch, and says so in
+              words. The difference is not carried by colour alone, which also
+              keeps it readable without colour vision.
+            */}
+            <span
+              className="mt-[3px] h-2.5 w-2.5 shrink-0 rounded-[1px]"
+              style={
+                c.unpainted
+                  ? { border: '1px dashed var(--color-ink-faint)', background: 'transparent' }
+                  : { background: c.color, border: '1px solid rgba(0,0,0,0.4)' }
+              }
+            />
             <div>
-              <div className="text-[11px] text-ink leading-tight">{c.label}</div>
+              <div className="text-[11px] text-ink leading-tight">
+                {c.label}
+                {c.unpainted && <span className="text-ink-faint"> — not shaded</span>}
+              </div>
               {c.note && <div className="text-[10px] text-ink-faint leading-relaxed">{c.note}</div>}
             </div>
           </div>
@@ -98,14 +113,11 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
             </span>
             <ProvenanceBadge provenance={adapter.provenance} />
           </div>
-          <div className="text-[10px] text-ink-faint leading-tight mt-0.5 truncate">
-            {adapter.mission + ' · ' + adapter.instrument}
-          </div>
         </button>
         <span className="text-ink-faint text-[10px] pt-[2px] select-none">{open ? '−' : '+'}</span>
       </div>
 
-      {controllable && state.visible && (
+      {open && controllable && state.visible && (
         <div className="px-2.5 pb-2">
           <div className="flex items-center gap-2">
             <span className="label shrink-0">opacity</span>
@@ -125,6 +137,9 @@ function LayerCard({ adapter }: { adapter: LayerAdapter }) {
 
       {open && (
         <div className="px-2.5 pb-2.5 pt-1 border-t border-line/50 space-y-2">
+          <div className="text-[10px] text-ink-faint leading-tight">
+            {adapter.mission + ' · ' + adapter.instrument}
+          </div>
           <LegendBody legend={adapter.legend} />
           <div>
             <span className="label !text-ink-faint">how this layer was made</span>
