@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei';
 import { DRAPEABLE_LAYER_IDS, getAdapter } from '../../data/config';
 import { formatDistance, formatDuration } from '../../lib/format';
 import { useMission } from '../../store/useMission';
-import { Badge, Button, Panel, Readout, Slider } from '../ui/primitives';
+import { Button, Panel, ProvenanceBadge, Readout, Slider } from '../ui/primitives';
 import { MarsScene } from './Scene';
 
 function DrapeSelector() {
@@ -27,7 +27,7 @@ function DrapeSelector() {
           >
             <div className="flex items-center gap-1.5">
               <span className={'text-[11px] ' + (active ? 'text-mars-300' : 'text-ink-dim')}>{a.name}</span>
-              {(a.provenance !== 'REAL') && <Badge tone="mock">mock</Badge>}
+              <ProvenanceBadge provenance={a.provenance} />
             </div>
             <div className="text-[9px] text-ink-faint truncate">{a.instrument}</div>
           </button>

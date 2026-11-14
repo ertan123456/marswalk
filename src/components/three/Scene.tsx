@@ -8,7 +8,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { AOI } from '../../lib/geo';
 import type { LocalPoint } from '../../lib/geo';
@@ -141,6 +141,42 @@ function TraverseLine({ exag, base }: { exag: number; base: number }) {
   );
 }
 
+
+/**
+ * Station labels are drawn as canvas-texture sprites rather than drei's <Html>.
+ *
+ * <Html> mounts a DOM portal next to the canvas; when the Canvas unmounts on a
+ * mode switch, its teardown removes that node first and React then throws
+ * "removeChild: the node to be removed is not a child of this node". A sprite
+ * lives entirely in the scene graph, so leaving 3D or HUD is clean - and it is
+ * cheaper to render besides.
+ */
+function makeLabelTexture(text: string, color: string): THREE.CanvasTexture {
+  const W = 256;
+  const H = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '600 34px ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.95)';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#000';
+    ctx.fillText(text, W / 2, H / 2);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = color;
+    ctx.fillText(text, W / 2, H / 2);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 /**
  * A station marker that holds a roughly constant screen size: the same marker
  * has to read from kilometres up in the orbit view and from 20 m away on the walk.
@@ -157,6 +193,8 @@ function Marker({
   onSelect: () => void;
 }) {
   const ref = useRef<THREE.Group>(null);
+  const label = useMemo(() => makeLabelTexture(code, color), [code, color]);
+  useEffect(() => () => label.dispose(), [label]);
   useFrame(({ camera }) => {
     const g = ref.current;
     if (!g) return;
@@ -184,21 +222,9 @@ function Marker({
         <ringGeometry args={[0.76, 0.9, 48]} />
         <meshBasicMaterial color={color} transparent opacity={0.8} side={THREE.DoubleSide} />
       </mesh>
-      <Html position={[0, 2.1, 0]} center zIndexRange={[20, 0]}>
-        <div
-          style={{
-            fontFamily: 'ui-monospace, monospace',
-            fontSize: 11,
-            letterSpacing: '0.14em',
-            color,
-            textShadow: '0 0 8px #000, 0 0 3px #000',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
-          }}
-        >
-          {code}
-        </div>
-      </Html>
+      <sprite position={[0, 2.25, 0]} scale={[2.2, 0.55, 1]}>
+        <spriteMaterial map={label} transparent depthTest={false} depthWrite={false} />
+      </sprite>
     </group>
   );
 }

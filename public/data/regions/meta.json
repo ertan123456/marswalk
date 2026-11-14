@@ -1,0 +1,112 @@
+{
+  "provenance": "DERIVED",
+  "derived_from": {
+    "product_name": "MSL rover traverse and waypoints",
+    "source_url": "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json",
+    "provenance": "REAL"
+  },
+  "informed_by": "https://science.nasa.gov/resource/curiositys-proposed-path-up-mount-sharp/",
+  "method": "For each unit, every DEM cell within 220 m of a surveyed rover waypoint inside that unit's sol window. Painted in listed order, so a later campaign wins on ground the rover revisited.",
+  "caveat": "This is the ground Curiosity covered while working each unit, NOT a geological contact. Real unit boundaries extend far beyond any rover track. The sol windows are approximate, taken from the mission record, and are listed here so they can be checked or changed. Traced from the traverse rather than from the NASA annotated figure because that figure publishes no georeferencing control points.",
+  "corridor_m": 220.0,
+  "bounds": {
+    "west": 137.35334875,
+    "south": -4.923,
+    "east": 137.468,
+    "north": -4.6764
+  },
+  "grid": {
+    "width": 474,
+    "height": 1024
+  },
+  "encoding": "8-bit PNG; pixel value = region code, 0 = outside every corridor",
+  "coverage_percent": 3.3,
+  "regions": [
+    {
+      "code": 1,
+      "key": "clay",
+      "label": "Clay-bearing unit (Glen Torridon)",
+      "color": "#5fb8a3",
+      "sols": [
+        2300,
+        2750
+      ],
+      "note": "Smectite-bearing lower unit. Clay needs water that stayed put, so this is the strongest habitability evidence in the AOI.",
+      "waypoints": 96,
+      "cells": 2851,
+      "area_km2": 0.58
+    },
+    {
+      "code": 2,
+      "key": "pediment",
+      "label": "Greenheugh Pediment",
+      "color": "#9db4c0",
+      "sols": [
+        2690,
+        2710
+      ],
+      "note": "Erosional surface capped by younger sandstone. Dates a pause in deposition.",
+      "waypoints": 7,
+      "cells": 834,
+      "area_km2": 0.17
+    },
+    {
+      "code": 3,
+      "key": "sulfate",
+      "label": "Sulfate-bearing unit",
+      "color": "#f2d06b",
+      "sols": [
+        3400,
+        3800
+      ],
+      "note": "Sulfates precipitate as water dries. The clay-to-sulfate crossing is the biggest climate change recorded in Gale.",
+      "waypoints": 118,
+      "cells": 4061,
+      "area_km2": 0.83
+    },
+    {
+      "code": 4,
+      "key": "gv-ridge",
+      "label": "Gediz Vallis Ridge",
+      "color": "#e08a3c",
+      "sols": [
+        3850,
+        4050
+      ],
+      "note": "Debris carried down from high on Mount Sharp - the only ground-level access to units the rover can never drive to.",
+      "waypoints": 57,
+      "cells": 2510,
+      "area_km2": 0.51
+    },
+    {
+      "code": 5,
+      "key": "gv-channel",
+      "label": "Gediz Vallis Channel",
+      "color": "#c2552f",
+      "sols": [
+        4100,
+        4400
+      ],
+      "note": "The channel that debris came down. Cut by water or by dry landslides is still open.",
+      "waypoints": 87,
+      "cells": 3160,
+      "area_km2": 0.64
+    },
+    {
+      "code": 6,
+      "key": "boxwork",
+      "label": "Boxwork region",
+      "color": "#b07de0",
+      "sols": [
+        4600,
+        5200
+      ],
+      "note": "Polygonal networks of mineral veins left by groundwater in fractures - the 2025 campaign, and the last chapter of habitability here.",
+      "waypoints": 106,
+      "cells": 4386,
+      "area_km2": 0.89
+    }
+  ],
+  "credit": "Derived by MARSWALK from NASA/JPL-Caltech rover localisation data",
+  "generated": "2026-11-14"
+}

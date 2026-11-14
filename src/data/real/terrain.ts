@@ -15,6 +15,7 @@
 
 import { AOI, CELL_X_M, CELL_Y_M, assertAoiMatches, gridToLocal } from '../../lib/geo';
 import type { AoiBounds, LocalPoint } from '../../lib/geo';
+import { loadJson, loadPixels } from '../../lib/png';
 
 export interface DemMeta {
   provenance: string;
@@ -96,34 +97,6 @@ export const HAZARD = {
   ROUGH: 3,
   NO_DATA: 4,
 } as const;
-
-const BASE = import.meta.env.BASE_URL || '/';
-
-async function loadJson<T>(path: string): Promise<T> {
-  const r = await fetch(BASE + path);
-  if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
-  return (await r.json()) as T;
-}
-
-/** Decode a PNG into raw RGBA bytes via an offscreen canvas. */
-async function loadPixels(path: string): Promise<{ data: Uint8ClampedArray; w: number; h: number }> {
-  const r = await fetch(BASE + path);
-  if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
-  const blob = await r.blob();
-  const bmp = await createImageBitmap(blob);
-  // Read the dimensions before close(): closing an ImageBitmap zeroes them.
-  const w = bmp.width;
-  const h = bmp.height;
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  if (!ctx) throw new Error('2D canvas unavailable');
-  ctx.drawImage(bmp, 0, 0);
-  const img = ctx.getImageData(0, 0, w, h);
-  bmp.close();
-  return { data: img.data, w, h };
-}
 
 /** Slope and aspect by Horn's method, honouring non-square cells. */
 function computeSlopeAspect(

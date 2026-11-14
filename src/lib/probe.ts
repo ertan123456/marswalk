@@ -58,7 +58,10 @@ export function probeAt(
     } else if (data.type === 'categorical-grid') {
       const code = sampleGridNearest(data.codes, data.width, data.height, point);
       const cat = data.categories.find((c) => c.code === code);
-      readings.push({ ...base, value: cat ? cat.label : 'unclassified' });
+      const miss = adapter.id === 'science-regions'
+        ? 'Outside every surveyed corridor'
+        : 'unclassified';
+      readings.push({ ...base, value: cat ? cat.label : miss });
     } else if (data.type === 'vector') {
       const hits = data.features.filter((f) => pointInRing(point, f.ring));
       if (hits.length === 0) {

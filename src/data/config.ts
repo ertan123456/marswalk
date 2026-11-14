@@ -15,6 +15,7 @@ import { opticalAdapter } from './adapters/optical';
 import { demAdapter, slopeAdapter } from './adapters/topography';
 import { hazardAdapter } from './adapters/hazards';
 import { traverseAdapter } from './adapters/traverse';
+import { regionsAdapter } from './adapters/regions';
 import { radiationAdapter } from './adapters/radiation';
 import { atmosphericAdapter } from './adapters/atmospheric';
 import { scienceAdapter } from './adapters/science';
@@ -26,6 +27,7 @@ export const LAYER_REGISTRY: LayerAdapter[] = [
   demAdapter,
   slopeAdapter,
   hazardAdapter,
+  regionsAdapter,
   traverseAdapter,
   scienceAdapter,
   radiationAdapter,
@@ -38,6 +40,7 @@ export const LAYER_IDS = {
   dem: demAdapter.id,
   slope: slopeAdapter.id,
   hazards: hazardAdapter.id,
+  regions: regionsAdapter.id,
   traverse: traverseAdapter.id,
   science: scienceAdapter.id,
   radiation: radiationAdapter.id,
@@ -95,4 +98,5 @@ export const DRAPEABLE_LAYER_IDS: string[] = [
   demAdapter.id,
   slopeAdapter.id,
   hazardAdapter.id,
+  regionsAdapter.id,
 ];
