@@ -81,6 +81,30 @@ export function SuitSettings() {
           onChange={(v) => setSuit({ taskTimeScale: v })}
           format={(v) => v.toFixed(2)}
         />
+        {/*
+          Thermal load. These two are the whole of the cold model, and they sit
+          here on purpose: a suit nobody has built heating itself against a
+          modelled atmosphere is not a measurement, and burying the constants
+          would let the result read like one.
+        */}
+        <Slider
+          label="Heating threshold"
+          value={suit.thermalRefC}
+          min={-60}
+          max={0}
+          step={1}
+          unit="°C"
+          onChange={(v) => setSuit({ thermalRefC: v })}
+        />
+        <Slider
+          label="Heating burn below threshold"
+          value={suit.thermalBurnPerDegC}
+          min={0}
+          max={0.012}
+          step={0.0005}
+          onChange={(v) => setSuit({ thermalBurnPerDegC: v })}
+          format={(v) => '+' + (v * 100).toFixed(2) + '% / °C'}
+        />
         <Slider
           label="Route slope penalty"
           value={suit.slopePenaltyPerDeg}

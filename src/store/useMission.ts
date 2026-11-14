@@ -7,6 +7,7 @@ import type { LocalPoint } from '../lib/geo';
 import { DEFAULT_SUIT, planRoute, straightProfile } from '../lib/planner';
 import type { ProfilePoint, RoutePlan, SuitModel } from '../lib/planner';
 import { probeAt } from '../lib/probe';
+import { assessStations } from '../data/models/investigations';
 import type { ProbeResult } from '../lib/probe';
 import { getHabitat, getSciencePoints } from '../data/real/science';
 import { AOI } from '../lib/geo';
@@ -50,6 +51,9 @@ interface MissionState {
   resetSuit: () => void;
   waypointOrder: string[];
   toggleWaypoint: (id: string) => void;
+  /** chosen scientific investigation, or null for "whatever each station is for" */
+  investigation: string | null;
+  setInvestigation: (id: string | null) => void;
   moveWaypoint: (id: string, dir: -1 | 1) => void;
   plan: RoutePlan | null;
   planning: boolean;
@@ -231,11 +235,24 @@ export const useMission = create<MissionState>((set, get) => ({
     get().replan();
   },
 
+  investigation: null,
+  setInvestigation: (id) => {
+    set({ investigation: id });
+    get().replan();
+  },
+
   plan: null,
   planning: false,
   replan: () => {
-    const { suit, waypointOrder } = get();
+    const { suit, waypointOrder, investigation } = get();
     set({ planning: true });
+    // An investigation re-times every station it can actually be done at: the
+    // crew spends as long as the work takes, not as long as the station's own
+    // default says. Stations with no qualifying ground within reach keep their
+    // own time and are flagged in the UI rather than silently re-timed.
+    const assessments = assessStations(getSciencePoints(), investigation);
+    const byStation = new Map(assessments.map((a) => [a.stationId, a]));
+
     const waypoints = waypointOrder
       .map((id) => getSciencePoints().find((p) => p.id === id))
       .filter((p): p is ReturnType<typeof getSciencePoints>[number] => Boolean(p))
@@ -244,7 +261,7 @@ export const useMission = create<MissionState>((set, get) => ({
         code: p.code,
         title: p.title,
         point: p.position,
-        taskMinutes: p.taskMinutes,
+        taskMinutes: byStation.get(p.id)?.taskMinutes ?? p.taskMinutes,
       }));
 
     const plan = planRoute({

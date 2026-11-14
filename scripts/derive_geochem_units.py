@@ -90,10 +90,15 @@ SIMPLIFY_CELLS = 2.0
 # this AOI at a nearly constant strength, and the outlier test selects none of
 # it, which is the data saying there is no ferric *structure* here to map. It
 # stays a continuous layer and is not made into a unit.
+# Palette note: the hazard layer owns amber, red and purple for safety, and both
+# layers are categorical and on by default, so the science palette deliberately
+# avoids those three. Sulfate was amber and mafic was purple, each within a few
+# percent of a hazard class - a sulfate detection was indistinguishable from a
+# caution cell on the same map.
 UNITS = [
     {
         "code": 1, "key": "femgclay", "label": "Fe/Mg smectite clay",
-        "color": "#5fb8a3", "bands": ["D2300"],
+        "color": "#2fd4b6", "bands": ["D2300"],
         "mineralogy": "Fe/Mg smectite",
         "water_story": "Smectite needs water that stayed in contact with rock for a long time, "
                        "so this marks former standing or slow-moving water: lake floor and "
@@ -101,7 +106,7 @@ UNITS = [
     },
     {
         "code": 2, "key": "silica-aloh", "label": "Opaline silica / Al-OH",
-        "color": "#8fb8e8", "bands": ["BD2210_2", "D2200"],
+        "color": "#5c9dff", "bands": ["BD2210_2", "D2200"],
         "mineralogy": "opaline silica, Al-clay",
         "water_story": "The 2.2 micron Al-OH and Si-OH absorptions are what altered volcanic ash "
                        "leaves behind. This is the tuff signature, and it also records acidic or "
@@ -109,7 +114,7 @@ UNITS = [
     },
     {
         "code": 3, "key": "sulfate", "label": "Polyhydrated sulfate",
-        "color": "#f2d06b", "bands": ["SINDEX2"],
+        "color": "#ff79c6", "bands": ["SINDEX2"],
         "mineralogy": "polyhydrated sulfate",
         "water_story": "Sulfates drop out of solution as water evaporates, so this is the drying "
                        "end of the record and the other half of Mount Sharp's clay-to-sulfate "
@@ -117,14 +122,14 @@ UNITS = [
     },
     {
         "code": 4, "key": "mafic", "label": "Mafic (pyroxene / olivine)",
-        "color": "#b07de0", "bands": ["LCPINDEX2", "HCPINDEX2", "OLINDEX3"],
+        "color": "#8fdb3a", "bands": ["LCPINDEX2", "HCPINDEX2", "OLINDEX3"],
         "mineralogy": "pyroxene, olivine",
         "water_story": "Primary volcanic minerals that water has not altered. Where they survive, "
                        "either little water reached the rock or the surface is young.",
     },
     {
         "code": 5, "key": "hydrated", "label": "Hydrated, mineral unresolved",
-        "color": "#9db4c0", "bands": ["BD1900R2"], "fallback": True,
+        "color": "#8fd3e8", "bands": ["BD1900R2"], "fallback": True,
         "mineralogy": "unidentified hydrated phase",
         "water_story": "Bound water with no diagnostic 2.2 or 2.3 micron absorption to name the "
                        "host mineral. Worth visiting precisely because orbit cannot settle it.",

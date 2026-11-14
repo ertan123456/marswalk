@@ -99,6 +99,7 @@ export const tr: Messages = {
   'layer.dem-elevation': 'Yükseklik (DTM)',
   'layer.dem-slope': 'Eğim',
   'layer.mobility-hazards': 'Hareket tehlikeleri',
+  'layer.geochem-units': 'Jeokimyasal birimler',
   'layer.science-regions': 'Bilim bölgeleri',
   'layer.science-waypoints': 'Bilim noktaları',
   'layer.curiosity-traverse': 'Curiosity’nin gittiği yol',
@@ -138,6 +139,59 @@ export const tr: Messages = {
   'ai.riskHigh': 'YÜKSEK risk',
   'ai.standingNote':
     'Her mesafe, sarf malzeme değeri, dönüş payı ve karar planlayıcı tarafından hesaplanır, model tarafından değil — asistan yalnızca bunları açıklar. Deterministik analist tarayıcıda çalışır ve her zaman kullanılabilir; erişilebilir bir yerel Ollama modeli varsa onun yerine o kullanılır, yayınlanmış statik sitede ise yoktur.',
+
+  'rail.science': 'bilim',
+
+  // --- investigations ----------------------------------------------------
+  'inv.title': 'Hangi araştırma, nerede',
+  'inv.intro':
+    'Bir araştırma seçin, EVA ona göre yeniden zamanlanır: mürettebat, çalışacak zemini olan her istasyonda o işin gerektirdiği kadar kalır. Aşağıdaki mesafeler elle yazılmadı, CRISM birim haritasından ölçüldü.',
+  'inv.loading': 'Jeokimya katmanı bekleniyor…',
+  'inv.clear': 'temizle',
+  'inv.clearTitle': 'Her istasyonu yeniden kendi amacına göre planla',
+  'inv.minPerStation': 'dk/istasyon',
+  'inv.groundArea': 'AOI içinde {km2} km² uygun zemin',
+  'inv.noStation':
+    'Hiçbir istasyonun {m} m içinde uygun zemini yok. Bu araştırma bu güzergâhta yapılamaz.',
+  'inv.caveat':
+    'Hiçbir istasyon haritalanmış bir birimin üstünde durmuyor. İstasyonlar Curiosity’nin ölçülmüş konumları, birimler ise CRISM’in spektral sapma gösterdiği yerler. Gösterilen mesafe mürettebatın istasyondan ne kadar uzağa yürümesi gerektiğidir; {m} m, hedefin desteksiz sayıldığı sınırdır.',
+  'inv.provenance':
+    'Birimler AOI’nin %{pct}’ini kaplıyor; eşik, her sahnenin kendi arka planının {k} sağlam standart sapma üstü. Görev süreleri NASA’nın değil, bizim.',
+
+  'inv.onTraverse': 'Planlanan güzergâhta: bu araştırma onu yeniden zamanlıyor',
+  'inv.offTraverse': 'Planlanan güzergâhta değil',
+  'inv.addStation':
+    'Bu istasyonların hiçbiri planlanan güzergâhta değil, bu yüzden bu araştırmayı seçmek hiçbir süreyi değiştirmez. Önce istasyonlar sekmesinden birini ekleyin.',
+
+  'inv.clay.label': 'Kil mineralojisi',
+  'inv.clay.question': 'Burada su, kayacı değiştirecek kadar uzun durdu mu?',
+  'inv.clay.rationale':
+    'Sondaj yap, örneği işle ve analiz et. Smektit uzaktan bir görüntüyle doğrulanamaz; listenin en uzunu olmasının sebebi bu.',
+  'inv.tuff.label': 'Tüf alterasyonu',
+  'inv.tuff.question': 'Burası volkanik kül müydü, su ona ne yaptı?',
+  'inv.tuff.rationale':
+    'Fırçala, yakın çek, sonra sondaj yap. Opalin silika ve Al-OH ince alterasyon kabuklarında durur; yüzey kalkmadan ölçüm bir şey ifade etmez.',
+  'inv.riverbed.label': 'Nehir yatağı sedimentolojisi',
+  'inv.riverbed.question': 'Burada su aktı mı, hangi yöne?',
+  'inv.riverbed.rationale':
+    'Tabakalanma ve tane boyu görüntüleme ve temas çalışmasıyla okunur, sondaj gerekmez. Cevap kimyada değil, yapıda.',
+  'inv.sulfate.label': 'Sülfat stratigrafisi',
+  'inv.sulfate.question': 'Su ne zaman çekildi?',
+  'inv.sulfate.rationale':
+    'Ölçülü bir kesiti fırçala ve nokta spektrometresiyle tara. İstasyon başına birkaç gözlem gerektiği için düz görüntülemeden uzun sürer.',
+  'inv.hydration.label': 'Hidratasyon taraması',
+  'inv.hydration.question': 'Bağlı su neye bağlı?',
+  'inv.hydration.rationale':
+    'Her durakta hızlı bir spektrometre geçişi. Bilerek kısa: tek bir noktayı çözmek için değil, çok istasyonu kapsamak için tasarlandı.',
+  'inv.mafic.label': 'Mafik köken',
+  'inv.mafic.question': 'Bu malzeme nereden geldi?',
+  'inv.mafic.rationale':
+    'Görüntüleme ve bir el örneği. Piroksen ve olivin sondaj olmadan tanınabilir; listenin en ucuzu bu.',
+
+  // --- thermal -----------------------------------------------------------
+  'plan.coldCost': 'soğuk bedeli',
+  'plan.coldCostHint':
+    'Tulum ısıtması, diğer her şifle aynı bütçeden: çıkışta soğumuş tulumu ısıtmak {soak} dk, geri kalanı yol boyunca ısıtma. Hava kilidi çıkışında {start}°C, girişte {end}°C. Ölçüm değil, model.',
 
   // --- landing -----------------------------------------------------------
   'landing.eyebrow': 'NASA Space Apps Challenge 2026',

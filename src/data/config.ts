@@ -16,6 +16,7 @@ import { demAdapter, slopeAdapter } from './adapters/topography';
 import { hazardAdapter } from './adapters/hazards';
 import { traverseAdapter } from './adapters/traverse';
 import { regionsAdapter } from './adapters/regions';
+import { geochemAdapter } from './adapters/geochem';
 import { radiationAdapter } from './adapters/radiation';
 import { atmosphericAdapter } from './adapters/atmospheric';
 import { scienceAdapter } from './adapters/science';
@@ -27,6 +28,7 @@ export const LAYER_REGISTRY: LayerAdapter[] = [
   demAdapter,
   slopeAdapter,
   hazardAdapter,
+  geochemAdapter,
   regionsAdapter,
   traverseAdapter,
   scienceAdapter,
@@ -40,6 +42,7 @@ export const LAYER_IDS = {
   dem: demAdapter.id,
   slope: slopeAdapter.id,
   hazards: hazardAdapter.id,
+  geochem: geochemAdapter.id,
   regions: regionsAdapter.id,
   traverse: traverseAdapter.id,
   science: scienceAdapter.id,
@@ -98,5 +101,6 @@ export const DRAPEABLE_LAYER_IDS: string[] = [
   demAdapter.id,
   slopeAdapter.id,
   hazardAdapter.id,
+  geochemAdapter.id,
   regionsAdapter.id,
 ];

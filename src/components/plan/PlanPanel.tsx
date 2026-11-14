@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { compassLabel } from '../../lib/geo';
+import { coldSoakH } from '../../lib/planner';
 import { formatDistance, formatDuration, formatMinutes, formatMLST } from '../../lib/format';
 import { getSciencePoints } from '../../data/real/science';
 import { SPE_EVENT } from '../../data/models/environment';
@@ -9,6 +10,7 @@ import { useMission } from '../../store/useMission';
 import { Alert, Badge, KeyVal, Panel, Readout, Segmented } from '../ui/primitives';
 import { ElevationProfileChart, WalkBackChart } from './RouteCharts';
 import { SuitSettings } from './SuitSettings';
+import { Investigations } from './Investigations';
 import { MissionAssistant } from '../ai/MissionAssistant';
 import { useT } from '../../i18n/useT';
 
@@ -80,6 +82,23 @@ function Totals() {
         hint={t('plan.consumablesHint', { budget: suit.evaBudgetH, reserve: reservePct })}
       />
       <Readout label={t('plan.dose')} value={plan.doseMgy.toFixed(2)} unit="mGy" tone={doseTone} />
+      {/*
+        The cold, as a number the crew pays. It only appears when it costs
+        something, so a midday EVA does not carry a readout reading zero.
+      */}
+      {plan.thermalPenaltyH > 0.005 && (
+        <Readout
+          label={t('plan.coldCost')}
+          value={Math.round(plan.thermalPenaltyH * 60).toString()}
+          unit="min"
+          tone={plan.thermalPenaltyH * 60 > 45 ? 'caution' : undefined}
+          hint={t('plan.coldCostHint', {
+            soak: Math.round(coldSoakH(suit) * 60),
+            start: Math.round(plan.airTempStartC),
+            end: Math.round(plan.airTempEndC),
+          })}
+        />
+      )}
       <Readout label={t('plan.airlockOut')} value={formatMLST(suit.evaStartHour)} size="sm" />
       <Readout label={t('plan.airlockIn')} value={formatMLST(suit.evaStartHour + plan.totalTimeH)} size="sm" />
     </div>
@@ -330,7 +349,7 @@ function SelectedTarget() {
 }
 
 export function PlanPanel() {
-  const [tab, setTab] = useState<'stations' | 'charts' | 'ai'>('stations');
+  const [tab, setTab] = useState<'stations' | 'science' | 'charts' | 'ai'>('stations');
   const t = useT();
   const plan = useMission((s) => s.plan);
   const suit = useMission((s) => s.suit);
@@ -410,6 +429,7 @@ export function PlanPanel() {
         onChange={setTab}
         options={[
           { value: 'stations', label: t('rail.stations') },
+          { value: 'science', label: t('rail.science') },
           { value: 'charts', label: t('rail.charts') },
           { value: 'ai', label: t('rail.ai') },
         ]}
@@ -432,6 +452,8 @@ export function PlanPanel() {
             <SuitSettings />
           </>
         )}
+
+        {tab === 'science' && <Investigations />}
 
         {tab === 'charts' &&
           (plan && plan.samples.length > 1 ? (

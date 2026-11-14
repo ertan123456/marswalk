@@ -12,7 +12,7 @@
 import { CELL_X_M, CELL_Y_M, bearingDeg, distanceM, gridToLocal, localToGrid } from './geo';
 import type { LocalPoint } from './geo';
 import { getTerrain, HAZARD } from '../data/real/terrain';
-import { doseOverWindow, speOverlap, SPE_EVENT } from '../data/models/environment';
+import { doseOverWindow, speOverlap, SPE_EVENT, weatherAt } from '../data/models/environment';
 
 /* ------------------------------------------------------------- suit model */
 
@@ -47,6 +47,19 @@ export interface SuitModel {
   roverBurnFactor: number;
   /** local hour the crew steps outside */
   evaStartHour: number;
+  /**
+   * Ambient air temperature at which suit heating is already paid for by the
+   * nominal burn rate. Below this the heater draws extra. MODELED, not
+   * measured: it is a parameter so that it reads as one.
+   */
+  thermalRefC: number;
+  /** extra consumables burn, as a fraction, per degree below thermalRefC */
+  thermalBurnPerDegC: number;
+  /**
+   * One-off consumable hours spent bringing a cold-soaked suit up to
+   * temperature at egress, per degree below thermalRefC at the start hour.
+   */
+  coldSoakHPerDegC: number;
 }
 
 export const DEFAULT_SUIT: SuitModel = {
@@ -65,6 +78,9 @@ export const DEFAULT_SUIT: SuitModel = {
   roverMaxSlopeDeg: 15,
   roverBurnFactor: 0.55,
   evaStartHour: 7.25,
+  thermalRefC: -20,
+  thermalBurnPerDegC: 0.004,
+  coldSoakHPerDegC: 0.004,
 };
 
 /**
@@ -76,6 +92,36 @@ export function walkSpeedMs(suit: SuitModel, grade: number): number {
   const norm = Math.exp(-3.5 * 0.05);
   const v = (suit.flatSpeedMs * Math.exp(-3.5 * Math.abs(grade + 0.05))) / norm;
   return Math.max(0.12, v);
+}
+
+/* ------------------------------------------------------------ thermal load */
+
+/**
+ * How much harder the suit burns consumables because of the cold.
+ *
+ * PROVENANCE: MODELED. A suit loses heat to its surroundings roughly in
+ * proportion to the temperature difference across it, and the heater that
+ * makes that up draws on the same budget as everything else, so the burn rate
+ * is modelled as linear in how far the air sits below `thermalRefC`. Both
+ * constants are editable suit parameters rather than hidden numbers, because
+ * this is a model of a suit nobody has built, not a measurement of one.
+ *
+ * The temperature itself comes from the weather model, which is MODELED from
+ * published REMS behaviour — so this is a model driven by a model, and the UI
+ * says so wherever it shows the result.
+ */
+export function thermalBurnFactor(suit: SuitModel, hour: number): number {
+  const air = weatherAt(hour).airTempC;
+  if (typeof air !== 'number') return 1;
+  const below = Math.max(0, suit.thermalRefC - air);
+  return 1 + suit.thermalBurnPerDegC * below;
+}
+
+/** Consumable hours spent warming a cold-soaked suit at egress. */
+export function coldSoakH(suit: SuitModel): number {
+  const air = weatherAt(suit.evaStartHour).airTempC;
+  if (typeof air !== 'number') return 0;
+  return Math.max(0, suit.thermalRefC - air) * suit.coldSoakHPerDegC;
 }
 
 /**
@@ -535,6 +581,11 @@ export interface RoutePlan {
   dropOffs: { point: LocalPoint; stationCode: string; walkM: number }[];
   roverDistanceM: number;
   footDistanceM: number;
+  /** consumable hours the cold cost: heating en route plus the egress cold-soak */
+  thermalPenaltyH: number;
+  /** air temperature at egress and at ingress, from the weather model */
+  airTempStartC: number;
+  airTempEndC: number;
   feasible: boolean;
   violations: string[];
   notes: string[];
@@ -625,7 +676,11 @@ export function planRoute(req: PlanRequest): RoutePlan {
   const reserveH = budget * req.suit.reserveFraction;
 
   let timeH = 0;
-  let consumablesH = 0;
+  // Egress costs before a step is taken: the suit starts cold-soaked and has
+  // to be brought up to temperature.
+  const soakH = coldSoakH(req.suit);
+  let consumablesH = soakH;
+  let thermalPenaltyH = soakH;
   let cumDist = 0;
   let roverDistanceM = 0;
   let footDistanceM = 0;
@@ -725,7 +780,11 @@ export function planRoute(req: PlanRequest): RoutePlan {
 
       cumDist += step;
       timeH += dt;
-      consumablesH += dt * burn;
+      // The crew gets colder or warmer as the sol turns, so the heater load is
+      // sampled at the clock hour this step actually happens at.
+      const thermal = thermalBurnFactor(req.suit, req.suit.evaStartHour + timeH);
+      consumablesH += dt * burn * thermal;
+      thermalPenaltyH += dt * burn * (thermal - 1);
       pushSample(gridToLocal(bc, br), b, mode);
     }
     return true;
@@ -766,7 +825,11 @@ export function planRoute(req: PlanRequest): RoutePlan {
     const arrivalConsumablesH = consumablesH;
     const taskH = target.taskMinutes / 60;
     timeH += taskH;
-    consumablesH += taskH; // on-station workload is the nominal 1.0x rate
+    // On-station workload is the nominal 1.0x rate, but standing still in the
+    // cold still costs heat - more of it, if anything, than walking does.
+    const taskThermal = thermalBurnFactor(req.suit, req.suit.evaStartHour + timeH);
+    consumablesH += taskH * taskThermal;
+    thermalPenaltyH += taskH * (taskThermal - 1);
 
     const last = samples[arrivalIdx];
     const marginAtStation = budget - consumablesH - last.returnConsumablesH - reserveH;
@@ -864,6 +927,19 @@ export function planRoute(req: PlanRequest): RoutePlan {
   } else {
     notes.push('On foot: every walk-back is measured all the way to the habitat airlock.');
   }
+  if (thermalPenaltyH > 0.01) {
+    notes.push(
+      'Cold cost ' +
+        (thermalPenaltyH * 60).toFixed(0) +
+        ' min of consumables: ' +
+        (coldSoakH(req.suit) * 60).toFixed(0) +
+        ' min warming a cold-soaked suit at egress, the rest heating it en route. Air goes from ' +
+        (weatherAt(req.suit.evaStartHour).airTempC as number).toFixed(0) +
+        '°C at airlock-out to ' +
+        (weatherAt(req.suit.evaStartHour + timeH).airTempC as number).toFixed(0) +
+        '°C at ingress. Modelled from the weather model, which is itself modelled — not measured.',
+    );
+  }
   notes.push(
     'Routing bars slopes at or above ' +
       req.suit.maxSlopeDeg +
@@ -889,6 +965,9 @@ export function planRoute(req: PlanRequest): RoutePlan {
     dropOffs,
     roverDistanceM,
     footDistanceM,
+    thermalPenaltyH,
+    airTempStartC: (weatherAt(req.suit.evaStartHour).airTempC as number) ?? 0,
+    airTempEndC: (weatherAt(req.suit.evaStartHour + timeH).airTempC as number) ?? 0,
     feasible: violations.length === 0,
     violations,
     notes,
