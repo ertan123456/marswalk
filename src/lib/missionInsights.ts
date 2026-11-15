@@ -176,7 +176,7 @@ export function buildMissionSnapshot(plan: RoutePlan | null, suit: SuitModel): M
         Math.max(0, floorPct - reservePct) * 1.4 -
         Math.min(26, failurePct * 0.9) -
         (plan.spe.overlaps ? 20 : 0) -
-        Math.min(14, plan.doseMgy * 10),
+        Math.min(14, plan.doseMsv * 10),
       0,
       100,
     ),
@@ -255,7 +255,7 @@ export function buildAssistantContext(plan: RoutePlan | null, suit: SuitModel): 
           totalTimeH: Number(plan.totalTimeH.toFixed(2)),
           totalConsumablesH: Number(plan.totalConsumablesH.toFixed(2)),
           consumablesRemainingPercent: Math.round(plan.consumablesRemainingFraction * 100),
-          doseMgy: Number(plan.doseMgy.toFixed(3)),
+          doseMsv: Number(plan.doseMsv.toFixed(3)),
           speOverlaps: plan.spe.overlaps,
           violations: plan.violations,
           notes: plan.notes,
@@ -363,7 +363,7 @@ export function localAnalystAnswer(question: string, plan: RoutePlan | null, sui
 
     case 'radiation':
       lines.push(
-        `Integrated dose over this window is ${plan.doseMgy.toFixed(2)} mGy. ` +
+        `Integrated dose equivalent over this window is ${plan.doseMsv.toFixed(2)} mSv. ` +
           (plan.spe.overlaps
             ? 'A forecast solar particle event intersects the window, which is a NO-GO on its own: re-time the egress or shelter.'
             : 'No forecast solar particle event falls inside the window.'),

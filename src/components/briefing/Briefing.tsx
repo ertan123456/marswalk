@@ -274,7 +274,7 @@ export function Briefing() {
               </Alert>
               {plan && (
                 <div>
-                  <KeyVal k="EVA dose (integrated)" v={plan.doseMgy.toFixed(3) + ' mGy'} />
+                  <KeyVal k="EVA dose equivalent (integrated)" v={plan.doseMsv.toFixed(3) + ' mSv'} />
                   <KeyVal
                     k="SPE overlap"
                     v={plan.spe.overlaps ? 'YES — re-time or shelter' : 'none in window'}

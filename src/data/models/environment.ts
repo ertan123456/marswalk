@@ -22,7 +22,7 @@ export const EVA_SOL = 214;
 
 /* ------------------------------------------------------------------ radiation */
 
-export const RAD_BASELINE_MGY_DAY = 0.64;
+export const RAD_BASELINE_MSV_DAY = 0.64;
 
 /** The injected solar particle event, in local true solar time hours. */
 export const SPE_EVENT: TimeEvent = {
@@ -39,18 +39,18 @@ export interface RadiationModel {
   samples: TimeSample[];
   series: SeriesDef[];
   events: TimeEvent[];
-  baselineMgyPerDay: number;
+  baselineMsvPerDay: number;
 }
 
 let radCache: RadiationModel | null = null;
 
-/** Dose rate in mGy/day at a given local hour, including the SPE profile. */
+/** Dose EQUIVALENT rate in mSv/day at a given local hour, including the SPE profile. */
 export function radDoseRateAt(hour: number): number {
   const h = ((hour % SOL_HOURS) + SOL_HOURS) % SOL_HOURS;
   // Galactic cosmic ray dose rate is slightly anti-correlated with the
   // atmospheric column, which thickens in the cold pre-dawn hours.
   const diurnal = 1 - 0.045 * Math.cos((2 * Math.PI * (h - 5)) / SOL_HOURS);
-  let rate = RAD_BASELINE_MGY_DAY * diurnal;
+  let rate = RAD_BASELINE_MSV_DAY * diurnal;
 
   if (h >= SPE_EVENT.startHour && h <= SPE_EVENT.endHour) {
     const span = SPE_EVENT.endHour - SPE_EVENT.startHour;
@@ -69,7 +69,7 @@ export function getRadiation(): RadiationModel {
   let cumulative = 0;
   for (let h = 0; h <= SOL_HOURS; h += 0.5) {
     const rate = radDoseRateAt(h) * (1 + rng.normal() * 0.012);
-    cumulative += (rate / 24) * 0.5; // mGy accrued over this half hour
+    cumulative += (rate / 24) * 0.5; // mSv accrued over this half hour
     samples.push({
       hour: Number(h.toFixed(3)),
       doseRate: Number(rate.toFixed(4)),
@@ -79,16 +79,16 @@ export function getRadiation(): RadiationModel {
   radCache = {
     samples,
     series: [
-      { key: 'doseRate', label: 'Surface dose rate', unit: 'mGy/day', color: '#f2b53a' },
-      { key: 'cumulative', label: 'Cumulative dose', unit: 'mGy', color: '#ff8f4d' },
+      { key: 'doseRate', label: 'Surface dose equivalent rate', unit: 'mSv/day', color: '#f2b53a' },
+      { key: 'cumulative', label: 'Cumulative dose equivalent', unit: 'mSv', color: '#ff8f4d' },
     ],
     events: [SPE_EVENT],
-    baselineMgyPerDay: RAD_BASELINE_MGY_DAY,
+    baselineMsvPerDay: RAD_BASELINE_MSV_DAY,
   };
   return radCache;
 }
 
-/** Integrated dose in mGy over an EVA window, mGy. */
+/** Integrated dose equivalent over an EVA window, mSv. */
 export function doseOverWindow(startHour: number, durationHours: number): number {
   const step = 1 / 60;
   let dose = 0;

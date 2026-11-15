@@ -572,7 +572,7 @@ export interface RoutePlan {
   /** fraction of the budget left when the crew is back inside */
   consumablesRemainingFraction: number;
   reserveH: number;
-  doseMgy: number;
+  doseMsv: number;
   spe: { overlaps: boolean; hoursUntil: number };
   /** latest EVA start hour that clears the SPE window */
   suggestedShelterHour: number;
@@ -901,7 +901,7 @@ export function planRoute(req: PlanRequest): RoutePlan {
     violations.push('No admissible route to ' + u + ' — every corridor is barred at the current slope limit.');
   }
 
-  const doseMgy = doseOverWindow(req.suit.evaStartHour, Math.max(0.01, timeH));
+  const doseMsv = doseOverWindow(req.suit.evaStartHour, Math.max(0.01, timeH));
   const spe = speOverlap(req.suit.evaStartHour, Math.max(0.01, timeH));
   if (spe.overlaps) {
     violations.push(
@@ -958,7 +958,7 @@ export function planRoute(req: PlanRequest): RoutePlan {
     totalConsumablesH: consumablesH,
     consumablesRemainingFraction: Math.max(0, (budget - consumablesH) / budget),
     reserveH,
-    doseMgy,
+    doseMsv,
     spe,
     suggestedShelterHour,
     mobility: req.suit.mobility,

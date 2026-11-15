@@ -149,13 +149,13 @@ export function RadiationChart({ plan }: { plan: RoutePlan | null }) {
       <Plot
         height={130}
         xLabel="local solar time"
-        yLabel="mGy/day"
+        yLabel="mSv/day"
         bands={bands}
         series={[
           {
             key: 'rate',
             label: 'Dose rate',
-            unit: 'mGy/day',
+            unit: 'mSv/day',
             color: '#f2b53a',
             area: true,
             points: rad.samples.map((s) => ({ x: s.hour, y: s.doseRate })),
@@ -163,7 +163,7 @@ export function RadiationChart({ plan }: { plan: RoutePlan | null }) {
         ]}
         xTickFormat={(v) => formatMLST(v)}
         yTickFormat={(v) => v.toFixed(1)}
-        hoverFormat={(x, vals) => [formatMLST(x), vals[0].y.toFixed(2) + ' mGy/day']}
+        hoverFormat={(x, vals) => [formatMLST(x), vals[0].y.toFixed(2) + ' mSv/day']}
       />
       <Legend
         series={[

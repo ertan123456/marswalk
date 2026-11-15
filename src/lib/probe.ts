@@ -93,7 +93,7 @@ export function probeAt(
         const rate = radDoseRateAt(evaStartHour);
         readings.push({
           ...base,
-          value: fmt(rate, 2) + ' mGy/day at EVA start',
+          value: fmt(rate, 2) + ' mSv/day at EVA start',
           tone: rate > 1.2 ? 'danger' : rate > 0.8 ? 'caution' : 'nominal',
         });
       } else {

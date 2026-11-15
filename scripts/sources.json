@@ -214,7 +214,13 @@
     "citation": "Hassler, D. M. et al. (2014), Mars' Surface Radiation Environment Measured with the Mars Science Laboratory's Curiosity Rover, Science 343, 1244797",
     "doi": "https://doi.org/10.1126/science.1244797",
     "note": "Baseline surface dose rate and the solar-particle-event scenario are modelled from published RAD results, not ingested telemetry. The SPE is explicitly labelled a scenario in the UI.",
-    "credit": "NASA/JPL-Caltech/SwRI"
+    "credit": "NASA/JPL-Caltech/SwRI",
+    "published_values": {
+      "absorbed_dose_rate_mGy_per_day": 0.21,
+      "dose_equivalent_rate_mSv_per_day": 0.64,
+      "quality_factor": 3.05,
+      "note": "Hassler et al. 2014 report both. The app models the DOSE EQUIVALENT rate, 0.64 mSv/day, because crew exposure limits are written in sieverts. An earlier version carried the 0.64 figure under the mGy/day label, which mixed the two quantities."
+    }
   },
   "weather": {
     "provenance": "MODELED",

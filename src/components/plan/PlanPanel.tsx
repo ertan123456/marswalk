@@ -58,7 +58,7 @@ function Totals() {
   const reservePct = Math.round(suit.reserveFraction * 100);
   const consTone =
     remainingH < 0 ? 'danger' : remainingPct < reservePct ? 'danger' : remainingPct < reservePct + 8 ? 'caution' : 'nominal';
-  const doseTone = plan.doseMgy > 1.5 ? 'danger' : plan.doseMgy > 0.4 ? 'caution' : 'nominal';
+  const doseTone = plan.doseMsv > 1.5 ? 'danger' : plan.doseMsv > 0.4 ? 'caution' : 'nominal';
 
   return (
     <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
@@ -81,7 +81,7 @@ function Totals() {
         tone={consTone}
         hint={t('plan.consumablesHint', { budget: suit.evaBudgetH, reserve: reservePct })}
       />
-      <Readout label={t('plan.dose')} value={plan.doseMgy.toFixed(2)} unit="mGy" tone={doseTone} />
+      <Readout label={t('plan.dose')} value={plan.doseMsv.toFixed(2)} unit="mSv" tone={doseTone} />
       {/*
         The cold, as a number the crew pays. It only appears when it costs
         something, so a midday EVA does not carry a readout reading zero.

@@ -195,7 +195,7 @@ export function HudView() {
             <div className="label !text-caution/80">radiation</div>
             <div className="flex items-baseline justify-end gap-1.5">
               <span className="num text-[26px] text-ink leading-none">{hud.dose.toFixed(2)}</span>
-              <span className="num text-[11px] text-ink-dim">mGy EVA</span>
+              <span className="num text-[11px] text-ink-dim">mSv EVA</span>
             </div>
             <div
               className={
